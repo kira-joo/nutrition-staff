@@ -2,15 +2,16 @@
 
 import { usePathname } from "next/navigation";
 import { AppLink, cn } from "@kira-joo/frontend-toolkit-tailwind";
+import { AppRoute } from "../../common/routes/app-route";
 
 interface NavItem {
-  href: "/" | "/users";
+  href: typeof AppRoute.home | typeof AppRoute.users;
   label: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Home" },
-  { href: "/users", label: "Users" },
+  { href: AppRoute.home, label: "Home" },
+  { href: AppRoute.users, label: "Users" },
 ];
 
 export function Sidebar() {
@@ -23,7 +24,8 @@ export function Sidebar() {
       </div>
       <nav className="flex flex-col gap-1 p-4">
         {NAV_ITEMS.map((item) => {
-          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const isActive =
+            item.href === AppRoute.home ? pathname === AppRoute.home : pathname.startsWith(item.href);
 
           return (
             <AppLink
