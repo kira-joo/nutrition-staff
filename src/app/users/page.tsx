@@ -1,8 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Filter, Pencil, Plus, Trash2, Users } from "lucide-react";
 
-import { AppLink, Badge, CustomTable, type TableColumn } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  AppLink,
+  Badge,
+  CustomButton,
+  CustomTable,
+  PageShell,
+  SearchInput,
+  type TableColumn,
+} from "@kira-joo/frontend-toolkit-tailwind";
 
 import { RouteButton } from "../../components/nav/route-button";
 import { AppRoute } from "../../../common/routes/app-route";
@@ -14,6 +23,18 @@ import { User } from "../../../common/interfaces/user.interface";
 export default function UsersPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>(() => getUsers());
+  const [search, setSearch] = useState("");
+
+  const filteredUsers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return users;
+
+    return users.filter((user) =>
+      [user.name, user.email, user.role, user.status].some((field) =>
+        field.toLowerCase().includes(query)
+      )
+    );
+  }, [users, search]);
 
   const columns: TableColumn<User>[] = [
     {
@@ -46,22 +67,46 @@ export default function UsersPage() {
   ];
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
+    <PageShell
+      surface
+      icon={Users}
+      title="Users"
+      description="Manage staff users"
+      maxWidth="5xl"
+      actions={
+        <RouteButton path={AppRoute.userCreate} leftIcon={Plus}>
+          Add User
+        </RouteButton>
+      }
+      toolbar={
+        <div className="flex flex-wrap items-center gap-2">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search users..."
+            className="max-w-xs"
+          />
+          <CustomButton variant="outline" leftIcon={Filter}>
+            Filter
+          </CustomButton>
+        </div>
+      }
+    >
       <CustomTable<User>
-        data={users}
+        bordered={false}
+        data={filteredUsers}
         columns={columns}
         rowKey="id"
-        emptyMessage="No users yet"
-        title="Users"
-        description="Manage staff users"
-        headerActions={<RouteButton path={AppRoute.userCreate}>Add User</RouteButton>}
+        emptyMessage="No users match your search"
         rowActions={[
           {
             label: "Edit",
+            icon: Pencil,
             onClick: (user) => navigate(AppRoute.userUpdate, { id: user.id }),
           },
           {
             label: "Delete",
+            icon: Trash2,
             destructive: true,
             onClick: (user) => {
               deleteUser(user.id);
@@ -70,6 +115,6 @@ export default function UsersPage() {
           },
         ]}
       />
-    </main>
+    </PageShell>
   );
 }

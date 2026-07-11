@@ -1,4 +1,4 @@
-import { Badge, Card, DateText, DetailsPageShell, ErrorState, InfoRow } from "@kira-joo/frontend-toolkit-tailwind";
+import { Badge, Card, DetailsPageShell, ErrorState, InfoRow } from "@kira-joo/frontend-toolkit-tailwind";
 import { RouteButton } from "../../../components/nav/route-button";
 import { AppRoute } from "../../../../common/routes/app-route";
 import { findUserById } from "../../../../common/data/users.mock";
@@ -25,17 +25,6 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
         <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>
           {user.status}
         </Badge>
-      }
-      meta={
-        <span className="flex flex-wrap items-center gap-2">
-          <span>
-            Created <DateText value={user.createdAt} />
-          </span>
-          <span>·</span>
-          <span>
-            Updated <DateText value={user.updatedAt} />
-          </span>
-        </span>
       }
       backAction={
         <RouteButton path={AppRoute.users} variant="ghost">
