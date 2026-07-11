@@ -72,7 +72,7 @@ export default function UsersPage() {
       icon={Users}
       title="Users"
       description="Manage staff users"
-      maxWidth="5xl"
+      maxWidth="full"
       actions={
         <RouteButton path={AppRoute.userCreate} leftIcon={Plus}>
           Add User

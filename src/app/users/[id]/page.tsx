@@ -19,7 +19,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
 
   if (!user) {
     return (
-      <DetailsPageShell title="User not found" maxWidth="3xl">
+      <DetailsPageShell title="User not found" maxWidth="full">
         <ErrorState description={`No user exists with id "${params.id}".`} />
         <RouteButton path={AppRoute.users} variant="outline">
           Back to Users
@@ -52,7 +52,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
           Edit
         </RouteButton>
       }
-      maxWidth="3xl"
+      maxWidth="full"
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card

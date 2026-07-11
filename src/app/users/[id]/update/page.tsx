@@ -12,7 +12,7 @@ export default function UserUpdatePage({ params }: { params: { id: string } }) {
 
   if (!user) {
     return (
-      <PageShell title="Update User" maxWidth="2xl">
+      <PageShell title="Update User" maxWidth="full">
         <ErrorState
           title="User not found"
           description={`No user exists with id "${params.id}".`}
@@ -30,7 +30,7 @@ export default function UserUpdatePage({ params }: { params: { id: string } }) {
       icon={UserCog}
       title="Update User"
       description="Update staff user information"
-      maxWidth="2xl"
+      maxWidth="full"
       actions={
         <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
           Back to Users
