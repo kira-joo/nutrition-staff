@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { createUser, updateUser } from "../data/users.mock";
 import { Status, UserRole } from "../enums";
 import { User, UserFormValues } from "../interfaces/user.interface";
+import { AppRoute } from "../routes/app-route";
 
 export interface UserFormProps {
   defaultValues?: User;
@@ -22,7 +23,7 @@ export function UserForm({ defaultValues, loading }: UserFormProps) {
   async function onSubmit(values: UserFormValues) {
     defaultValues ? updateUser(defaultValues?.id, values) : createUser(values);
     toast.success("User updated successfully");
-    router.push("/users");
+    router.push(AppRoute.users);
   }
   const fields: FormFieldConfig<UserFormValues>[] = [
     {
