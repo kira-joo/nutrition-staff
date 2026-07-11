@@ -6,6 +6,7 @@ import {
   toast,
   type FormFieldConfig,
 } from "@kira-joo/frontend-toolkit-tailwind";
+import { Briefcase, IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createUser, updateUser } from "../data/users.mock";
 import { Status, UserRole } from "../enums";
@@ -25,7 +26,8 @@ export function UserForm({ defaultValues, loading }: UserFormProps) {
     toast.success("User updated successfully");
     router.push(AppRoute.users);
   }
-  const fields: FormFieldConfig<UserFormValues>[] = [
+
+  const basicInfoFields: FormFieldConfig<UserFormValues>[] = [
     {
       type: FieldType.INPUT,
       name: "name",
@@ -57,6 +59,9 @@ export function UserForm({ defaultValues, loading }: UserFormProps) {
       disabled: loading,
       rules: { required: true },
     },
+  ];
+
+  const employmentFields: FormFieldConfig<UserFormValues>[] = [
     {
       type: FieldType.INPUT,
       name: "salary",
@@ -71,9 +76,31 @@ export function UserForm({ defaultValues, loading }: UserFormProps) {
       disabled: loading,
     },
   ];
+
   return (
     <CustomForm<UserFormValues>
-      fields={fields}
+      sections={[
+        {
+          title: (
+            <span className="flex items-center gap-2">
+              <IdCard className="h-4 w-4" aria-hidden="true" />
+              Basic information
+            </span>
+          ),
+          card: true,
+          fields: basicInfoFields,
+        },
+        {
+          title: (
+            <span className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" aria-hidden="true" />
+              Employment details
+            </span>
+          ),
+          card: true,
+          fields: employmentFields,
+        },
+      ]}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
       loading={loading}
