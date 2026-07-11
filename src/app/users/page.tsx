@@ -1,28 +1,26 @@
 "use client";
 
-import {
-  AppLink,
-  Badge,
-  CustomButton,
-  CustomTable,
-  type TableColumn,
-} from "@kira-joo/frontend-toolkit-tailwind";
+import { useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { AppLink, Badge, CustomTable, type TableColumn } from "@kira-joo/frontend-toolkit-tailwind";
 
-import { getUsers } from "../../../common/data/users.mock";
+import { RouteButton } from "../../components/nav/route-button";
+import { AppRoute } from "../../../common/routes/app-route";
+import { useNavigate } from "../../../common/routes/use-navigate";
+import { deleteUser, getUsers } from "../../../common/data/users.mock";
 import { Status } from "../../../common/enums";
 import { User } from "../../../common/interfaces/user.interface";
 
 export default function UsersPage() {
-  const router = useRouter();
-  const users = getUsers();
+  const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>(() => getUsers());
+
   const columns: TableColumn<User>[] = [
     {
       key: "name",
       header: "Name",
       render: (user) => (
-        <AppLink path="/users/[id]" params={{ id: user.id }}>
+        <AppLink path={AppRoute.userDetails} params={{ id: user.id }}>
           {user.name}
         </AppLink>
       ),
@@ -33,9 +31,7 @@ export default function UsersPage() {
       key: "status",
       header: "Status",
       render: (user) => (
-        <Badge
-          variant={user.status === Status.ACTIVE ? "success" : "secondary"}
-        >
+        <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>
           {user.status}
         </Badge>
       ),
@@ -47,38 +43,32 @@ export default function UsersPage() {
       render: (user) => `$${user.salary.toLocaleString()}`,
     },
     { key: "joinedAt", header: "Joined At" },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (user) => (
-        <div className="flex items-center justify-end gap-2">
-          <CustomButton
-            size="sm"
-            variant="outline"
-            onClick={() => router.push(`/users/${user.id}/update`)}
-          >
-            Edit
-          </CustomButton>
-        </div>
-      ),
-      align: "right",
-    },
   ];
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Users</h1>
-        <CustomButton onClick={() => router.push("/users/create")}>
-          Add User
-        </CustomButton>
-      </div>
-
       <CustomTable<User>
         data={users}
         columns={columns}
         rowKey="id"
         emptyMessage="No users yet"
+        title="Users"
+        description="Manage staff users"
+        headerActions={<RouteButton path={AppRoute.userCreate}>Add User</RouteButton>}
+        rowActions={[
+          {
+            label: "Edit",
+            onClick: (user) => navigate(AppRoute.userUpdate, { id: user.id }),
+          },
+          {
+            label: "Delete",
+            destructive: true,
+            onClick: (user) => {
+              deleteUser(user.id);
+              setUsers(getUsers());
+            },
+          },
+        ]}
       />
     </main>
   );
