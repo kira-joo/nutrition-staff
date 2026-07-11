@@ -70,14 +70,12 @@ export function UserForm({ defaultValues, loading }: UserFormProps) {
       disabled: loading,
     },
   ];
-  const mode = !!defaultValues;
-
   return (
     <CustomForm<UserFormValues>
-      mode={mode ? "edit" : "create"}
       fields={fields}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
+      loading={loading}
       layout="grid"
       columns={2}
     />

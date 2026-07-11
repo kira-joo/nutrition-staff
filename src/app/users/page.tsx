@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AppLink,
   Badge,
   CustomButton,
   CustomTable,
@@ -17,7 +18,15 @@ export default function UsersPage() {
   const router = useRouter();
   const users = getUsers();
   const columns: TableColumn<User>[] = [
-    { key: "name", header: "Name", sortable: true },
+    {
+      key: "name",
+      header: "Name",
+      render: (user) => (
+        <AppLink path="/users/[id]" params={{ id: user.id }}>
+          {user.name}
+        </AppLink>
+      ),
+    },
     { key: "email", header: "Email" },
     { key: "role", header: "Role" },
     {
@@ -43,13 +52,6 @@ export default function UsersPage() {
       header: "Actions",
       render: (user) => (
         <div className="flex items-center justify-end gap-2">
-          <CustomButton
-            size="sm"
-            variant="outline"
-            onClick={() => router.push(`/users/${user.id}`)}
-          >
-            Details
-          </CustomButton>
           <CustomButton
             size="sm"
             variant="outline"
