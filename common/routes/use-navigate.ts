@@ -14,7 +14,7 @@ export function useNavigate() {
     path: TPath,
     params?: Record<string, string | number>,
     query?: Record<string, unknown>,
-    options?: NavigateOptions
+    options?: NavigateOptions,
   ) {
     const href = buildAppHref(path, params, query);
 

@@ -15,10 +15,5 @@ export function RouteButton({ path, params, query, replace, ...buttonProps }: Ro
   const router = useRouter();
   const href = buildAppHref(path, params, query);
 
-  return (
-    <CustomButton
-      onClick={() => (replace ? router.replace(href) : router.push(href))}
-      {...buttonProps}
-    />
-  );
+  return <CustomButton onClick={() => (replace ? router.replace(href) : router.push(href))} {...buttonProps} />;
 }

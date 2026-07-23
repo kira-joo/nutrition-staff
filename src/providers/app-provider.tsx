@@ -11,7 +11,7 @@ import {
 import { Toaster } from "@kira-joo/frontend-toolkit-tailwind";
 import Link from "next/link";
 
-APIConfig.baseURL = "http://localhost:3001/api";
+APIConfig.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 APIConfig.dynamicHeaders = () => ({});
 
 // Next's Link isn't directly assignable to AppLinkConfig.Component (its

@@ -24,8 +24,7 @@ export function Sidebar() {
       </div>
       <nav className="flex flex-col gap-1 p-4">
         {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === AppRoute.home ? pathname === AppRoute.home : pathname.startsWith(item.href);
+          const isActive = item.href === AppRoute.home ? pathname === AppRoute.home : pathname.startsWith(item.href);
 
           return (
             <AppLink
@@ -33,9 +32,7 @@ export function Sidebar() {
               path={item.href}
               className={cn(
                 "rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-slate-100 text-slate-900"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                isActive ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
               )}
             >
               {item.label}

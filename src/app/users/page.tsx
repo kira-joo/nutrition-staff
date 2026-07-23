@@ -1,40 +1,30 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Filter, Pencil, Plus, Trash2, Users } from "lucide-react";
+import { useRef } from "react";
+import { Pencil, Plus, Trash2, Users } from "lucide-react";
 
 import {
   AppLink,
   Badge,
-  CustomButton,
-  CustomTable,
+  FeatureTable,
   PageShell,
-  SearchInput,
+  useErrorHandler,
+  type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
+import { requester } from "@kira-joo/frontend-toolkit-core";
 
 import { RouteButton } from "../../components/nav/route-button";
 import { AppRoute } from "../../../common/routes/app-route";
 import { useNavigate } from "../../../common/routes/use-navigate";
-import { deleteUser, getUsers } from "../../../common/data/users.mock";
+import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
 import { Status } from "../../../common/enums";
 import { User } from "../../../common/interfaces/user.interface";
 
 export default function UsersPage() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>(() => getUsers());
-  const [search, setSearch] = useState("");
-
-  const filteredUsers = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return users;
-
-    return users.filter((user) =>
-      [user.name, user.email, user.role, user.status].some((field) =>
-        field.toLowerCase().includes(query)
-      )
-    );
-  }, [users, search]);
+  const tableRef = useRef<FeatureTableHandle>(null);
+  const { call } = useErrorHandler();
 
   const columns: TableColumn<User>[] = [
     {
@@ -51,11 +41,7 @@ export default function UsersPage() {
     {
       key: "status",
       header: "Status",
-      render: (user) => (
-        <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>
-          {user.status}
-        </Badge>
-      ),
+      render: (user) => <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>,
     },
     {
       key: "salary",
@@ -65,6 +51,11 @@ export default function UsersPage() {
     },
     { key: "joinedAt", header: "Joined At" },
   ];
+
+  async function handleDelete(user: User) {
+    await call(() => requester(deleteUserEndpoint, { params: { id: user.id } }));
+    tableRef.current?.refetch();
+  }
 
   return (
     <PageShell
@@ -78,25 +69,27 @@ export default function UsersPage() {
           Add User
         </RouteButton>
       }
-      toolbar={
-        <div className="flex flex-wrap items-center gap-2">
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search users..."
-            className="max-w-xs"
-          />
-          <CustomButton variant="outline" leftIcon={Filter}>
-            Filter
-          </CustomButton>
-        </div>
-      }
     >
-      <CustomTable<User>
+      <FeatureTable<User>
+        ref={tableRef}
         bordered={false}
-        data={filteredUsers}
+        endpoint={getUsersEndpoint}
         columns={columns}
         rowKey="id"
+        searchable
+        searchPlaceholder="Search users..."
+        paginated
+        pageSizeOptions={[10, 25, 50]}
+        filters={[
+          {
+            key: "status",
+            header: "Status",
+            options: [
+              { label: "Active", value: Status.ACTIVE },
+              { label: "Inactive", value: Status.INACTIVE },
+            ],
+          },
+        ]}
         emptyMessage="No users match your search"
         rowActions={[
           {
@@ -108,10 +101,7 @@ export default function UsersPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (user) => {
-              deleteUser(user.id);
-              setUsers(getUsers());
-            },
+            onClick: handleDelete,
           },
         ]}
       />

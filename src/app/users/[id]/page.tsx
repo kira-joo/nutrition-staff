@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
+import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
   Badge,
   Card,
@@ -8,14 +8,29 @@ import {
   DetailsPageShell,
   ErrorState,
   InfoRow,
+  Spinner,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { RouteButton } from "../../../components/nav/route-button";
-import { AppRoute } from "../../../../common/routes/app-route";
-import { findUserById } from "../../../../common/data/users.mock";
+import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
+import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
 import { Status } from "../../../../common/enums";
+import { AppRoute } from "../../../../common/routes/app-route";
+import { RouteButton } from "../../../components/nav/route-button";
 
 export default function UserDetailsPage({ params }: { params: { id: string } }) {
-  const user = findUserById(params.id);
+  const { data, loading } = useRequesterQuery({
+    endpoint: getUserByIdEndpoint,
+    options: { params: { id: params.id } },
+  });
+
+  if (loading) {
+    return (
+      <DetailsPageShell title="Loading..." maxWidth="full">
+        <Spinner />
+      </DetailsPageShell>
+    );
+  }
+
+  const user = data;
 
   if (!user) {
     return (
@@ -32,23 +47,14 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
     <DetailsPageShell
       icon={UserRound}
       title={user.name}
-      status={
-        <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>
-          {user.status}
-        </Badge>
-      }
+      status={<Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>}
       backAction={
         <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
           Back to Users
         </RouteButton>
       }
       actions={
-        <RouteButton
-          path={AppRoute.userUpdate}
-          params={{ id: user.id }}
-          variant="outline"
-          leftIcon={Pencil}
-        >
+        <RouteButton path={AppRoute.userUpdate} params={{ id: user.id }} variant="outline" leftIcon={Pencil}>
           Edit
         </RouteButton>
       }
@@ -81,11 +87,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
           <div className="flex flex-col gap-3">
             <InfoRow
               label="Status"
-              value={
-                <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>
-                  {user.status}
-                </Badge>
-              }
+              value={<Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>}
             />
             <InfoRow label="Created" value={<DateText value={user.createdAt} />} />
             <InfoRow label="Updated" value={<DateText value={user.updatedAt} />} />

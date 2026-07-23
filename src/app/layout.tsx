@@ -6,8 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Nutrition Staff — User Management",
-  description:
-    "Smoke test app for @kira-joo/frontend-toolkit-core and @kira-joo/frontend-toolkit-tailwind",
+  description: "Smoke test app for @kira-joo/frontend-toolkit-core and @kira-joo/frontend-toolkit-tailwind",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -11,10 +11,5 @@ export interface NavigateButtonProps extends Omit<CustomButtonProps, "onClick"> 
 export function NavigateButton({ href, replace, ...buttonProps }: NavigateButtonProps) {
   const router = useRouter();
 
-  return (
-    <CustomButton
-      onClick={() => (replace ? router.replace(href) : router.push(href))}
-      {...buttonProps}
-    />
-  );
+  return <CustomButton onClick={() => (replace ? router.replace(href) : router.push(href))} {...buttonProps} />;
 }
