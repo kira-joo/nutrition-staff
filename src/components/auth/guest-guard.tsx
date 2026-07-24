@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { AppRoute } from "../../common/routes/app-route";
+import { useEffect, type ReactNode } from "react";
 import { getAccessToken } from "../../common/auth/token-storage";
+import { AppRoute } from "../../common/routes/app-route";
 
 /** Wraps public-only pages (login/signup) — redirects away if already authenticated. */
 export function GuestGuard({ children }: { children: ReactNode }) {
@@ -12,7 +12,7 @@ export function GuestGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (hasToken) {
-      router.replace(AppRoute.users);
+      router.replace(AppRoute.home);
     }
   }, [hasToken, router]);
 
