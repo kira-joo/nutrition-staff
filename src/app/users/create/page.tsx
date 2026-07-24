@@ -1,11 +1,11 @@
 "use client";
 
+import { UserForm } from "@/common/forms/user-form";
+import { AppRoute } from "@/common/routes/app-route";
+import { RouteButton } from "@/components/nav/route-button";
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import { createUserEndpoint } from "../../../../api/user.endpoints";
-import { UserForm } from "../../../../common/forms/user-form";
-import { AppRoute } from "../../../../common/routes/app-route";
-import { RouteButton } from "../../../components/nav/route-button";
 
 export default function UserCreatePage() {
   return (

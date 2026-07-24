@@ -1,5 +1,6 @@
 "use client";
 
+import { RouteButton } from "@/components/nav/route-button";
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
   Badge,
@@ -12,9 +13,8 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
 import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
-import { Status } from "../../../../common/enums";
-import { AppRoute } from "../../../../common/routes/app-route";
-import { RouteButton } from "../../../components/nav/route-button";
+import { Status } from "@/common/enums";
+import { AppRoute } from "@/common/routes/app-route";
 
 export default function UserDetailsPage({ params }: { params: { id: string } }) {
   const { data, loading } = useRequesterQuery({
@@ -54,7 +54,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
         </RouteButton>
       }
       actions={
-        <RouteButton path={AppRoute.userUpdate} params={{ id: user.id }} variant="outline" leftIcon={Pencil}>
+        <RouteButton path={AppRoute.userUpdate} params={{ id: user._id }} variant="outline" leftIcon={Pencil}>
           Edit
         </RouteButton>
       }

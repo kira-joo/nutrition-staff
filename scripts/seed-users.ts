@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
+import { Status, UserRole } from "../src/common/enums";
 import { connectToDatabase } from "../src/server/db/connect";
 import { UserModel } from "../src/server/users/user.schema";
-import { Status, UserRole } from "../common/enums";
 
 const sampleUsers = [
   {

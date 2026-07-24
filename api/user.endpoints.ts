@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { CreateUserDto, UpdateUserDto, User } from "../common/interfaces/user.interface";
+import type { CreateUserDto, UpdateUserDto, User } from "../src/common/interfaces/user.interface";
 
 // Backed by the MongoDB-backed route handlers under src/app/api/users.
 
@@ -25,7 +25,7 @@ export const createUserEndpoint: Endpoint<{ body: CreateUserDto; returnType: Use
 
 export const updateUserEndpoint: Endpoint<{ params: { id: string }; body: UpdateUserDto; returnType: User }> = {
   url: "/users/:id",
-  methodType: MethodType.PATCH,
+  methodType: MethodType.PUT,
 };
 
 export const deleteUserEndpoint: Endpoint<{ params: { id: string }; returnType: void }> = {

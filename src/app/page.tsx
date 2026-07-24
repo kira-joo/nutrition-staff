@@ -1,5 +1,5 @@
+import { AppRoute } from "@/common/routes/app-route";
 import { AppLink } from "@kira-joo/frontend-toolkit-tailwind";
-import { AppRoute } from "../../common/routes/app-route";
 
 export default function HomePage() {
   return (

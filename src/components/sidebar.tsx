@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { AppLink, cn } from "@kira-joo/frontend-toolkit-tailwind";
-import { AppRoute } from "../../common/routes/app-route";
+import { usePathname } from "next/navigation";
+import { AppRoute } from "../common/routes/app-route";
 
 interface NavItem {
   href: typeof AppRoute.home | typeof AppRoute.users;

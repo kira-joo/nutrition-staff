@@ -3,7 +3,7 @@
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Briefcase, IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { createUserEndpoint, updateUserEndpoint } from "../../api/user.endpoints";
+import type { createUserEndpoint, updateUserEndpoint } from "../../../api/user.endpoints";
 import { Status, UserRole } from "../enums";
 import { User, UserFormValues } from "../interfaces/user.interface";
 import { AppRoute } from "../routes/app-route";
@@ -68,7 +68,7 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
       ]}
       defaultValues={defaultValues}
       submitEndpoint={endpoint}
-      submitParams={defaultValues ? { id: defaultValues.id } : undefined}
+      submitParams={defaultValues ? { id: defaultValues._id } : undefined}
       onSuccess={() => {
         toast.success("User saved successfully");
         router.push(AppRoute.users);

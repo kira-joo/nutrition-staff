@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
 import { Pencil, Plus, Trash2, Users } from "lucide-react";
+import { useRef } from "react";
 
+import { requester } from "@kira-joo/frontend-toolkit-core";
 import {
   AppLink,
   Badge,
@@ -12,14 +13,13 @@ import {
   type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { requester } from "@kira-joo/frontend-toolkit-core";
 
-import { RouteButton } from "../../components/nav/route-button";
-import { AppRoute } from "../../../common/routes/app-route";
-import { useNavigate } from "../../../common/routes/use-navigate";
+import { Status } from "@/common/enums";
+import { User } from "@/common/interfaces/user.interface";
+import { AppRoute } from "@/common/routes/app-route";
+import { useNavigate } from "@/common/routes/use-navigate";
+import { RouteButton } from "@/components/nav/route-button";
 import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
-import { Status } from "../../../common/enums";
-import { User } from "../../../common/interfaces/user.interface";
 
 export default function UsersPage() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export default function UsersPage() {
       key: "name",
       header: "Name",
       render: (user) => (
-        <AppLink path={AppRoute.userDetails} params={{ id: user.id }}>
+        <AppLink path={AppRoute.userDetails} params={{ id: user._id }}>
           {user.name}
         </AppLink>
       ),
@@ -53,7 +53,7 @@ export default function UsersPage() {
   ];
 
   async function handleDelete(user: User) {
-    await call(() => requester(deleteUserEndpoint, { params: { id: user.id } }));
+    await call(() => requester(deleteUserEndpoint, { params: { id: user._id } }));
     tableRef.current?.refetch();
   }
 
@@ -75,7 +75,7 @@ export default function UsersPage() {
         bordered={false}
         endpoint={getUsersEndpoint}
         columns={columns}
-        rowKey="id"
+        rowKey="_id"
         searchable
         searchPlaceholder="Search users..."
         paginated
@@ -95,7 +95,7 @@ export default function UsersPage() {
           {
             label: "Edit",
             icon: Pencil,
-            onClick: (user) => navigate(AppRoute.userUpdate, { id: user.id }),
+            onClick: (user) => navigate(AppRoute.userUpdate, { id: user._id }),
           },
           {
             label: "Delete",

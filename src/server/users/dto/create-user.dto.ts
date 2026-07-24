@@ -1,7 +1,7 @@
-import "reflect-metadata";
+import { ToNumber } from "@kira-joo/backend-toolkit-core";
 import { IsEmail, IsEnum, IsNumber, IsOptional, IsString, MinLength } from "class-validator";
-import { Status, UserRole } from "../../../../common/enums";
-import { ToNumber } from "../../decorators/to-number.decorator";
+import "reflect-metadata";
+import { Status, UserRole } from "../../../common/enums";
 
 export class CreateUserDto {
   @IsString()
