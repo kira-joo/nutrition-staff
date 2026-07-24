@@ -1,5 +1,7 @@
 "use client";
 
+import { Status } from "@/common/enums";
+import { AppRoute } from "@/common/routes/app-route";
 import { RouteButton } from "@/components/nav/route-button";
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
@@ -13,11 +15,9 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
 import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
-import { Status } from "@/common/enums";
-import { AppRoute } from "@/common/routes/app-route";
 
 export default function UserDetailsPage({ params }: { params: { id: string } }) {
-  const { data, loading } = useRequesterQuery({
+  const { data: user, loading } = useRequesterQuery({
     endpoint: getUserByIdEndpoint,
     options: { params: { id: params.id } },
   });
@@ -29,9 +29,6 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
       </DetailsPageShell>
     );
   }
-
-  const user = data;
-
   if (!user) {
     return (
       <DetailsPageShell title="User not found" maxWidth="full">

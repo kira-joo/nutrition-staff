@@ -3,7 +3,7 @@
 import { Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useRef } from "react";
 
-import { requester } from "@kira-joo/frontend-toolkit-core";
+import { requester, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
   AppLink,
   Badge,
@@ -20,11 +20,14 @@ import { AppRoute } from "@/common/routes/app-route";
 import { useNavigate } from "@/common/routes/use-navigate";
 import { RouteButton } from "@/components/nav/route-button";
 import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
+import { getRolesEndpoint } from "../../../api/role.endpoints";
 
 export default function UsersPage() {
   const navigate = useNavigate();
   const tableRef = useRef<FeatureTableHandle>(null);
   const { call } = useErrorHandler();
+  const rolesQuery = useRequesterQuery({ endpoint: getRolesEndpoint });
+  const roleFilterOptions = (rolesQuery.data?.data ?? []).map((role) => ({ label: role.name, value: role._id }));
 
   const columns: TableColumn<User>[] = [
     {
@@ -37,7 +40,11 @@ export default function UsersPage() {
       ),
     },
     { key: "email", header: "Email" },
-    { key: "role", header: "Role" },
+    {
+      key: "roles",
+      header: "Roles",
+      render: (user) => (user.roles.length > 0 ? user.roles.map((role) => role.name).join(", ") : "—"),
+    },
     {
       key: "status",
       header: "Status",
@@ -88,6 +95,11 @@ export default function UsersPage() {
               { label: "Active", value: Status.ACTIVE },
               { label: "Inactive", value: Status.INACTIVE },
             ],
+          },
+          {
+            key: "roles",
+            header: "Role",
+            options: roleFilterOptions,
           },
         ]}
         emptyMessage="No users match your search"

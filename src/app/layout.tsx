@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { AppProvider } from "../providers/app-provider";
 import { Sidebar } from "../components/sidebar";
+import { AuthGuard } from "../components/auth/auth-guard";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +17,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AppProvider>
           <div className="flex min-h-screen">
             <Sidebar />
-            <main className="flex-1 overflow-y-auto">{children}</main>
+            <main className="flex-1 overflow-y-auto">
+              <AuthGuard>{children}</AuthGuard>
+            </main>
           </div>
         </AppProvider>
       </body>

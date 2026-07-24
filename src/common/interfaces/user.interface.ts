@@ -1,11 +1,11 @@
 import { Status } from "../enums";
-import type { Role } from "./role.interface";
+import type { RoleSummary } from "./role.interface";
 
 export interface User {
   _id: string;
   name: string;
   email: string;
-  roles: Role[];
+  roles: RoleSummary[];
   status: Status;
   salary: number;
   joinedAt: string;

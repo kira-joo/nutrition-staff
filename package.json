@@ -9,7 +9,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "seed": "node --env-file=.env --import tsx scripts/seed-users.ts",
+    "seed": "npm run seed:roles && node --env-file=.env --import tsx scripts/seed-users.ts",
     "seed:roles": "node --env-file=.env --import tsx scripts/seed-roles-and-permissions.ts"
   },
   "dependencies": {

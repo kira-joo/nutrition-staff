@@ -10,6 +10,7 @@ import {
 } from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { Status } from "../../common/enums";
+import { EntityName } from "../authorization/entity-name.enum";
 
 @MongoSchema({ timestamps: true })
 export class UserSchema {
@@ -43,7 +44,7 @@ export class UserSchema {
   tokenVersion!: number;
 
   /** Authorization roles this user holds. Replaces the old flat UserRole enum field entirely. */
-  @MongoField({ type: [mongoose.Schema.Types.ObjectId], ref: "Role", default: [] })
+  @MongoField({ type: [mongoose.Schema.Types.ObjectId], ref: EntityName.ROLE, default: [] })
   @Filterable()
   @Relation(() => RoleSchema)
   roles!: mongoose.Types.ObjectId[];
@@ -61,4 +62,4 @@ export class UserSchema {
   joinedAt!: string;
 }
 
-export const UserModel = createMongoModel("User", UserSchema);
+export const UserModel = createMongoModel(EntityName.USER, UserSchema);

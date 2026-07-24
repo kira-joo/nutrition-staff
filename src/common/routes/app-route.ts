@@ -1,7 +1,13 @@
 export const AppRoute = {
   home: "/",
+  login: "/login",
+  signup: "/signup",
   users: "/users",
   userCreate: "/users/create",
   userDetails: "/users/[id]",
   userUpdate: "/users/[id]/update",
+  roles: "/roles",
+  roleCreate: "/roles/create",
+  roleDetails: "/roles/[id]",
+  roleUpdate: "/roles/[id]/update",
 } as const;

@@ -40,6 +40,9 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
       optionValue: "_id",
       multiple: true,
       placeholder: "Select roles",
+      // Only active roles can be newly assigned — an inactive role already
+      // assigned to this user still shows up via defaultValues below.
+      query: { isActive: true },
     },
     {
       type: FieldType.SELECT,
