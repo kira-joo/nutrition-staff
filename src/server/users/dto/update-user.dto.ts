@@ -1,7 +1,7 @@
 import { ToNumber } from "@kira-joo/backend-toolkit-core";
-import { IsEmail, IsEnum, IsNumber, IsOptional, IsString, MinLength } from "class-validator";
+import { IsEmail, IsMongoId, IsNumber, IsEnum, IsOptional, IsString, MinLength } from "class-validator";
 import "reflect-metadata";
-import { Status, UserRole } from "../../../common/enums";
+import { Status } from "../../../common/enums";
 
 export class UpdateUserDto {
   @IsOptional()
@@ -14,8 +14,8 @@ export class UpdateUserDto {
   email?: string;
 
   @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+  @IsMongoId({ each: true })
+  roles?: string[];
 
   @IsOptional()
   @IsEnum(Status)

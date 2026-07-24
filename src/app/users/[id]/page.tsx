@@ -71,7 +71,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
         >
           <div className="flex flex-col gap-3">
             <InfoRow label="Email" value={user.email} />
-            <InfoRow label="Role" value={user.role} />
+            <InfoRow label="Role" value={user.roles.map((role) => role.name).join(", ") || "—"} />
             <InfoRow label="Salary" value={`$${user.salary.toLocaleString()}`} />
             <InfoRow label="Joined At" value={user.joinedAt} />
           </div>

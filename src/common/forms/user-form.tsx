@@ -3,8 +3,9 @@
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Briefcase, IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getRolesEndpoint } from "../../../api/role.endpoints";
 import type { createUserEndpoint, updateUserEndpoint } from "../../../api/user.endpoints";
-import { Status, UserRole } from "../enums";
+import { Status } from "../enums";
 import { User, UserFormValues } from "../interfaces/user.interface";
 import { AppRoute } from "../routes/app-route";
 
@@ -31,11 +32,14 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
       rules: { required: true },
     },
     {
-      type: FieldType.SELECT,
-      name: "role",
-      label: "Role",
-      options: Object.values(UserRole).map((v) => ({ label: v, value: v })),
-      rules: { required: true },
+      type: FieldType.FEATURE_COMBOBOX,
+      name: "roles",
+      label: "Roles",
+      endpoint: getRolesEndpoint,
+      optionLabel: "name",
+      optionValue: "_id",
+      multiple: true,
+      placeholder: "Select roles",
     },
     {
       type: FieldType.SELECT,
@@ -66,7 +70,7 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
         { title: "Basic information", icon: IdCard, fields: basicInfoFields },
         { title: "Employment details", icon: Briefcase, fields: employmentFields },
       ]}
-      defaultValues={defaultValues}
+      defaultValues={defaultValues ? { ...defaultValues, roles: defaultValues.roles.map((role) => role._id) } : undefined}
       submitEndpoint={endpoint}
       submitParams={defaultValues ? { id: defaultValues._id } : undefined}
       onSuccess={() => {

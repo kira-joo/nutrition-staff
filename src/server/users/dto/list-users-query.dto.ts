@@ -1,6 +1,6 @@
 import { BaseFindQueryDto } from "@kira-joo/backend-toolkit-core";
-import { IsEnum, IsOptional } from "class-validator";
-import { Status, UserRole } from "../../../common/enums";
+import { IsEnum, IsMongoId, IsOptional } from "class-validator";
+import { Status } from "../../../common/enums";
 
 export class ListUsersQueryDto extends BaseFindQueryDto {
   @IsOptional()
@@ -8,6 +8,6 @@ export class ListUsersQueryDto extends BaseFindQueryDto {
   status?: Status;
 
   @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+  @IsMongoId()
+  roles?: string;
 }
