@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { CustomButton, type CustomButtonProps } from "@kira-joo/frontend-toolkit-tailwind";
+import { useRouter } from "next/navigation";
 
 export interface NavigateButtonProps extends Omit<CustomButtonProps, "onClick"> {
   href: string;

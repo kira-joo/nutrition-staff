@@ -1,10 +1,5 @@
 "use client";
 
-import { Status } from "@/common/enums";
-import { AppRoute } from "@/common/routes/app-route";
-import { RouteButton } from "@/components/nav/route-button";
-import { AppPermission } from "@/common/authorization/app-permission";
-import { EntityName } from "@/common/authorization/entity-name.enum";
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
   Badge,
@@ -16,6 +11,11 @@ import {
   QueryState,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
+import { AppPermission } from "src/common/authorization/app-permission";
+import { EntityName } from "src/common/authorization/entity-name.enum";
+import { Status } from "src/common/enums";
+import { AppRoute } from "src/common/routes/app-route";
+import { RouteButton } from "src/components/nav/route-button";
 import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
 
 export default function UserDetailsPage({ params }: { params: { id: string } }) {

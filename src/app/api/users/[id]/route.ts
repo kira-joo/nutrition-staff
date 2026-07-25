@@ -1,8 +1,8 @@
-import { createDeleteRoute, createGetRoute, createPutRoute } from "@/server/route-factories";
-import { FindUserParamsDto } from "@/server/users/dto/find-user-params.dto";
-import { UpdateUserDto } from "@/server/users/dto/update-user.dto";
-import { userRepository } from "@/server/users/users.repository";
-import { AppPermission } from "@/server/authorization/authorization-registry";
+import { AppPermission } from "src/server/core/authorization/authorization-registry";
+import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { FindUserParamsDto } from "src/server/users/dto/find-user-params.dto";
+import { UpdateUserDto } from "src/server/users/dto/update-user.dto";
+import { userRepository } from "src/server/users/users.repository";
 
 export const GET = createGetRoute({
   params: FindUserParamsDto,

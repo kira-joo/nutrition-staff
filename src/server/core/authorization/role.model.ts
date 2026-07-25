@@ -1,5 +1,5 @@
 import { createPermissionModel, createRoleModel } from "@kira-joo/backend-toolkit-mongoose";
-import { EntityName } from "@/common/authorization/entity-name.enum";
+import { EntityName } from "src/common/authorization/entity-name.enum";
 
 // EntityName.ROLE/PERMISSION are passed explicitly as the Mongoose model
 // name (rather than relying on createRoleModel()/createPermissionModel()'s

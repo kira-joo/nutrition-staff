@@ -1,8 +1,8 @@
-import { createDeleteRoute, createGetRoute, createPutRoute } from "@/server/route-factories";
-import { FindRoleParamsDto } from "@/server/authorization/dto/find-role-params.dto";
-import { UpdateRoleDto } from "@/server/authorization/dto/update-role.dto";
-import { roleRepository } from "@/server/authorization/role.repository";
-import { AppPermission } from "@/server/authorization/authorization-registry";
+import { AppPermission } from "src/server/core/authorization/authorization-registry";
+import { FindRoleParamsDto } from "src/server/core/authorization/dto/find-role-params.dto";
+import { UpdateRoleDto } from "src/server/core/authorization/dto/update-role.dto";
+import { roleRepository } from "src/server/core/authorization/role.repository";
+import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 
 export const GET = createGetRoute({
   params: FindRoleParamsDto,

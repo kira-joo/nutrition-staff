@@ -4,12 +4,12 @@ import { AppLink, Card, CustomForm, FieldType, type FormFieldConfig } from "@kir
 import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { FieldValues } from "react-hook-form";
+import { setAccessToken } from "src/common/auth/token-storage";
+import type { SignupDto } from "src/common/interfaces/auth.interface";
+import { AppRoute } from "src/common/routes/app-route";
+import { GuestGuard } from "src/components/auth/guest-guard";
+import { PasswordInput } from "src/components/auth/password-input";
 import { signupEndpoint } from "../../../api/auth.endpoints";
-import { AppRoute } from "@/common/routes/app-route";
-import { setAccessToken } from "@/common/auth/token-storage";
-import { GuestGuard } from "@/components/auth/guest-guard";
-import { PasswordInput } from "@/components/auth/password-input";
-import type { SignupDto } from "@/common/interfaces/auth.interface";
 
 interface SignupFormValues extends SignupDto {
   confirmPassword: string;
@@ -22,7 +22,11 @@ const fields: FormFieldConfig<SignupFormValues>[] = [
     type: FieldType.CUSTOM,
     name: "password",
     label: "Password",
-    rules: { required: true, minLength: { value: 8, message: "Password must be at least 8 characters" }, deps: ["confirmPassword"] },
+    rules: {
+      required: true,
+      minLength: { value: 8, message: "Password must be at least 8 characters" },
+      deps: ["confirmPassword"],
+    },
     render: ({ field, error }) => <PasswordInput field={field} label="Password" error={error} />,
   },
   {
@@ -31,8 +35,7 @@ const fields: FormFieldConfig<SignupFormValues>[] = [
     label: "Confirm password",
     rules: {
       required: true,
-      validate: (value: string, formValues: FieldValues) =>
-        value === formValues.password || "Passwords do not match",
+      validate: (value: string, formValues: FieldValues) => value === formValues.password || "Passwords do not match",
     },
     render: ({ field, error }) => <PasswordInput field={field} label="Confirm password" error={error} />,
   },

@@ -15,17 +15,17 @@ import {
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
 
-import { Status } from "@/common/enums";
-import { User } from "@/common/interfaces/user.interface";
-import { AppRoute } from "@/common/routes/app-route";
-import { useNavigate } from "@/common/routes/use-navigate";
-import { RouteButton } from "@/components/nav/route-button";
-import { AppPermission } from "@/common/authorization/app-permission";
-import { usePermissions } from "@/common/auth/use-permissions";
-import { ENTITY_PLURAL_LABELS } from "@/common/authorization/entity-labels";
-import { EntityName } from "@/common/authorization/entity-name.enum";
-import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
+import { usePermissions } from "src/common/auth/use-permissions";
+import { AppPermission } from "src/common/authorization/app-permission";
+import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
+import { EntityName } from "src/common/authorization/entity-name.enum";
+import { Status } from "src/common/enums";
+import { User } from "src/common/interfaces/user.interface";
+import { AppRoute } from "src/common/routes/app-route";
+import { useNavigate } from "src/common/routes/use-navigate";
+import { RouteButton } from "src/components/nav/route-button";
 import { getRolesEndpoint } from "../../../api/role.endpoints";
+import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
 
 export default function UsersPage() {
   const navigate = useNavigate();

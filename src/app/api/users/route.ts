@@ -1,8 +1,8 @@
-import { createGetRoute, createPostRoute } from "@/server/route-factories";
-import { CreateUserDto } from "@/server/users/dto/create-user.dto";
-import { ListUsersQueryDto } from "@/server/users/dto/list-users-query.dto";
-import { userRepository } from "@/server/users/users.repository";
-import { AppPermission } from "@/server/authorization/authorization-registry";
+import { AppPermission } from "src/server/core/authorization/authorization-registry";
+import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
+import { CreateUserDto } from "src/server/users/dto/create-user.dto";
+import { ListUsersQueryDto } from "src/server/users/dto/list-users-query.dto";
+import { userRepository } from "src/server/users/users.repository";
 
 export const GET = createGetRoute({
   query: ListUsersQueryDto,

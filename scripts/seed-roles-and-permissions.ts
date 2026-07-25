@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
 import { syncPermissions } from "@kira-joo/backend-toolkit-mongoose";
-import { connectToDatabase } from "../src/server/db/connect";
-import { PermissionModel, RoleModel } from "../src/server/authorization/role.model";
-import { authorization, AppPermission } from "../src/server/authorization/authorization-registry";
+import mongoose from "mongoose";
+import { AppPermission, authorization } from "../src/server/core/authorization/authorization-registry";
+import { PermissionModel, RoleModel } from "../src/server/core/authorization/role.model";
+import { connectToDatabase } from "../src/server/core/db/connect";
 import { UserModel } from "../src/server/users/user.schema";
 
 interface RoleDefinition {
@@ -27,7 +27,12 @@ const ROLE_DEFINITIONS: RoleDefinition[] = [
   {
     name: "manager",
     grantsAll: false,
-    permissionKeys: [AppPermission.USER.READ, AppPermission.USER.READ_ONE, AppPermission.USER.UPDATE, AppPermission.ROLE.READ],
+    permissionKeys: [
+      AppPermission.USER.READ,
+      AppPermission.USER.READ_ONE,
+      AppPermission.USER.UPDATE,
+      AppPermission.ROLE.READ,
+    ],
   },
   { name: "employee", grantsAll: false, permissionKeys: [] },
 ];
@@ -57,11 +62,13 @@ async function seedRoles(): Promise<Map<string, mongoose.Types.ObjectId>> {
     const role = await RoleModel.findOneAndUpdate(
       { name: definition.name },
       { $set: { grantsAll: definition.grantsAll, permissions: permissionIds } },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     roleIdByName.set(definition.name, role._id);
-    console.log(`[roles] upserted "${definition.name}" (grantsAll=${definition.grantsAll}, ${permissionIds.length} permissions)`);
+    console.log(
+      `[roles] upserted "${definition.name}" (grantsAll=${definition.grantsAll}, ${permissionIds.length} permissions)`,
+    );
   }
 
   return roleIdByName;
@@ -80,26 +87,32 @@ async function migrateExistingUsers(roleIdByName: Map<string, mongoose.Types.Obj
     const roleId = roleName ? roleIdByName.get(roleName) : undefined;
 
     if (!roleId) {
-      console.warn(`[migrate] user ${rawUser._id} has no mappable legacy role ("${legacyRole}") — left with empty roles`);
+      console.warn(
+        `[migrate] user ${rawUser._id} has no mappable legacy role ("${legacyRole}") — left with empty roles`,
+      );
       continue;
     }
 
     await UserModel.collection.updateOne(
       { _id: rawUser._id },
-      { $set: { roles: [roleId], tokenVersion: 1 }, $unset: { role: "" } }
+      { $set: { roles: [roleId], tokenVersion: 1 }, $unset: { role: "" } },
     );
     migrated++;
   }
 
   const total = await UserModel.countDocuments({});
   const withRoles = await UserModel.countDocuments({ "roles.0": { $exists: true } });
-  console.log(`[migrate] ${migrated} users migrated. Verification: ${withRoles}/${total} users now have at least one role.`);
+  console.log(
+    `[migrate] ${migrated} users migrated. Verification: ${withRoles}/${total} users now have at least one role.`,
+  );
 }
 
 async function main() {
   await connectToDatabase();
   const syncResult = await syncPermissions({ model: PermissionModel, definitions: authorization.definitions });
-  console.log(`[permissions] synced: ${syncResult.created.length} created, ${syncResult.skipped.length} already existed`);
+  console.log(
+    `[permissions] synced: ${syncResult.created.length} created, ${syncResult.skipped.length} already existed`,
+  );
 
   const roleIdByName = await seedRoles();
   await migrateExistingUsers(roleIdByName);

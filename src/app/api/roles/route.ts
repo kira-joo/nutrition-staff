@@ -1,8 +1,8 @@
-import { createGetRoute, createPostRoute } from "@/server/route-factories";
-import { roleRepository } from "@/server/authorization/role.repository";
-import { AppPermission } from "@/server/authorization/authorization-registry";
-import { CreateRoleDto } from "@/server/authorization/dto/create-role.dto";
-import { ListRolesQueryDto } from "@/server/authorization/dto/list-roles-query.dto";
+import { AppPermission } from "src/server/core/authorization/authorization-registry";
+import { CreateRoleDto } from "src/server/core/authorization/dto/create-role.dto";
+import { ListRolesQueryDto } from "src/server/core/authorization/dto/list-roles-query.dto";
+import { roleRepository } from "src/server/core/authorization/role.repository";
+import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
 
 export const GET = createGetRoute({
   query: ListRolesQueryDto,

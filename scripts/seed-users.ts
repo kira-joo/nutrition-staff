@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
 import { hashPassword } from "@kira-joo/backend-toolkit-next";
+import mongoose from "mongoose";
 import { Status } from "../src/common/enums";
-import { connectToDatabase } from "../src/server/db/connect";
+import { RoleModel } from "../src/server/core/authorization/role.model";
+import { connectToDatabase } from "../src/server/core/db/connect";
 import { UserModel } from "../src/server/users/user.schema";
-import { RoleModel } from "../src/server/authorization/role.model";
 
 // Dev-only password shared by every seeded sample user, so there's a way to
 // log in locally right after seeding. Never use this literal value outside
@@ -13,11 +13,46 @@ const DEV_PASSWORD = "Passw0rd!";
 // Requires `npm run seed:roles` to have already run at least once, so these
 // role names resolve to real Role documents.
 const SAMPLE_USERS = [
-  { name: "Ava Thompson", email: "ava.thompson@example.com", roleName: "admin", status: Status.ACTIVE, salary: 95000, joinedAt: "2021-03-15" },
-  { name: "Liam Chen", email: "liam.chen@example.com", roleName: "manager", status: Status.ACTIVE, salary: 78000, joinedAt: "2022-01-10" },
-  { name: "Sofia Martinez", email: "sofia.martinez@example.com", roleName: "employee", status: Status.ACTIVE, salary: 54000, joinedAt: "2022-08-22" },
-  { name: "Noah Williams", email: "noah.williams@example.com", roleName: "hr", status: Status.INACTIVE, salary: 61000, joinedAt: "2020-11-05" },
-  { name: "Emma Johnson", email: "emma.johnson@example.com", roleName: "employee", status: Status.ACTIVE, salary: 58000, joinedAt: "2023-02-01" },
+  {
+    name: "Ava Thompson",
+    email: "ava.thompson@example.com",
+    roleName: "admin",
+    status: Status.ACTIVE,
+    salary: 95000,
+    joinedAt: "2021-03-15",
+  },
+  {
+    name: "Liam Chen",
+    email: "liam.chen@example.com",
+    roleName: "manager",
+    status: Status.ACTIVE,
+    salary: 78000,
+    joinedAt: "2022-01-10",
+  },
+  {
+    name: "Sofia Martinez",
+    email: "sofia.martinez@example.com",
+    roleName: "employee",
+    status: Status.ACTIVE,
+    salary: 54000,
+    joinedAt: "2022-08-22",
+  },
+  {
+    name: "Noah Williams",
+    email: "noah.williams@example.com",
+    roleName: "hr",
+    status: Status.INACTIVE,
+    salary: 61000,
+    joinedAt: "2020-11-05",
+  },
+  {
+    name: "Emma Johnson",
+    email: "emma.johnson@example.com",
+    roleName: "employee",
+    status: Status.ACTIVE,
+    salary: 58000,
+    joinedAt: "2023-02-01",
+  },
 ];
 
 async function seed() {

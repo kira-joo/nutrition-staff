@@ -1,8 +1,5 @@
 "use client";
 
-import { RouteButton } from "@/components/nav/route-button";
-import { AppPermission } from "@/common/authorization/app-permission";
-import { EntityName } from "@/common/authorization/entity-name.enum";
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
   Badge,
@@ -14,8 +11,11 @@ import {
   QueryState,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, ArrowLeft, Pencil, ShieldCheck } from "lucide-react";
+import { AppPermission } from "src/common/authorization/app-permission";
+import { EntityName } from "src/common/authorization/entity-name.enum";
+import { AppRoute } from "src/common/routes/app-route";
+import { RouteButton } from "src/components/nav/route-button";
 import { getRoleByIdEndpoint } from "../../../../api/role.endpoints";
-import { AppRoute } from "@/common/routes/app-route";
 
 export default function RoleDetailsPage({ params }: { params: { id: string } }) {
   const roleQuery = useRequesterQuery({
@@ -37,7 +37,9 @@ export default function RoleDetailsPage({ params }: { params: { id: string } }) 
         <DetailsPageShell
           icon={ShieldCheck}
           title={role.name}
-          status={<Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>}
+          status={
+            <Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>
+          }
           backAction={
             <RouteButton path={AppRoute.roles} variant="ghost" leftIcon={ArrowLeft}>
               Back to Roles
@@ -88,7 +90,11 @@ export default function RoleDetailsPage({ params }: { params: { id: string } }) 
               <div className="flex flex-col gap-3">
                 <InfoRow
                   label="Status"
-                  value={<Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>}
+                  value={
+                    <Badge variant={role.isActive ? "success" : "secondary"}>
+                      {role.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  }
                 />
                 <InfoRow label="Created" value={<DateText value={role.createdAt} />} />
                 <InfoRow label="Updated" value={<DateText value={role.updatedAt} />} />

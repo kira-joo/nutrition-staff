@@ -1,7 +1,7 @@
 import type { AuthUser } from "@kira-joo/backend-toolkit-core";
 import { buildRolePopulateRelations, resolveUserRoles } from "@kira-joo/backend-toolkit-mongoose";
-import { userRepository } from "@/server/users/users.repository";
-import { Status } from "@/common/enums";
+import { Status } from "src/common/enums";
+import { userRepository } from "src/server/users/users.repository";
 
 /**
  * The app's ResolveUserFn, wired into configureNextBackendToolkit's auth

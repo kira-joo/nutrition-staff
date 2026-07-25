@@ -1,9 +1,9 @@
 import { UnauthorizedError } from "@kira-joo/backend-toolkit-core";
 import { comparePassword, signAuthToken } from "@kira-joo/backend-toolkit-next";
-import { createPostRoute } from "@/server/route-factories";
-import { resolveUser } from "@/server/auth/resolve-user";
-import { LoginDto } from "@/server/auth/dto/login.dto";
-import { UserModel } from "@/server/users/user.schema";
+import { LoginDto } from "src/server/core/auth/dto/login.dto";
+import { resolveUser } from "src/server/core/auth/resolve-user";
+import { createPostRoute } from "src/server/core/route-factories";
+import { UserModel } from "src/server/users/user.schema";
 
 export const POST = createPostRoute({
   body: LoginDto,

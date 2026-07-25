@@ -1,12 +1,12 @@
 "use client";
 
-import { UserForm } from "@/common/forms/user-form";
-import { AppRoute } from "@/common/routes/app-route";
-import { RouteButton } from "@/components/nav/route-button";
-import { EntityName } from "@/common/authorization/entity-name.enum";
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { ArrowLeft, UserCog } from "lucide-react";
+import { EntityName } from "src/common/authorization/entity-name.enum";
+import { UserForm } from "src/common/forms/user-form";
+import { AppRoute } from "src/common/routes/app-route";
+import { RouteButton } from "src/components/nav/route-button";
 import { getUserByIdEndpoint, updateUserEndpoint } from "../../../../../api/user.endpoints";
 
 export default function UserUpdatePage({ params }: { params: { id: string } }) {

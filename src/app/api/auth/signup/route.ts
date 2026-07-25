@@ -1,9 +1,9 @@
 import { hashPassword, signAuthToken } from "@kira-joo/backend-toolkit-next";
-import { createPostRoute } from "@/server/route-factories";
-import { resolveUser } from "@/server/auth/resolve-user";
-import { SignupDto } from "@/server/auth/dto/signup.dto";
-import { userRepository } from "@/server/users/users.repository";
-import { Status } from "@/common/enums";
+import { Status } from "src/common/enums";
+import { SignupDto } from "src/server/core/auth/dto/signup.dto";
+import { resolveUser } from "src/server/core/auth/resolve-user";
+import { createPostRoute } from "src/server/core/route-factories";
+import { userRepository } from "src/server/users/users.repository";
 
 // Public self-service signup. New users get zero roles (secure by default —
 // an admin assigns roles afterward via the Users management UI) and are

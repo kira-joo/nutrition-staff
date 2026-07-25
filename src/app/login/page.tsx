@@ -3,12 +3,12 @@
 import { AppLink, Card, CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { setAccessToken } from "src/common/auth/token-storage";
+import type { LoginDto } from "src/common/interfaces/auth.interface";
+import { AppRoute } from "src/common/routes/app-route";
+import { GuestGuard } from "src/components/auth/guest-guard";
+import { PasswordInput } from "src/components/auth/password-input";
 import { loginEndpoint } from "../../../api/auth.endpoints";
-import { AppRoute } from "@/common/routes/app-route";
-import { setAccessToken } from "@/common/auth/token-storage";
-import { GuestGuard } from "@/components/auth/guest-guard";
-import { PasswordInput } from "@/components/auth/password-input";
-import type { LoginDto } from "@/common/interfaces/auth.interface";
 
 const fields: FormFieldConfig<LoginDto>[] = [
   { type: FieldType.INPUT, name: "email", label: "Email", inputType: "email", rules: { required: true } },

@@ -11,4 +11,4 @@
 // (see the phase report) — if a future dependency bump makes that no longer
 // negligible, replace this re-export with a small hand-written literal
 // object instead of importing the live registry value.
-export { AppPermission } from "../../server/authorization/authorization-registry";
+export { AppPermission } from "../../server/core/authorization/authorization-registry";

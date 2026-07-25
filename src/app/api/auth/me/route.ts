@@ -1,4 +1,4 @@
-import { createGetRoute } from "@/server/route-factories";
+import { createGetRoute } from "src/server/core/route-factories";
 
 // No repository call needed — `user` is already fully resolved (roles +
 // permissions populated) by authenticateRequest before this handler runs.

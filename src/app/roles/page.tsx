@@ -1,12 +1,12 @@
 "use client";
 
-import { Pencil, Plus, Trash2, ShieldCheck } from "lucide-react";
+import { Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { useRef } from "react";
 
 import { useRequesterMutation } from "@kira-joo/frontend-toolkit-core";
 import {
-  Badge,
   AppLink,
+  Badge,
   FeatureTable,
   PageShell,
   PermissionGuard,
@@ -14,14 +14,14 @@ import {
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
 
-import { Role } from "@/common/interfaces/role.interface";
-import { AppRoute } from "@/common/routes/app-route";
-import { useNavigate } from "@/common/routes/use-navigate";
-import { RouteButton } from "@/components/nav/route-button";
-import { AppPermission } from "@/common/authorization/app-permission";
-import { usePermissions } from "@/common/auth/use-permissions";
-import { ENTITY_PLURAL_LABELS } from "@/common/authorization/entity-labels";
-import { EntityName } from "@/common/authorization/entity-name.enum";
+import { usePermissions } from "src/common/auth/use-permissions";
+import { AppPermission } from "src/common/authorization/app-permission";
+import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
+import { EntityName } from "src/common/authorization/entity-name.enum";
+import { Role } from "src/common/interfaces/role.interface";
+import { AppRoute } from "src/common/routes/app-route";
+import { useNavigate } from "src/common/routes/use-navigate";
+import { RouteButton } from "src/components/nav/route-button";
 import { deleteRoleEndpoint, getRolesEndpoint } from "../../../api/role.endpoints";
 
 export default function RolesPage() {
@@ -57,7 +57,9 @@ export default function RolesPage() {
     {
       key: "isActive",
       header: "Status",
-      render: (role) => <Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>,
+      render: (role) => (
+        <Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>
+      ),
     },
   ];
 

@@ -5,13 +5,13 @@ import { Briefcase, IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getRolesEndpoint } from "../../../api/role.endpoints";
 import type { createUserEndpoint, updateUserEndpoint } from "../../../api/user.endpoints";
+import { usePermissions } from "../auth/use-permissions";
+import { AppPermission } from "../authorization/app-permission";
+import { ENTITY_PLURAL_LABELS } from "../authorization/entity-labels";
+import { EntityName } from "../authorization/entity-name.enum";
 import { Status } from "../enums";
 import { User, UserFormValues } from "../interfaces/user.interface";
 import { AppRoute } from "../routes/app-route";
-import { AppPermission } from "../authorization/app-permission";
-import { usePermissions } from "../auth/use-permissions";
-import { ENTITY_PLURAL_LABELS } from "../authorization/entity-labels";
-import { EntityName } from "../authorization/entity-name.enum";
 
 export interface UserFormProps {
   defaultValues?: User;
@@ -90,7 +90,9 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
         { title: "Basic information", icon: IdCard, fields: basicInfoFields },
         { title: "Employment details", icon: Briefcase, fields: employmentFields },
       ]}
-      defaultValues={defaultValues ? { ...defaultValues, roles: defaultValues.roles.map((role) => role._id) } : undefined}
+      defaultValues={
+        defaultValues ? { ...defaultValues, roles: defaultValues.roles.map((role) => role._id) } : undefined
+      }
       submitEndpoint={endpoint}
       submitParams={defaultValues ? { id: defaultValues._id } : undefined}
       onSuccess={() => {

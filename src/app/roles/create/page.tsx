@@ -1,10 +1,10 @@
 "use client";
 
-import { RoleForm } from "@/common/forms/role-form";
-import { AppRoute } from "@/common/routes/app-route";
-import { RouteButton } from "@/components/nav/route-button";
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { ArrowLeft, ShieldPlus } from "lucide-react";
+import { RoleForm } from "src/common/forms/role-form";
+import { AppRoute } from "src/common/routes/app-route";
+import { RouteButton } from "src/components/nav/route-button";
 import { createRoleEndpoint } from "../../../../api/role.endpoints";
 
 export default function RoleCreatePage() {
