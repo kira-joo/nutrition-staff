@@ -10,7 +10,7 @@ import {
 } from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { Status } from "../../common/enums";
-import { EntityName } from "../authorization/entity-name.enum";
+import { EntityName } from "@/common/authorization/entity-name.enum";
 
 @MongoSchema({ timestamps: true })
 export class UserSchema {

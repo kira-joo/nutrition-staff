@@ -1,24 +1,33 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { QueryClient } from "@tanstack/react-query";
 import {
   APIConfig,
   AppLinkConfig,
+  AuthUserProvider,
   ToolkitProviders,
+  createToolkitQueryClient,
   type AppLinkComponentProps,
 } from "@kira-joo/frontend-toolkit-core";
-import { Toaster } from "@kira-joo/frontend-toolkit-tailwind";
+import { Toaster, showApiErrorToast } from "@kira-joo/frontend-toolkit-tailwind";
 import Link from "next/link";
 import { AppRoute } from "../common/routes/app-route";
 import { getAccessToken, removeAccessToken } from "../common/auth/token-storage";
+import { usePermissions } from "../common/auth/use-permissions";
 
 // Module-level (not per-component-mount) on purpose — this is a client-only
 // SPA-style app (every data-fetching page is "use client", nothing fetches
 // via this client during server rendering), and onUnauthorized (defined
 // below, outside of any React component) needs a stable reference to call
-// .clear() on when a request comes back 401.
-export const queryClient = new QueryClient();
+// .clear() on when a request comes back 401. createToolkitQueryClient also
+// wires the shared retry policy (no retry on deterministic 4xx, one retry
+// for network/5xx queries, no retry for mutations) and a single global error
+// toast via QueryCache/MutationCache — not APIConfig.onError, which fires
+// once per raw fetch attempt (including every retry) and would double-toast
+// a retried request. QueryCache/MutationCache fire exactly once per query or
+// mutation settling, regardless of retries or how many components observe
+// the same query key.
+export const queryClient = createToolkitQueryClient({ onError: showApiErrorToast });
 
 APIConfig.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 
@@ -54,10 +63,19 @@ export interface AppProviderProps {
   children: ReactNode;
 }
 
+// Bridges `usePermissions()` (which needs QueryClient context) into
+// AuthUserProvider's context, so `PermissionGuard` can resolve the current
+// user implicitly instead of every call site threading it through manually.
+// Must render inside ToolkitProviders, not alongside it in AppProvider.
+function PermissionContextBridge({ children }: { children: ReactNode }) {
+  const { user } = usePermissions();
+  return <AuthUserProvider user={user}>{children}</AuthUserProvider>;
+}
+
 export function AppProvider({ children }: AppProviderProps) {
   return (
     <ToolkitProviders client={queryClient}>
-      {children}
+      <PermissionContextBridge>{children}</PermissionContextBridge>
       <Toaster />
     </ToolkitProviders>
   );

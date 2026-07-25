@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { AppProvider } from "../providers/app-provider";
-import { Sidebar } from "../components/sidebar";
 import { AuthGuard } from "../components/auth/auth-guard";
+import { Sidebar } from "../components/sidebar";
+import { AppProvider } from "../providers/app-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nutrition Staff — User Management",
+  title: "Nutrition Staff",
   description: "Smoke test app for @kira-joo/frontend-toolkit-core and @kira-joo/frontend-toolkit-tailwind",
 };
 

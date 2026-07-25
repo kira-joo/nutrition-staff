@@ -1,6 +1,6 @@
 "use client";
 
-import { AppLink, Card, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { AppLink, Card, CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { FieldValues } from "react-hook-form";
@@ -65,9 +65,6 @@ export default function SignupPage() {
               onSuccess={(data) => {
                 setAccessToken(data.accessToken);
                 router.push(AppRoute.users);
-              }}
-              onError={(error) => {
-                toast.error(error.message);
               }}
             />
           </Card>

@@ -3,13 +3,13 @@
 import { Pencil, Plus, Trash2, ShieldCheck } from "lucide-react";
 import { useRef } from "react";
 
-import { requester } from "@kira-joo/frontend-toolkit-core";
+import { useRequesterMutation } from "@kira-joo/frontend-toolkit-core";
 import {
   Badge,
   AppLink,
   FeatureTable,
   PageShell,
-  useErrorHandler,
+  PermissionGuard,
   type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
@@ -18,12 +18,21 @@ import { Role } from "@/common/interfaces/role.interface";
 import { AppRoute } from "@/common/routes/app-route";
 import { useNavigate } from "@/common/routes/use-navigate";
 import { RouteButton } from "@/components/nav/route-button";
+import { AppPermission } from "@/common/authorization/app-permission";
+import { usePermissions } from "@/common/auth/use-permissions";
+import { ENTITY_PLURAL_LABELS } from "@/common/authorization/entity-labels";
+import { EntityName } from "@/common/authorization/entity-name.enum";
 import { deleteRoleEndpoint, getRolesEndpoint } from "../../../api/role.endpoints";
 
 export default function RolesPage() {
   const navigate = useNavigate();
   const tableRef = useRef<FeatureTableHandle>(null);
-  const { call } = useErrorHandler();
+  const { can } = usePermissions();
+
+  const deleteMutation = useRequesterMutation({
+    endpoint: deleteRoleEndpoint,
+    onSuccess: () => tableRef.current?.refetch(),
+  });
 
   const columns: TableColumn<Role>[] = [
     {
@@ -52,11 +61,6 @@ export default function RolesPage() {
     },
   ];
 
-  async function handleDelete(role: Role) {
-    await call(() => requester(deleteRoleEndpoint, { params: { id: role._id } }));
-    tableRef.current?.refetch();
-  }
-
   return (
     <PageShell
       surface
@@ -65,21 +69,20 @@ export default function RolesPage() {
       description="Manage roles and their permissions"
       maxWidth="full"
       actions={
-        <RouteButton path={AppRoute.roleCreate} leftIcon={Plus}>
-          Add Role
-        </RouteButton>
+        <PermissionGuard permission={AppPermission.ROLE.CREATE}>
+          <RouteButton path={AppRoute.roleCreate} leftIcon={Plus}>
+            Add Role
+          </RouteButton>
+        </PermissionGuard>
       }
     >
-      <FeatureTable<Role>
+      <FeatureTable<Role, typeof getRolesEndpoint>
         ref={tableRef}
         bordered={false}
         endpoint={getRolesEndpoint}
-        columns={columns}
-        rowKey="_id"
-        searchable
+        entityName={ENTITY_PLURAL_LABELS[EntityName.ROLE]}
         searchPlaceholder="Search roles..."
-        paginated
-        pageSizeOptions={[10, 25, 50]}
+        emptyMessage="No roles match your search"
         filters={[
           {
             key: "isActive",
@@ -90,18 +93,20 @@ export default function RolesPage() {
             ],
           },
         ]}
-        emptyMessage="No roles match your search"
+        columns={columns}
         rowActions={[
           {
             label: "Edit",
             icon: Pencil,
             onClick: (role) => navigate(AppRoute.roleUpdate, { id: role._id }),
+            hidden: !can(AppPermission.ROLE.UPDATE),
           },
           {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: handleDelete,
+            onClick: (role) => deleteMutation.mutate({ params: { id: role._id } }),
+            hidden: !can(AppPermission.ROLE.DELETE),
           },
         ]}
       />

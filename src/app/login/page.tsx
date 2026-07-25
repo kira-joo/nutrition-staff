@@ -1,6 +1,6 @@
 "use client";
 
-import { AppLink, Card, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { AppLink, Card, CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { loginEndpoint } from "../../../api/auth.endpoints";
@@ -44,9 +44,6 @@ export default function LoginPage() {
               onSuccess={(data) => {
                 setAccessToken(data.accessToken);
                 router.push(AppRoute.users);
-              }}
-              onError={(error) => {
-                toast.error(error.message);
               }}
             />
           </Card>

@@ -1,6 +1,6 @@
 "use client";
 
-import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { ApiErrorState, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Briefcase, IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getRolesEndpoint } from "../../../api/role.endpoints";
@@ -8,6 +8,10 @@ import type { createUserEndpoint, updateUserEndpoint } from "../../../api/user.e
 import { Status } from "../enums";
 import { User, UserFormValues } from "../interfaces/user.interface";
 import { AppRoute } from "../routes/app-route";
+import { AppPermission } from "../authorization/app-permission";
+import { usePermissions } from "../auth/use-permissions";
+import { ENTITY_PLURAL_LABELS } from "../authorization/entity-labels";
+import { EntityName } from "../authorization/entity-name.enum";
 
 export interface UserFormProps {
   defaultValues?: User;
@@ -16,6 +20,19 @@ export interface UserFormProps {
 
 export function UserForm({ defaultValues, endpoint }: UserFormProps) {
   const router = useRouter();
+  const { can } = usePermissions();
+
+  // Assigning roles requires reading the Roles list — block the whole form
+  // rather than silently submit one with the Roles field missing (which
+  // would lose validation and produce an incomplete payload).
+  if (!can(AppPermission.ROLE.READ)) {
+    return (
+      <ApiErrorState
+        error={{ statusCode: 403, message: "Managing user roles requires permission to view roles." }}
+        entityName={ENTITY_PLURAL_LABELS[EntityName.ROLE]}
+      />
+    );
+  }
 
   const basicInfoFields: FormFieldConfig<UserFormValues>[] = [
     {
@@ -79,9 +96,6 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
       onSuccess={() => {
         toast.success("User saved successfully");
         router.push(AppRoute.users);
-      }}
-      onError={(error) => {
-        toast.error(error.message);
       }}
       layout="grid"
       columns={2}

@@ -1,11 +1,15 @@
 "use client";
 
-import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { ApiErrorState, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { useRouter } from "next/navigation";
 import { getPermissionsEndpoint } from "../../../api/permission.endpoints";
 import type { createRoleEndpoint, updateRoleEndpoint } from "../../../api/role.endpoints";
 import { Role, RoleFormValues } from "../interfaces/role.interface";
 import { AppRoute } from "../routes/app-route";
+import { AppPermission } from "../authorization/app-permission";
+import { usePermissions } from "../auth/use-permissions";
+import { ENTITY_PLURAL_LABELS } from "../authorization/entity-labels";
+import { EntityName } from "../authorization/entity-name.enum";
 
 export interface RoleFormProps {
   defaultValues?: Role;
@@ -14,6 +18,18 @@ export interface RoleFormProps {
 
 export function RoleForm({ defaultValues, endpoint }: RoleFormProps) {
   const router = useRouter();
+  const { can } = usePermissions();
+
+  // Assigning permissions requires reading the Permissions list — block the
+  // whole form rather than silently submit one with the field missing.
+  if (!can(AppPermission.PERMISSION.READ)) {
+    return (
+      <ApiErrorState
+        error={{ statusCode: 403, message: "Managing role permissions requires permission to view permissions." }}
+        entityName={ENTITY_PLURAL_LABELS[EntityName.PERMISSION]}
+      />
+    );
+  }
 
   const fields: FormFieldConfig<RoleFormValues>[] = [
     {
@@ -68,9 +84,6 @@ export function RoleForm({ defaultValues, endpoint }: RoleFormProps) {
       onSuccess={() => {
         toast.success("Role saved successfully");
         router.push(AppRoute.roles);
-      }}
-      onError={(error) => {
-        toast.error(error.message);
       }}
       layout="grid"
       columns={2}

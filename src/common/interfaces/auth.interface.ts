@@ -1,3 +1,5 @@
+import type { AuthUser, ResolvedRole } from "@kira-joo/frontend-toolkit-core";
+
 export interface LoginDto {
   email: string;
   password: string;
@@ -9,18 +11,17 @@ export interface SignupDto {
   password: string;
 }
 
-/** A single resolved role, exactly as GET /api/auth/me and the login/signup responses return it. */
-export interface CurrentUserRole {
-  name: string;
-  grantsAll: boolean;
-  permissions: string[];
-}
-
-/** The authenticated-user shape shared by login, signup, and GET /api/auth/me. */
-export interface CurrentUser {
+/**
+ * The authenticated-user shape shared by login, signup, and GET /api/auth/me.
+ * Extends the toolkit's `AuthUser` rather than duplicating it, so
+ * `@kira-joo/frontend-toolkit-core` stays the single source of truth for the
+ * authenticated-user model — `hasPermission`/`PermissionGuard` accept this
+ * directly, with no adapter/mapping layer.
+ */
+export interface CurrentUser extends AuthUser {
   _id: string;
   tokenVersion: number;
-  roles: CurrentUserRole[];
+  roles: ResolvedRole[];
   name: string;
   email: string;
 }
