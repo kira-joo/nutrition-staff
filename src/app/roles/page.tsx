@@ -9,7 +9,6 @@ import {
   Badge,
   FeatureTable,
   PageShell,
-  PermissionGuard,
   RouteButton,
   type FeatureTableHandle,
   type TableColumn,
@@ -69,11 +68,9 @@ export default function RolesPage() {
       title="Roles"
       description="Manage roles and their permissions"
       actions={
-        <PermissionGuard permission={AppPermission.ROLE.CREATE}>
-          <RouteButton path={AppRoute.roleCreate} leftIcon={Plus}>
-            Add Role
-          </RouteButton>
-        </PermissionGuard>
+        <RouteButton path={AppRoute.roleCreate} permission={AppPermission.ROLE.CREATE} leftIcon={Plus}>
+          Add Role
+        </RouteButton>
       }
     >
       <FeatureTable<Role, typeof getRolesEndpoint>

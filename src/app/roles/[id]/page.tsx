@@ -7,7 +7,6 @@ import {
   InfoRow,
   PageSection,
   PageShell,
-  PermissionGuard,
   QueryState,
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
@@ -31,11 +30,15 @@ export default function RoleDetailsPage({ params }: { params: { id: string } }) 
           title={role.name}
           badge={<Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>}
           actions={
-            <PermissionGuard permission={AppPermission.ROLE.UPDATE}>
-              <RouteButton path={AppRoute.roleUpdate} params={{ id: role._id }} variant="outline" leftIcon={Pencil}>
-                Edit
-              </RouteButton>
-            </PermissionGuard>
+            <RouteButton
+              path={AppRoute.roleUpdate}
+              params={{ id: role._id }}
+              permission={AppPermission.ROLE.UPDATE}
+              variant="outline"
+              leftIcon={Pencil}
+            >
+              Edit
+            </RouteButton>
           }
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -10,7 +10,6 @@ import {
   FeatureFilterType,
   FeatureTable,
   PageShell,
-  PermissionGuard,
   RouteButton,
   type FeatureTableHandle,
   type TableColumn,
@@ -73,11 +72,9 @@ export default function UsersPage() {
       title="Users"
       description="Manage staff users"
       actions={
-        <PermissionGuard permission={AppPermission.USER.CREATE}>
-          <RouteButton path={AppRoute.userCreate} leftIcon={Plus}>
-            Add User
-          </RouteButton>
-        </PermissionGuard>
+        <RouteButton path={AppRoute.userCreate} permission={AppPermission.USER.CREATE} leftIcon={Plus}>
+          Add User
+        </RouteButton>
       }
     >
       <FeatureTable<User, typeof getUsersEndpoint>

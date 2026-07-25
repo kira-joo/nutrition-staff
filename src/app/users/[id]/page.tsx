@@ -7,7 +7,6 @@ import {
   InfoRow,
   PageSection,
   PageShell,
-  PermissionGuard,
   QueryState,
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
@@ -32,11 +31,15 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
           title={user.name}
           badge={<Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>}
           actions={
-            <PermissionGuard permission={AppPermission.USER.UPDATE}>
-              <RouteButton path={AppRoute.userUpdate} params={{ id: user._id }} variant="outline" leftIcon={Pencil}>
-                Edit
-              </RouteButton>
-            </PermissionGuard>
+            <RouteButton
+              path={AppRoute.userUpdate}
+              params={{ id: user._id }}
+              permission={AppPermission.USER.UPDATE}
+              variant="outline"
+              leftIcon={Pencil}
+            >
+              Edit
+            </RouteButton>
           }
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
