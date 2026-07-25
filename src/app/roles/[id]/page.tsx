@@ -11,7 +11,7 @@ import {
   QueryState,
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { Activity, ArrowLeft, Pencil, ShieldCheck } from "lucide-react";
+import { Activity, Pencil, ShieldCheck } from "lucide-react";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
@@ -24,25 +24,12 @@ export default function RoleDetailsPage({ params }: { params: { id: string } }) 
   });
 
   return (
-    <QueryState
-      query={roleQuery}
-      entityName={EntityName.ROLE}
-      backAction={
-        <RouteButton path={AppRoute.roles} variant="outline">
-          Back to Roles
-        </RouteButton>
-      }
-    >
+    <QueryState query={roleQuery} entityName={EntityName.ROLE} backRoute={{ path: AppRoute.roles, label: "Back to Roles" }}>
       {(role) => (
         <PageShell
           icon={ShieldCheck}
           title={role.name}
           badge={<Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>}
-          backAction={
-            <RouteButton path={AppRoute.roles} variant="ghost" leftIcon={ArrowLeft}>
-              Back to Roles
-            </RouteButton>
-          }
           actions={
             <PermissionGuard permission={AppPermission.ROLE.UPDATE}>
               <RouteButton path={AppRoute.roleUpdate} params={{ id: role._id }} variant="outline" leftIcon={Pencil}>

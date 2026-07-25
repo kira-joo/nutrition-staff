@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  CustomForm,
-  FieldType,
-  PageShell,
-  RouteButton,
-  toast,
-  type FormFieldConfig,
-} from "@kira-joo/frontend-toolkit-tailwind";
-import { ArrowLeft, KeyRound } from "lucide-react";
+import { CustomForm, FieldType, PageShell, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AppRoute } from "src/common/routes/app-route";
 import { PasswordInput } from "src/components/auth/password-input";
@@ -44,11 +37,7 @@ export default function UpdatePasswordPage() {
       icon={KeyRound}
       title="Update Password"
       description="Change your account password"
-      actions={
-        <RouteButton path={AppRoute.settings} variant="ghost" leftIcon={ArrowLeft}>
-          Back to Account Settings
-        </RouteButton>
-      }
+      backRoute={{ path: AppRoute.settings, label: "Back to Account Settings" }}
     >
       <CustomForm<PasswordFormValues, typeof updateOwnPasswordEndpoint>
         fields={fields}

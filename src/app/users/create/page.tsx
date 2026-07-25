@@ -1,7 +1,7 @@
 "use client";
 
-import { PageShell, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
+import { UserPlus } from "lucide-react";
 import { UserForm } from "src/common/forms/user-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { createUserEndpoint } from "../../../../api/user.endpoints";
@@ -12,11 +12,7 @@ export default function UserCreatePage() {
       icon={UserPlus}
       title="Create User"
       description="Add a new staff user"
-      actions={
-        <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
-          Back to Users
-        </RouteButton>
-      }
+      backRoute={{ path: AppRoute.users, label: "Back to Users" }}
     >
       <UserForm endpoint={createUserEndpoint} />
     </PageShell>

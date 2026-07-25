@@ -11,7 +11,7 @@ import {
   QueryState,
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
+import { Activity, IdCard, Pencil, UserRound } from "lucide-react";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Status } from "src/common/enums";
@@ -25,25 +25,12 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
   });
 
   return (
-    <QueryState
-      query={userQuery}
-      entityName={EntityName.USER}
-      backAction={
-        <RouteButton path={AppRoute.users} variant="outline">
-          Back to Users
-        </RouteButton>
-      }
-    >
+    <QueryState query={userQuery} entityName={EntityName.USER} backRoute={{ path: AppRoute.users, label: "Back to Users" }}>
       {(user) => (
         <PageShell
           icon={UserRound}
           title={user.name}
           badge={<Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>}
-          backAction={
-            <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
-              Back to Users
-            </RouteButton>
-          }
           actions={
             <PermissionGuard permission={AppPermission.USER.UPDATE}>
               <RouteButton path={AppRoute.userUpdate} params={{ id: user._id }} variant="outline" leftIcon={Pencil}>

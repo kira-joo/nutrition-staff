@@ -1,8 +1,8 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
-import { ArrowLeft, UserCog } from "lucide-react";
+import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
+import { UserCog } from "lucide-react";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { UserForm } from "src/common/forms/user-form";
 import { AppRoute } from "src/common/routes/app-route";
@@ -18,23 +18,10 @@ export default function UserUpdatePage({ params }: { params: { id: string } }) {
     <QueryState
       query={userQuery}
       entityName={EntityName.USER}
-      backAction={
-        <RouteButton path={AppRoute.users} variant="outline">
-          Back to Users
-        </RouteButton>
-      }
+      backRoute={{ path: AppRoute.users, label: "Back to Users" }}
     >
       {(user) => (
-        <PageShell
-          icon={UserCog}
-          title="Update User"
-          description="Update staff user information"
-          actions={
-            <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
-              Back to Users
-            </RouteButton>
-          }
-        >
+        <PageShell icon={UserCog} title="Update User" description="Update staff user information">
           <UserForm defaultValues={user} endpoint={updateUserEndpoint} />
         </PageShell>
       )}
