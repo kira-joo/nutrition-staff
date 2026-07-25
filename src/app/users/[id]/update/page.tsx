@@ -1,12 +1,11 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
+import { PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
 import { ArrowLeft, UserCog } from "lucide-react";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { UserForm } from "src/common/forms/user-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { RouteButton } from "src/components/nav/route-button";
 import { getUserByIdEndpoint, updateUserEndpoint } from "../../../../../api/user.endpoints";
 
 export default function UserUpdatePage({ params }: { params: { id: string } }) {
@@ -27,11 +26,9 @@ export default function UserUpdatePage({ params }: { params: { id: string } }) {
     >
       {(user) => (
         <PageShell
-          surface
           icon={UserCog}
           title="Update User"
           description="Update staff user information"
-          maxWidth="full"
           actions={
             <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
               Back to Users

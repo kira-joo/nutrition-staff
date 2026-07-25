@@ -10,6 +10,7 @@ import {
   FeatureTable,
   PageShell,
   PermissionGuard,
+  RouteButton,
   type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
@@ -21,7 +22,6 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Role } from "src/common/interfaces/role.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { RouteButton } from "src/components/nav/route-button";
 import { deleteRoleEndpoint, getRolesEndpoint } from "../../../api/role.endpoints";
 
 export default function RolesPage() {
@@ -65,11 +65,9 @@ export default function RolesPage() {
 
   return (
     <PageShell
-      surface
       icon={ShieldCheck}
       title="Roles"
       description="Manage roles and their permissions"
-      maxWidth="full"
       actions={
         <PermissionGuard permission={AppPermission.ROLE.CREATE}>
           <RouteButton path={AppRoute.roleCreate} leftIcon={Plus}>
@@ -80,11 +78,8 @@ export default function RolesPage() {
     >
       <FeatureTable<Role, typeof getRolesEndpoint>
         ref={tableRef}
-        bordered={false}
         endpoint={getRolesEndpoint}
         entityName={ENTITY_PLURAL_LABELS[EntityName.ROLE]}
-        searchPlaceholder="Search roles..."
-        emptyMessage="No roles match your search"
         filters={[
           {
             key: "isActive",

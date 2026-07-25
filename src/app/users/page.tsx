@@ -11,6 +11,7 @@ import {
   FeatureTable,
   PageShell,
   PermissionGuard,
+  RouteButton,
   type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
@@ -23,7 +24,6 @@ import { Status } from "src/common/enums";
 import { User } from "src/common/interfaces/user.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { RouteButton } from "src/components/nav/route-button";
 import { getRolesEndpoint } from "../../../api/role.endpoints";
 import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
 
@@ -69,11 +69,9 @@ export default function UsersPage() {
 
   return (
     <PageShell
-      surface
       icon={Users}
       title="Users"
       description="Manage staff users"
-      maxWidth="full"
       actions={
         <PermissionGuard permission={AppPermission.USER.CREATE}>
           <RouteButton path={AppRoute.userCreate} leftIcon={Plus}>
@@ -84,11 +82,8 @@ export default function UsersPage() {
     >
       <FeatureTable<User, typeof getUsersEndpoint>
         ref={tableRef}
-        bordered={false}
         endpoint={getUsersEndpoint}
         entityName={ENTITY_PLURAL_LABELS[EntityName.USER]}
-        searchPlaceholder="Search users..."
-        emptyMessage="No users match your search"
         filters={[
           {
             key: "status",

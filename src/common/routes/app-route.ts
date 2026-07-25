@@ -10,4 +10,6 @@ export const AppRoute = {
   roleCreate: "/roles/create",
   roleDetails: "/roles/[id]",
   roleUpdate: "/roles/[id]/update",
+  settings: "/settings",
+  settingsPassword: "/settings/password",
 } as const;

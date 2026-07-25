@@ -11,49 +11,57 @@ import {
   QueryState,
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { Activity, ArrowLeft, IdCard, Pencil, UserRound } from "lucide-react";
+import { Activity, IdCard, KeyRound, Pencil, UserRound } from "lucide-react";
+import { useCurrentUser } from "src/common/auth/use-current-user";
 import { AppPermission } from "src/common/authorization/app-permission";
-import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Status } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
-import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
+import { getUserByIdEndpoint } from "../../../api/user.endpoints";
 
-export default function UserDetailsPage({ params }: { params: { id: string } }) {
-  const userQuery = useRequesterQuery({
+// The current authenticated user's own account settings — a read-only
+// details view (same layout as the Users detail page), not a duplicate of
+// the Update User / Update Password forms. Those already exist; this page
+// only displays the profile and links out to them.
+export default function SettingsPage() {
+  const currentUserQuery = useCurrentUser();
+  const currentUserId = currentUserQuery.data?._id;
+
+  const userDetailsQuery = useRequesterQuery({
     endpoint: getUserByIdEndpoint,
-    options: { params: { id: params.id } },
+    options: { params: { id: currentUserId ?? "" } },
+    queryOptions: { enabled: Boolean(currentUserId) },
   });
 
+  const query = {
+    data: userDetailsQuery.data,
+    isLoading: currentUserQuery.isLoading || userDetailsQuery.isLoading,
+    isError: currentUserQuery.isError || userDetailsQuery.isError,
+    error: currentUserQuery.error ?? userDetailsQuery.error,
+    refetch: userDetailsQuery.refetch,
+  };
+
   return (
-    <QueryState
-      query={userQuery}
-      entityName={EntityName.USER}
-      backAction={
-        <RouteButton path={AppRoute.users} variant="outline">
-          Back to Users
-        </RouteButton>
-      }
-    >
+    <QueryState query={query} entityName="Account">
       {(user) => (
         <PageShell
           icon={UserRound}
           title={user.name}
           badge={<Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>}
-          backAction={
-            <RouteButton path={AppRoute.users} variant="ghost" leftIcon={ArrowLeft}>
-              Back to Users
-            </RouteButton>
-          }
           actions={
-            <PermissionGuard permission={AppPermission.USER.UPDATE}>
-              <RouteButton path={AppRoute.userUpdate} params={{ id: user._id }} variant="outline" leftIcon={Pencil}>
-                Edit
+            <>
+              <PermissionGuard permission={AppPermission.USER.UPDATE}>
+                <RouteButton path={AppRoute.userUpdate} params={{ id: user._id }} variant="outline" leftIcon={Pencil}>
+                  Update Profile
+                </RouteButton>
+              </PermissionGuard>
+              <RouteButton path={AppRoute.settingsPassword} variant="outline" leftIcon={KeyRound}>
+                Update Password
               </RouteButton>
-            </PermissionGuard>
+            </>
           }
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <PageSection icon={IdCard} title="User information">
+            <PageSection icon={IdCard} title="Account information">
               <div className="flex flex-col gap-3">
                 <InfoRow label="Email" value={user.email} />
                 <InfoRow label="Role" value={user.roles.map((role) => role.name).join(", ") || "—"} />

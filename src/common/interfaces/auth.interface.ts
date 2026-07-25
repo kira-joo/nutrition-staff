@@ -30,3 +30,8 @@ export interface AuthResponse {
   accessToken: string;
   user: CurrentUser;
 }
+
+export interface UpdateOwnPasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
