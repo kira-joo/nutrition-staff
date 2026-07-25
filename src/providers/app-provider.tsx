@@ -5,6 +5,7 @@ import {
   APIConfig,
   AppLinkConfig,
   AuthUserProvider,
+  QueryParamsRouterProvider,
   ToolkitProviders,
   createToolkitQueryClient,
   type AppLinkComponentProps,
@@ -14,6 +15,7 @@ import Link from "next/link";
 import { AppRoute } from "../common/routes/app-route";
 import { getAccessToken, removeAccessToken } from "../common/auth/token-storage";
 import { usePermissions } from "../common/auth/use-permissions";
+import { useNextQueryParamsRouter } from "../common/routes/use-next-query-params-router";
 
 // Module-level (not per-component-mount) on purpose — this is a client-only
 // SPA-style app (every data-fetching page is "use client", nothing fetches
@@ -75,7 +77,9 @@ function PermissionContextBridge({ children }: { children: ReactNode }) {
 export function AppProvider({ children }: AppProviderProps) {
   return (
     <ToolkitProviders client={queryClient}>
-      <PermissionContextBridge>{children}</PermissionContextBridge>
+      <QueryParamsRouterProvider useAdapter={useNextQueryParamsRouter}>
+        <PermissionContextBridge>{children}</PermissionContextBridge>
+      </QueryParamsRouterProvider>
       <Toaster />
     </ToolkitProviders>
   );
