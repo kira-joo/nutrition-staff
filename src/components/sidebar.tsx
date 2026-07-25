@@ -3,7 +3,7 @@
 import { AppLink, cn } from "@kira-joo/frontend-toolkit-tailwind";
 import { LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { getAccessToken, removeAccessToken } from "../common/auth/token-storage";
+import { removeAccessToken } from "../common/auth/token-storage";
 import { AppRoute } from "../common/routes/app-route";
 import { queryClient } from "../providers/app-provider";
 import { AppPermission } from "../common/authorization/app-permission";
@@ -20,7 +20,7 @@ const AUTH_ONLY_ROUTES: string[] = [AppRoute.login, AppRoute.signup];
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { can } = usePermissions();
+  const { user, can } = usePermissions();
 
   if (AUTH_ONLY_ROUTES.includes(pathname)) return null;
 
@@ -55,7 +55,11 @@ export function Sidebar() {
           );
         })}
       </nav>
-      {getAccessToken() ? (
+      {/* Decided from the resolved user (usePermissions()), not a direct
+          localStorage read — useCurrentUser() is already SSR-safe (gated on
+          mount internally), so this is never out of sync and never at risk
+          of a hydration mismatch. */}
+      {user ? (
         <div className="border-t border-slate-200 p-4">
           <button
             type="button"

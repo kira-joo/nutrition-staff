@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { Spinner } from "@kira-joo/frontend-toolkit-tailwind";
+import { CenteredSpinner, ClientOnly } from "@kira-joo/frontend-toolkit-tailwind";
 import { usePathname, useRouter } from "next/navigation";
 import { AppRoute } from "../../common/routes/app-route";
 import { getAccessToken } from "../../common/auth/token-storage";
@@ -13,6 +13,28 @@ import { useCurrentUser } from "../../common/auth/use-current-user";
 const PUBLIC_ROUTES: string[] = [AppRoute.home, AppRoute.login, AppRoute.signup];
 
 /**
+ * Only ever rendered client-side, after mount (inside ClientOnly) — so it can
+ * read localStorage/call useCurrentUser() directly with no hydration-mismatch
+ * risk of its own.
+ */
+function AuthenticatedRouteGuard({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const hasToken = Boolean(getAccessToken());
+  const { data: user, isLoading, isError } = useCurrentUser();
+
+  useEffect(() => {
+    if (!hasToken || isError) {
+      router.replace(AppRoute.login);
+    }
+  }, [hasToken, isError, router]);
+
+  if (!hasToken || isError) return null;
+  if (isLoading || !user) return <CenteredSpinner className="min-h-[50vh]" />;
+
+  return <>{children}</>;
+}
+
+/**
  * Mounted once, at the root layout — this is the single, global route guard
  * for the whole app (there is no per-feature/per-route guard anywhere else).
  * The backend remains the actual security boundary (every protected route
@@ -22,28 +44,12 @@ const PUBLIC_ROUTES: string[] = [AppRoute.home, AppRoute.login, AppRoute.signup]
  */
 export function AuthGuard({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
-  const hasToken = Boolean(getAccessToken());
-  const { data: user, isLoading, isError } = useCurrentUser();
 
-  useEffect(() => {
-    if (!isPublicRoute && (!hasToken || isError)) {
-      router.replace(AppRoute.login);
-    }
-  }, [isPublicRoute, hasToken, isError, router]);
+  if (PUBLIC_ROUTES.includes(pathname)) return <>{children}</>;
 
-  if (isPublicRoute) return <>{children}</>;
-
-  if (!hasToken || isError) return null;
-
-  if (isLoading || !user) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Spinner />
-      </div>
-    );
-  }
-
-  return <>{children}</>;
+  return (
+    <ClientOnly fallback={<CenteredSpinner className="min-h-[50vh]" />}>
+      <AuthenticatedRouteGuard>{children}</AuthenticatedRouteGuard>
+    </ClientOnly>
+  );
 }
