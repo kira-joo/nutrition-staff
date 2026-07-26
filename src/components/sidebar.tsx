@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
 import { SideNav } from "@kira-joo/frontend-toolkit-tailwind";
+import { usePathname, useRouter } from "next/navigation";
 import { sideNavFooterItems, sideNavSections } from "src/common/navigation/side-nav.config";
 import { removeAccessToken } from "../common/auth/token-storage";
 import { AppRoute } from "../common/routes/app-route";
@@ -20,7 +20,11 @@ export function Sidebar() {
   return (
     <SideNav
       pathname={pathname}
-      brand={{ title: "Nutrition Staff" }}
+      brand={{
+        src: "/logo.png",
+        alt: "Nutrition Staff",
+        collapsedSrc: "/icon.png",
+      }}
       sections={sideNavSections}
       footerItems={sideNavFooterItems}
       onLogout={handleLogout}
