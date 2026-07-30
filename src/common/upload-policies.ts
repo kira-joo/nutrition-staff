@@ -5,4 +5,10 @@
 // zero server-only dependencies (just plain data shaped by a type from
 // `@kira-joo/toolkit-common`), so this re-export is a plain literal, not a
 // live/heavier module.
-export { reviewImagePolicy } from "../server/core/assets/upload-policies";
+export {
+  doctorPhotoPolicy,
+  faviconImagePolicy,
+  logoImagePolicy,
+  ogImagePolicy,
+  reviewImagePolicy,
+} from "../server/core/assets/upload-policies";

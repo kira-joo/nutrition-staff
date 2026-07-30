@@ -6,4 +6,7 @@ export const ENTITY_PLURAL_LABELS: Record<EntityName, string> = {
   [EntityName.ROLE]: "Roles",
   [EntityName.PERMISSION]: "Permissions",
   [EntityName.REVIEW]: "Reviews",
+  [EntityName.SITE_SETTINGS]: "Site Settings",
+  [EntityName.DOCTOR_PROFILE]: "Doctor Profile",
+  [EntityName.PACKAGES_PAGE_SETTINGS]: "Packages Page Settings",
 };

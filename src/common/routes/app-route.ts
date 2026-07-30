@@ -14,6 +14,9 @@ export const AppRoute = {
   reviewCreate: "/reviews/create",
   reviewDetails: "/reviews/[id]",
   reviewUpdate: "/reviews/[id]/update",
+  siteSettings: "/site-settings",
+  doctorProfile: "/doctor-profile",
+  packagesPageSettings: "/packages-page-settings",
   settings: "/settings",
   settingsPassword: "/settings/password",
 } as const;
