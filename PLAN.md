@@ -276,10 +276,27 @@ nutrition-staff → all of the above (no source import changes needed for the pr
 
 10. Remaining Campaign block types in the stated order; `timeline`/`statistics` schema-only.
 11. **Deferred, not started without separate approval:** Resources, Newsletter, dynamic navigation, Leads.
+12. **Deferred, not started without separate approval and its own dedicated planning pass:** Singleton content staging and publishing (Draft/Published versioning for SiteSettings, DoctorProfile, PackagesPageSettings) — see §15 for the requirements captured so far. Added to the plan after Checkpoint D; do not implement during Checkpoint E or any checkpoint before this is separately scoped.
 
 At every checkpoint: tests passing, builds passing, dependency versions aligned across repos, no stale imports, working trees reviewed — no publishing or pushing beyond what's needed to reach that checkpoint without your explicit approval.
 
 ---
+
+## 15. Singleton content staging and publishing (future phase — not yet scoped for implementation)
+
+**Deferred.** Captured here per explicit direction after Checkpoint D so the requirement isn't lost, not because implementation is starting. No schema, API, or UI design is committed by this section — only the constraints the eventual design must satisfy.
+
+The public-facing singleton modules (SiteSettings, DoctorProfile, PackagesPageSettings) currently have exactly one document each, always live — sufficient for staff to edit directly today, but with no draft/publish staging: there's no way for staff to work on a Draft revision while the public client keeps serving the currently Published one.
+
+**Explicitly not a `status` field on the single document** — flipping the one document to "draft" would leave the public client with nothing to serve. The real requirement is two separate documents/versions per singleton (a Published one and a Draft one), not a status flag on one.
+
+Requirements for the eventual design:
+- The current Published version stays available to the public client at all times while staff edit a separate Draft.
+- Draft content may have incomplete Arabic/English translations — same as everywhere else in this system, completeness is a publish-time rule, never a save-time one.
+- Publishing validates every required localized field in both languages before a Draft is allowed to become the new Published version. This is the same platform-wide localization/publishing rule established after Checkpoint C (`isLocalizedComplete`/`findIncompleteLocalizedPaths`, §10), applied here for the first time to modules that previously had no `status` concept at all.
+- After a successful publish, the new version replaces the previous Published version.
+- Asset lifecycle must account for both versions existing at once: an asset still referenced by the current Published version must never be destroyed while it's being replaced or removed on the Draft side — the existing "destroy the previous asset after a successful replace" rule (§2/§3) isn't safe to apply naively here, since the same asset could still be the live Published one.
+- The architecture should leave room for previewing the Draft (as staff, before publishing) and for potentially retaining version history later — not necessarily building either now, but not designing something that forecloses them either.
 
 ## Open decisions needing your approval
 
