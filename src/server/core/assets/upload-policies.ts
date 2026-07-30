@@ -47,3 +47,12 @@ export const ogImagePolicy: UploadPolicy = {
   minWidth: 200,
   minHeight: 200,
 };
+
+/** A Campaign Hero block's banner — wide, full-bleed marketing imagery, so it wants a meaningfully larger minimum than a portrait/avatar photo. */
+export const campaignHeroPolicy: UploadPolicy = {
+  allowedMimeTypes: IMAGE_MIME_TYPES,
+  allowedFormats: IMAGE_FORMATS,
+  maxBytes: 10 * 1024 * 1024,
+  minWidth: 600,
+  minHeight: 300,
+};

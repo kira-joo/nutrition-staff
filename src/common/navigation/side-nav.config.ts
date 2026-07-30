@@ -1,4 +1,4 @@
-import { Globe, Home, Images, MessageSquareQuote, Settings, ShieldCheck, SlidersHorizontal, Users } from "lucide-react";
+import { Globe, Home, Images, Megaphone, MessageSquareQuote, Settings, ShieldCheck, SlidersHorizontal, Users } from "lucide-react";
 import type { SideNavItemConfig, SideNavSectionConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { AppRoute } from "src/common/routes/app-route";
@@ -18,6 +18,13 @@ export const sideNavSections: SideNavSectionConfig[] = [
         href: AppRoute.reviews,
         icon: MessageSquareQuote,
         permission: AppPermission.REVIEW.READ,
+      },
+      {
+        key: "campaigns",
+        label: "Campaigns",
+        href: AppRoute.campaigns,
+        icon: Megaphone,
+        permission: AppPermission.CAMPAIGN.READ,
       },
     ],
   },

@@ -9,4 +9,5 @@ export const ENTITY_PLURAL_LABELS: Record<EntityName, string> = {
   [EntityName.SITE_SETTINGS]: "Site Settings",
   [EntityName.DOCTOR_PROFILE]: "Doctor Profile",
   [EntityName.PACKAGES_PAGE_SETTINGS]: "Packages Page Settings",
+  [EntityName.CAMPAIGN]: "Campaigns",
 };

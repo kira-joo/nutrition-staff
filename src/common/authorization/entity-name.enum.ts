@@ -6,4 +6,5 @@ export enum EntityName {
   SITE_SETTINGS = "SiteSettings",
   DOCTOR_PROFILE = "DoctorProfile",
   PACKAGES_PAGE_SETTINGS = "PackagesPageSettings",
+  CAMPAIGN = "Campaign",
 }

@@ -17,6 +17,9 @@ export const AppRoute = {
   siteSettings: "/site-settings",
   doctorProfile: "/doctor-profile",
   packagesPageSettings: "/packages-page-settings",
+  campaigns: "/campaigns",
+  campaignCreate: "/campaigns/create",
+  campaignDetails: "/campaigns/[id]",
   settings: "/settings",
   settingsPassword: "/settings/password",
 } as const;
