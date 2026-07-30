@@ -1,4 +1,4 @@
-import { Home, Settings, ShieldCheck, Users } from "lucide-react";
+import { Home, MessageSquareQuote, Settings, ShieldCheck, Users } from "lucide-react";
 import type { SideNavItemConfig, SideNavSectionConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { AppRoute } from "src/common/routes/app-route";
@@ -7,6 +7,19 @@ export const sideNavSections: SideNavSectionConfig[] = [
   {
     key: "general",
     items: [{ key: "home", label: "Home", href: AppRoute.home, icon: Home }],
+  },
+  {
+    key: "content",
+    label: "Content",
+    items: [
+      {
+        key: "reviews",
+        label: "Reviews",
+        href: AppRoute.reviews,
+        icon: MessageSquareQuote,
+        permission: AppPermission.REVIEW.READ,
+      },
+    ],
   },
   {
     key: "administration",
