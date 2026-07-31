@@ -42,7 +42,8 @@ export async function replaceCampaignBlock(request: NextRequest, campaignId: str
   let saved;
   try {
     const dto = (await validateCampaignBlock(payload)) as Omit<CampaignBlock, "id" | "order">;
-    const updatedBlock: CampaignBlock = { ...dto, id: previousBlock.id, order: previousBlock.order };
+    // See add-campaign-block.ts for why this needs an assertion, not a plain annotation.
+    const updatedBlock = { ...dto, id: previousBlock.id, order: previousBlock.order } as CampaignBlock;
     const nextBlocks = campaign.blocks.map((block, index) => (index === blockIndex ? updatedBlock : block));
 
     assertPublishReady({ title: campaign.title, blocks: nextBlocks }, campaign.status);

@@ -25,7 +25,11 @@ export async function addCampaignBlock(request: NextRequest, campaignId: string)
 
   try {
     const dto = (await validateCampaignBlock(payload)) as Omit<CampaignBlock, "id" | "order">;
-    const newBlock: CampaignBlock = { ...dto, id: crypto.randomUUID(), order: campaign.blocks.length };
+    // TS can't re-narrow a spread of an asserted union back into that same
+    // union (it would need every member's fields simultaneously) — asserted
+    // here instead, since `dto`'s own `type` field is what actually
+    // discriminates it correctly at runtime.
+    const newBlock = { ...dto, id: crypto.randomUUID(), order: campaign.blocks.length } as CampaignBlock;
     const nextBlocks = [...campaign.blocks, newBlock];
 
     // A block can only ever be *added* to an already-published campaign in

@@ -1,7 +1,16 @@
 "use client";
 
 import { useRequesterMutation } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, Modal, toast, useConfirmDialog } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  CustomButton,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Modal,
+  toast,
+  useConfirmDialog,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -105,9 +114,20 @@ export function CampaignBlockManager({ campaignId, blocks, onChanged }: Campaign
         );
       })}
 
-      <CustomButton type="button" variant="outline" leftIcon={Plus} onClick={() => setAdding(CampaignBlockType.HERO)}>
-        Add Hero block
-      </CustomButton>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <CustomButton type="button" variant="outline" leftIcon={Plus}>
+            Add block
+          </CustomButton>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          {(Object.keys(campaignBlockRegistry) as CampaignBlockType[]).map((type) => (
+            <DropdownMenuItem key={type} onSelect={() => setAdding(type)}>
+              {campaignBlockRegistry[type].label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {adding ? (
         <Modal open onOpenChange={() => setAdding(null)} title={`Add ${campaignBlockRegistry[adding].label} block`} size="lg">

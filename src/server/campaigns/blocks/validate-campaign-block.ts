@@ -2,6 +2,7 @@ import { BadRequestError, validateDto } from "@kira-joo/backend-toolkit-core";
 import type { ClassConstructor } from "class-transformer";
 import { CampaignBlockType } from "src/common/enums";
 import { HeroBlockDto } from "./dto/hero-block.dto";
+import { RichTextBlockDto } from "./dto/rich-text-block.dto";
 
 /**
  * Each block type gets its own DTO (per the plan), but blocks are never
@@ -17,6 +18,7 @@ import { HeroBlockDto } from "./dto/hero-block.dto";
  */
 const BLOCK_DTO_BY_TYPE: Record<CampaignBlockType, ClassConstructor<object>> = {
   [CampaignBlockType.HERO]: HeroBlockDto,
+  [CampaignBlockType.RICH_TEXT]: RichTextBlockDto,
 };
 
 /** Validated first, standalone — asset processing needs a known block type before validation ever runs (to know which asset field(s) to look for). */
