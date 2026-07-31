@@ -19,7 +19,7 @@
     "@kira-joo/backend-toolkit-mongoose": "^0.3.0",
     "@kira-joo/backend-toolkit-next": "^0.2.3",
     "@kira-joo/frontend-toolkit-core": "^0.4.0",
-    "@kira-joo/frontend-toolkit-tailwind": "^0.3.18",
+    "@kira-joo/frontend-toolkit-tailwind": "^0.3.19",
     "@kira-joo/toolkit-common": "^0.1.1",
     "cloudinary": "^2.0.0",
     "jose": "^6.0.0",

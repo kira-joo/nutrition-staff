@@ -2,6 +2,7 @@
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
+  AssetViewer,
   Badge,
   DateText,
   InfoRow,
@@ -69,9 +70,7 @@ export default function RecipeDetailsPage({ params }: { params: { id: string } }
                       .join(", ") || "—"
                   }
                 />
-                {recipe.image ? (
-                  <img src={recipe.image.secureUrl} alt="" className="h-32 w-32 rounded-md object-cover" />
-                ) : null}
+                <AssetViewer image={{ asset: recipe.image, label: recipe.title?.en || recipe.title?.ar || "Recipe photo" }} />
               </div>
             </PageSection>
             <PageSection icon={Activity} title="Status & activity">

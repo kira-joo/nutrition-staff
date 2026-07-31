@@ -10,4 +10,8 @@ export class ListRecipesQueryDto extends BaseFindQueryDto {
   @IsOptional()
   @IsMongoId()
   category?: string;
+
+  @IsOptional()
+  @IsMongoId()
+  foodGroups?: string;
 }

@@ -35,6 +35,7 @@ export class RecipeSchema {
   category!: mongoose.Types.ObjectId;
 
   @MongoField({ type: [mongoose.Schema.Types.ObjectId], ref: EntityName.RECIPE_FOOD_GROUP, default: [] })
+  @Filterable()
   @Relation(() => RecipeFoodGroupSchema)
   foodGroups!: mongoose.Types.ObjectId[];
 

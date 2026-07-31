@@ -1,13 +1,22 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { Badge, DateText, InfoRow, PageSection, PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  AssetViewer,
+  Badge,
+  DateText,
+  InfoRow,
+  PageSection,
+  PageShell,
+  QueryState,
+  RouteButton,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Image as ImageIcon, MessageSquareText, Pencil, UserRound } from "lucide-react";
-import { getReviewByIdEndpoint } from "../../../../api/review.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
+import { getReviewByIdEndpoint } from "../../../../api/review.endpoints";
 
 export default function ReviewDetailsPage({ params }: { params: { id: string } }) {
   const reviewQuery = useRequesterQuery({
@@ -26,9 +35,7 @@ export default function ReviewDetailsPage({ params }: { params: { id: string } }
           icon={UserRound}
           title={review.content?.en || review.content?.ar || "Review"}
           badge={
-            <Badge variant={review.status === ContentStatus.PUBLISHED ? "success" : "secondary"}>
-              {review.status}
-            </Badge>
+            <Badge variant={review.status === ContentStatus.PUBLISHED ? "success" : "secondary"}>{review.status}</Badge>
           }
           actions={
             <RouteButton
@@ -60,18 +67,14 @@ export default function ReviewDetailsPage({ params }: { params: { id: string } }
               </div>
             </PageSection>
             <PageSection icon={ImageIcon} title="Media" className="sm:col-span-2">
-              <div className="flex flex-wrap gap-4">
-                {review.image ? <img src={review.image.secureUrl} alt="" className="h-32 w-32 rounded-md object-cover" /> : null}
-                {review.beforeImage ? (
-                  <img src={review.beforeImage.secureUrl} alt="Before" className="h-32 w-32 rounded-md object-cover" />
-                ) : null}
-                {review.afterImage ? (
-                  <img src={review.afterImage.secureUrl} alt="After" className="h-32 w-32 rounded-md object-cover" />
-                ) : null}
-                {!review.image && !review.beforeImage && !review.afterImage ? (
-                  <span className="text-sm text-slate-500">No media</span>
-                ) : null}
-              </div>
+              <AssetViewer
+                images={[
+                  review.image && { key: "image", label: "Photo", asset: review.image },
+                  review.beforeImage && { key: "beforeImage", label: "Before", asset: review.beforeImage },
+                  review.afterImage && { key: "afterImage", label: "After", asset: review.afterImage },
+                ]}
+                emptyState={<span className="text-sm text-slate-500">No media</span>}
+              />
             </PageSection>
           </div>
         </PageShell>

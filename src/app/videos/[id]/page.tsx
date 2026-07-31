@@ -1,7 +1,16 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { Badge, DateText, InfoRow, PageSection, PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  AssetViewer,
+  Badge,
+  DateText,
+  InfoRow,
+  PageSection,
+  PageShell,
+  QueryState,
+  RouteButton,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Pencil, Video as VideoIcon } from "lucide-react";
 import { getVideoByIdEndpoint } from "../../../../api/video.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -47,7 +56,7 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
                   <source src={video.video.secureUrl} />
                 </video>
               ) : video.poster ? (
-                <img src={video.poster.secureUrl} alt="" className="h-32 w-32 rounded-md object-cover" />
+                <AssetViewer image={{ asset: video.poster, label: video.title?.en || video.title?.ar || "Video poster" }} />
               ) : (
                 <p className="text-sm text-slate-500">No uploaded video or poster.</p>
               )}

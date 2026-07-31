@@ -4,6 +4,7 @@ import { downloadRequester, useRequesterMutation } from "@kira-joo/frontend-tool
 import {
   AppLink,
   Badge,
+  FeatureFilterType,
   FeatureTable,
   PageShell,
   RouteButton,
@@ -13,6 +14,8 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { ChefHat, Download, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
+import { getRecipeCategoriesEndpoint } from "../../../api/recipe-category.endpoints";
+import { getRecipeFoodGroupsEndpoint } from "../../../api/recipe-food-group.endpoints";
 import { deleteRecipeEndpoint, exportRecipesPdfEndpoint, getRecipesEndpoint } from "../../../api/recipe.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -20,6 +23,8 @@ import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { Recipe } from "src/common/interfaces/recipe.interface";
+import { RecipeCategory } from "src/common/interfaces/recipe-category.interface";
+import { RecipeFoodGroup } from "src/common/interfaces/recipe-food-group.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
 
@@ -62,6 +67,17 @@ export default function RecipesPage() {
         typeof recipe.category === "string" ? "—" : recipe.category?.title?.en || recipe.category?.title?.ar || "—",
     },
     {
+      key: "foodGroups",
+      header: "Food Groups",
+      render: (recipe) =>
+        recipe.foodGroups
+          ?.reduce<string[]>((labels, item) => {
+            const label = typeof item === "string" ? undefined : item.title?.en || item.title?.ar;
+            return label ? [...labels, label] : labels;
+          }, [])
+          .join(", ") || "—",
+    },
+    {
       key: "status",
       header: "Status",
       render: (recipe) => (
@@ -91,6 +107,28 @@ export default function RecipesPage() {
             header: "Status",
             options: Object.values(ContentStatus).map((value) => ({ label: value, value })),
           },
+          {
+            type: FeatureFilterType.COMBOBOX,
+            queryKey: "category",
+            endpoint: getRecipeCategoriesEndpoint,
+            optionLabel: (item: Record<string, unknown>) => {
+              const category = item as unknown as RecipeCategory;
+              return category.title.en || category.title.ar || "(untitled)";
+            },
+            optionValue: "_id",
+            placeholder: "Filter by category",
+          },
+          {
+            type: FeatureFilterType.COMBOBOX,
+            queryKey: "foodGroups",
+            endpoint: getRecipeFoodGroupsEndpoint,
+            optionLabel: (item: Record<string, unknown>) => {
+              const foodGroup = item as unknown as RecipeFoodGroup;
+              return foodGroup.title.en || foodGroup.title.ar || "(untitled)";
+            },
+            optionValue: "_id",
+            placeholder: "Filter by food group",
+          },
         ]}
         columns={columns}
         rowActions={[
@@ -112,7 +150,14 @@ export default function RecipesPage() {
         bulkActions={[
           {
             label: "Download PDF",
+            loadingLabel: "Generating PDF...",
             icon: Download,
+            // BulkActionsBar shows "Generating PDF..." + a spinner and
+            // disables every bulk action for the whole life of this
+            // promise (see loadingLabel above) — no separate loading state
+            // needed here. Selection clears only on success: a failed
+            // export leaves the same rows selected so the user can just
+            // retry, rather than having to re-select everything.
             onClick: async ({ selectedIds, selectedItems, clearSelection }) => {
               try {
                 await downloadRequester({

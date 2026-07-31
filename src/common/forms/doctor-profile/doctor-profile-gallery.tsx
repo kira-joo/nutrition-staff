@@ -43,6 +43,13 @@ function buildGalleryFormData(file: File | null, altText: LocalizedString): Reco
  * plan's Campaign-blocks precedent) — this manages them independently via
  * their own sub-resource routes, refetching the whole profile after every
  * change since the parent page owns the actual data.
+ *
+ * Deliberately stays on `AssetThumbnail`/`AssetLightbox` directly rather
+ * than the higher-level `AssetViewer` — each thumbnail here sits alongside
+ * its own move/edit/remove controls and a shared `lightboxIndex` that a
+ * modal also needs to read/write, which `AssetViewer`'s self-contained
+ * state doesn't expose. This is exactly the "custom editing/reordering"
+ * case `AssetViewer` isn't meant to absorb.
  */
 export function DoctorProfileGallery({ gallery, onChanged }: DoctorProfileGalleryProps) {
   const { confirm, dialog } = useConfirmDialog();
