@@ -1,10 +1,18 @@
-import { AssetKind, campaignHeroPolicy, type AssetFieldConfig } from "src/server/core/assets";
+import { AssetKind, campaignHeroPolicy, videoContentPolicy, type AssetFieldConfig } from "src/server/core/assets";
 import { CampaignBlockType } from "src/common/enums";
 
 /** Per-block-type asset field config — a future block type with no assets at all would map to an empty array here. */
 const BLOCK_ASSET_FIELDS_BY_TYPE: Record<CampaignBlockType, readonly AssetFieldConfig[]> = {
   [CampaignBlockType.HERO]: [{ name: "image", kind: AssetKind.IMAGE, policy: campaignHeroPolicy }],
   [CampaignBlockType.RICH_TEXT]: [],
+  [CampaignBlockType.FEATURE_GRID]: [],
+  [CampaignBlockType.MEDIA]: [
+    { name: "image", kind: AssetKind.IMAGE, policy: campaignHeroPolicy },
+    { name: "video", kind: AssetKind.VIDEO, policy: videoContentPolicy },
+  ],
+  [CampaignBlockType.CTA]: [],
+  [CampaignBlockType.FAQ_REF]: [],
+  [CampaignBlockType.COUNTDOWN]: [],
 };
 
 export function getCampaignBlockAssetFields(type: CampaignBlockType): readonly AssetFieldConfig[] {

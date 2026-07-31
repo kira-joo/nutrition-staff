@@ -2,8 +2,18 @@ import type { ComponentType } from "react";
 import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "../../../api/campaign.endpoints";
 import { CampaignBlockType } from "../enums";
 import type { CampaignBlock } from "../interfaces/campaign-block.interface";
+import { CountdownBlockEditor } from "./countdown-block-editor";
+import { CountdownBlockPreview } from "./countdown-block-preview";
+import { CtaBlockEditor } from "./cta-block-editor";
+import { CtaBlockPreview } from "./cta-block-preview";
+import { FaqRefBlockEditor } from "./faq-ref-block-editor";
+import { FaqRefBlockPreview } from "./faq-ref-block-preview";
+import { FeatureGridBlockEditor } from "./feature-grid-block-editor";
+import { FeatureGridBlockPreview } from "./feature-grid-block-preview";
 import { HeroBlockEditor } from "./hero-block-editor";
 import { HeroBlockPreview } from "./hero-block-preview";
+import { MediaBlockEditor } from "./media-block-editor";
+import { MediaBlockPreview } from "./media-block-preview";
 import { RichTextBlockEditor } from "./rich-text-block-editor";
 import { RichTextBlockPreview } from "./rich-text-block-preview";
 
@@ -50,5 +60,30 @@ export const campaignBlockRegistry: Record<CampaignBlockType, CampaignBlockRegis
     label: "Rich Text",
     Editor: RichTextBlockEditor as ComponentType<CampaignBlockEditorProps>,
     Preview: RichTextBlockPreview as ComponentType<{ block: CampaignBlock }>,
+  },
+  [CampaignBlockType.FEATURE_GRID]: {
+    label: "Feature Grid",
+    Editor: FeatureGridBlockEditor as ComponentType<CampaignBlockEditorProps>,
+    Preview: FeatureGridBlockPreview as ComponentType<{ block: CampaignBlock }>,
+  },
+  [CampaignBlockType.MEDIA]: {
+    label: "Media",
+    Editor: MediaBlockEditor as ComponentType<CampaignBlockEditorProps>,
+    Preview: MediaBlockPreview as ComponentType<{ block: CampaignBlock }>,
+  },
+  [CampaignBlockType.CTA]: {
+    label: "Call to Action",
+    Editor: CtaBlockEditor as ComponentType<CampaignBlockEditorProps>,
+    Preview: CtaBlockPreview as ComponentType<{ block: CampaignBlock }>,
+  },
+  [CampaignBlockType.FAQ_REF]: {
+    label: "FAQ Reference",
+    Editor: FaqRefBlockEditor as ComponentType<CampaignBlockEditorProps>,
+    Preview: FaqRefBlockPreview as ComponentType<{ block: CampaignBlock }>,
+  },
+  [CampaignBlockType.COUNTDOWN]: {
+    label: "Countdown",
+    Editor: CountdownBlockEditor as ComponentType<CampaignBlockEditorProps>,
+    Preview: CountdownBlockPreview as ComponentType<{ block: CampaignBlock }>,
   },
 };

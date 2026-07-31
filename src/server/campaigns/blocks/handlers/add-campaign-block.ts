@@ -5,6 +5,7 @@ import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/campaigns/blocks/campaign-block-asset-fields";
 import { assertValidBlockType, validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
+import { assertBlockReferencesValid } from "src/server/campaigns/blocks/assert-block-references-valid";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
 
 /** Adding a block always appends (order = current length) — reordering is its own dedicated route. */
@@ -25,6 +26,7 @@ export async function addCampaignBlock(request: NextRequest, campaignId: string)
 
   try {
     const dto = (await validateCampaignBlock(payload)) as Omit<CampaignBlock, "id" | "order">;
+    await assertBlockReferencesValid(dto as unknown as Record<string, unknown>);
     // TS can't re-narrow a spread of an asserted union back into that same
     // union (it would need every member's fields simultaneously) — asserted
     // here instead, since `dto`'s own `type` field is what actually

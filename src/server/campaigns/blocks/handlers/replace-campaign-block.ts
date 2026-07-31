@@ -12,6 +12,7 @@ import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/campaigns/blocks/campaign-block-asset-fields";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
 import { validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
+import { assertBlockReferencesValid } from "src/server/campaigns/blocks/assert-block-references-valid";
 
 /**
  * Replaces one block's content in place — never touches its position or
@@ -42,6 +43,7 @@ export async function replaceCampaignBlock(request: NextRequest, campaignId: str
   let saved;
   try {
     const dto = (await validateCampaignBlock(payload)) as Omit<CampaignBlock, "id" | "order">;
+    await assertBlockReferencesValid(dto as unknown as Record<string, unknown>);
     // See add-campaign-block.ts for why this needs an assertion, not a plain annotation.
     const updatedBlock = { ...dto, id: previousBlock.id, order: previousBlock.order } as CampaignBlock;
     const nextBlocks = campaign.blocks.map((block, index) => (index === blockIndex ? updatedBlock : block));

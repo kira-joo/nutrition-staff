@@ -1,7 +1,12 @@
 import { BadRequestError, validateDto } from "@kira-joo/backend-toolkit-core";
 import type { ClassConstructor } from "class-transformer";
 import { CampaignBlockType } from "src/common/enums";
+import { CountdownBlockDto } from "./dto/countdown-block.dto";
+import { CtaBlockDto } from "./dto/cta-block.dto";
+import { FaqRefBlockDto } from "./dto/faq-ref-block.dto";
+import { FeatureGridBlockDto } from "./dto/feature-grid-block.dto";
 import { HeroBlockDto } from "./dto/hero-block.dto";
+import { MediaBlockDto } from "./dto/media-block.dto";
 import { RichTextBlockDto } from "./dto/rich-text-block.dto";
 
 /**
@@ -19,6 +24,11 @@ import { RichTextBlockDto } from "./dto/rich-text-block.dto";
 const BLOCK_DTO_BY_TYPE: Record<CampaignBlockType, ClassConstructor<object>> = {
   [CampaignBlockType.HERO]: HeroBlockDto,
   [CampaignBlockType.RICH_TEXT]: RichTextBlockDto,
+  [CampaignBlockType.FEATURE_GRID]: FeatureGridBlockDto,
+  [CampaignBlockType.MEDIA]: MediaBlockDto,
+  [CampaignBlockType.CTA]: CtaBlockDto,
+  [CampaignBlockType.FAQ_REF]: FaqRefBlockDto,
+  [CampaignBlockType.COUNTDOWN]: CountdownBlockDto,
 };
 
 /** Validated first, standalone — asset processing needs a known block type before validation ever runs (to know which asset field(s) to look for). */

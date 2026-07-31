@@ -4,4 +4,9 @@
 export enum CampaignBlockType {
   HERO = "hero",
   RICH_TEXT = "richText",
+  FEATURE_GRID = "featureGrid",
+  MEDIA = "media",
+  CTA = "cta",
+  FAQ_REF = "faqRef",
+  COUNTDOWN = "countdown",
 }
