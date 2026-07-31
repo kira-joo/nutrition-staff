@@ -34,7 +34,6 @@ export function ReviewForm({ defaultValues, endpoint }: ReviewFormProps) {
   const detailsFields: FormFieldConfig<ReviewFormValues>[] = [
     { type: FieldType.SWITCH, name: "featured", label: "Featured" },
     { type: FieldType.INPUT, name: "sourceUrl", label: "Source URL", inputType: "url" },
-    { type: FieldType.INPUT, name: "order", label: "Order", inputType: "number" },
     {
       type: FieldType.SELECT,
       name: "status",
@@ -62,7 +61,6 @@ export function ReviewForm({ defaultValues, endpoint }: ReviewFormProps) {
               afterImage: defaultValues.afterImage ?? null,
               featured: defaultValues.featured,
               sourceUrl: defaultValues.sourceUrl,
-              order: defaultValues.order,
               status: defaultValues.status,
             }
           : {
@@ -73,7 +71,6 @@ export function ReviewForm({ defaultValues, endpoint }: ReviewFormProps) {
               beforeImage: null,
               afterImage: null,
               featured: false,
-              order: 0,
               status: ContentStatus.DRAFT,
             }
       }

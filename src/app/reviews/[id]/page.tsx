@@ -55,7 +55,6 @@ export default function ReviewDetailsPage({ params }: { params: { id: string } }
             <PageSection icon={Activity} title="Status & activity">
               <div className="flex flex-col gap-3">
                 <InfoRow label="Featured" value={review.featured ? "Yes" : "No"} />
-                <InfoRow label="Order" value={review.order} />
                 <InfoRow label="Created" value={<DateText value={review.createdAt} />} />
                 <InfoRow label="Updated" value={<DateText value={review.updatedAt} />} />
               </div>

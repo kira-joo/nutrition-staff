@@ -50,7 +50,6 @@ export default function ReviewsPage() {
       ),
     },
     { key: "featured", header: "Featured", render: (review) => (review.featured ? "Yes" : "—") },
-    { key: "order", header: "Order", align: "right" },
   ];
 
   return (

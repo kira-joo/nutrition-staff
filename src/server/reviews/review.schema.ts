@@ -42,9 +42,6 @@ export class ReviewSchema {
   @MongoField({ type: String, required: false })
   sourceUrl?: string;
 
-  @MongoField({ type: Number, default: 0 })
-  order!: number;
-
   @MongoField({ type: String, enum: Object.values(ContentStatus), required: true })
   @Filterable()
   status!: ContentStatus;

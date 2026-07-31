@@ -11,7 +11,6 @@ export interface Review {
   afterImage?: ImageAsset | null;
   featured: boolean;
   sourceUrl?: string;
-  order: number;
   status: ContentStatus;
   createdAt: string;
   updatedAt: string;
@@ -31,6 +30,5 @@ export interface ReviewFormValues {
   afterImage: ImageAsset | File | null;
   featured: boolean;
   sourceUrl?: string;
-  order?: number;
   status: ContentStatus;
 }
