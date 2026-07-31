@@ -1,18 +1,16 @@
 import { NotFoundError, type AssetResourceType } from "@kira-joo/backend-toolkit-core";
 import { AssetKind, assetProvider } from "src/server/core/assets";
-import { toPlainGalleryItem } from "src/server/doctor-profile/doctor-profile.schema";
 import { doctorProfileRepository } from "src/server/doctor-profile/doctor-profile.repository";
 
 /** Removes one gallery item and re-normalizes the remaining items' `order` to stay contiguous. */
 export async function removeGalleryItem(itemId: string) {
   const profile = await doctorProfileRepository.findOne({ where: {} });
-  const galleryPlain = profile.gallery.map(toPlainGalleryItem);
-  const removedItem = galleryPlain.find((item) => item.id === itemId);
+  const removedItem = profile.gallery.find((item) => item.id === itemId);
   if (!removedItem) {
     throw new NotFoundError(`No gallery item exists with id "${itemId}"`, { itemId });
   }
 
-  const nextGallery = galleryPlain.filter((item) => item.id !== itemId).map((item, order) => ({ ...item, order }));
+  const nextGallery = profile.gallery.filter((item) => item.id !== itemId).map((item, order) => ({ ...item, order }));
 
   const saved = await doctorProfileRepository.update({ where: {} }, { gallery: nextGallery });
 

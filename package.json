@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@kira-joo/backend-toolkit-cloudinary": "^0.1.0",
-    "@kira-joo/backend-toolkit-core": "^0.3.2",
-    "@kira-joo/backend-toolkit-mongoose": "^0.2.1",
+    "@kira-joo/backend-toolkit-core": "^0.3.3",
+    "@kira-joo/backend-toolkit-mongoose": "^0.3.0",
     "@kira-joo/backend-toolkit-next": "^0.2.2",
     "@kira-joo/frontend-toolkit-core": "^0.4.0",
     "@kira-joo/frontend-toolkit-tailwind": "^0.3.17",

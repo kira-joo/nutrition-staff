@@ -12,7 +12,7 @@ import {
   DOCTOR_PROFILE_ASSET_FOLDER,
   DOCTOR_PROFILE_GALLERY_ASSET_FIELDS,
 } from "src/server/doctor-profile/doctor-profile-asset-fields";
-import { toPlainGalleryItem, type GalleryItem } from "src/server/doctor-profile/doctor-profile.schema";
+import type { GalleryItem } from "src/server/doctor-profile/doctor-profile.schema";
 import { doctorProfileRepository } from "src/server/doctor-profile/doctor-profile.repository";
 
 /** Replaces one gallery item's image and/or altText in place — never touches its position. */
@@ -21,12 +21,11 @@ export async function replaceGalleryItem(request: NextRequest, itemId: string) {
   const payload = JSON.parse(fields.payload ?? "{}");
 
   const profile = await doctorProfileRepository.findOne({ where: {} });
-  const galleryPlain = profile.gallery.map(toPlainGalleryItem);
-  const itemIndex = galleryPlain.findIndex((item) => item.id === itemId);
+  const itemIndex = profile.gallery.findIndex((item) => item.id === itemId);
   if (itemIndex === -1) {
     throw new NotFoundError(`No gallery item exists with id "${itemId}"`, { itemId });
   }
-  const previousItem = galleryPlain[itemIndex];
+  const previousItem = profile.gallery[itemIndex];
 
   const { uploaded } = await processAssetUploadFields({
     files,
@@ -44,7 +43,7 @@ export async function replaceGalleryItem(request: NextRequest, itemId: string) {
       altText: dto.altText ?? previousItem.altText,
       image: (payload.image as GalleryItem["image"] | undefined) ?? previousItem.image,
     };
-    const nextGallery = galleryPlain.map((item, index) => (index === itemIndex ? updatedItem : item));
+    const nextGallery = profile.gallery.map((item, index) => (index === itemIndex ? updatedItem : item));
     saved = await doctorProfileRepository.update({ where: {} }, { gallery: nextGallery });
   } catch (error) {
     await destroyUploadedAssets(assetProvider, uploaded);

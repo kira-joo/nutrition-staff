@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import { assertPublishReady } from "src/server/core/publishing";
 import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
-import { toPlainCampaign } from "src/server/campaigns/campaign.schema";
 import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/campaigns/blocks/campaign-block-asset-fields";
 import { assertValidBlockType, validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
@@ -13,7 +12,7 @@ export async function addCampaignBlock(request: NextRequest, campaignId: string)
   const { fields, files } = await parseMultipartFormData(request);
   const payload = JSON.parse(fields.payload ?? "{}");
 
-  const campaign = toPlainCampaign(await campaignRepository.findOne({ where: { _id: campaignId } }));
+  const campaign = await campaignRepository.findOne({ where: { _id: campaignId } });
   const assetFields = getCampaignBlockAssetFields(assertValidBlockType(payload.type));
 
   const { uploaded } = await processAssetUploadFields({

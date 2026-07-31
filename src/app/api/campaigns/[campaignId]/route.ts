@@ -2,7 +2,6 @@ import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
-import { toPlainCampaign } from "src/server/campaigns/campaign.schema";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 import { UpdateCampaignDto } from "src/server/campaigns/dto/update-campaign.dto";
 
@@ -18,7 +17,7 @@ export const PUT = createPutRoute({
   body: UpdateCampaignDto,
   auth: { permissions: [AppPermission.CAMPAIGN.UPDATE] },
   handler: async ({ params, body }) => {
-    const campaign = toPlainCampaign(await campaignRepository.findOne({ where: { _id: params.campaignId } }));
+    const campaign = await campaignRepository.findOne({ where: { _id: params.campaignId } });
     const nextStatus = body.status ?? campaign.status;
     const nextTitle = body.title ?? campaign.title;
     assertPublishReady({ title: nextTitle, blocks: campaign.blocks }, nextStatus);

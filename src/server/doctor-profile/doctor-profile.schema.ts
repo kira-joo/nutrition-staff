@@ -66,17 +66,6 @@ export interface GalleryItem {
   order: number;
 }
 
-/**
- * `GalleryItem` is a plain-data interface (deliberately — it's the wire/DTO
- * shape), but at runtime `profile.gallery`'s elements are actual Mongoose
- * subdocuments: their fields are prototype getters, not own enumerable
- * properties, so `{...item}` silently drops all of them. Any gallery
- * handler that spreads/patches an item must convert it via this first.
- */
-export function toPlainGalleryItem(item: GalleryItem): GalleryItem {
-  return (item as unknown as { toObject: () => GalleryItem }).toObject();
-}
-
 @MongoSchema({ timestamps: true })
 export class DoctorProfileSchema {
   _id!: mongoose.Types.ObjectId;

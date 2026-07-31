@@ -38,17 +38,3 @@ export class CampaignSchema {
 }
 
 export const CampaignModel = createMongoModel(EntityName.CAMPAIGN, CampaignSchema);
-
-/**
- * `title` is a real Mongoose subdocument (via `localizedStringField()`),
- * not a plain `{ar, en}` object — its fields are prototype getters, and its
- * internal Mongoose bookkeeping (parent/schema back-references) forms a
- * genuinely circular graph. Passing a hydrated document straight into
- * `findIncompleteLocalizedPaths`'s recursive walk crashes with a stack
- * overflow once it falls through to walking those internals. Any publish
- * check must convert to a plain object first — same fix as
- * `toPlainGalleryItem` in doctor-profile.schema.ts.
- */
-export function toPlainCampaign(campaign: CampaignSchema): CampaignSchema {
-  return (campaign as unknown as { toObject: () => CampaignSchema }).toObject();
-}

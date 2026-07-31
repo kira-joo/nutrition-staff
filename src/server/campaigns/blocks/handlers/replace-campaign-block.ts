@@ -9,7 +9,6 @@ import {
 } from "src/server/core/assets";
 import { assertPublishReady } from "src/server/core/publishing";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
-import { toPlainCampaign } from "src/server/campaigns/campaign.schema";
 import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/campaigns/blocks/campaign-block-asset-fields";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
 import { validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
@@ -23,7 +22,7 @@ export async function replaceCampaignBlock(request: NextRequest, campaignId: str
   const { fields, files } = await parseMultipartFormData(request);
   const payload = JSON.parse(fields.payload ?? "{}");
 
-  const campaign = toPlainCampaign(await campaignRepository.findOne({ where: { _id: campaignId } }));
+  const campaign = await campaignRepository.findOne({ where: { _id: campaignId } });
   const blockIndex = campaign.blocks.findIndex((block) => block.id === blockId);
   if (blockIndex === -1) {
     throw new NotFoundError(`No block exists with id "${blockId}"`, { blockId });
