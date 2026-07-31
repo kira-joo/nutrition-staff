@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "seed": "npm run seed:roles && node --env-file=.env --import tsx scripts/seed-users.ts",
-    "seed:roles": "node --env-file=.env --import tsx scripts/seed-roles-and-permissions.ts"
+    "seed:roles": "node --env-file=.env --import tsx scripts/seed-roles-and-permissions.ts",
+    "migrate:client-content": "node --env-file=.env --import tsx scripts/migrate-client-content.ts"
   },
   "dependencies": {
     "@kira-joo/backend-toolkit-cloudinary": "^0.1.0",
