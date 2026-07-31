@@ -7,4 +7,11 @@ export enum EntityName {
   DOCTOR_PROFILE = "DoctorProfile",
   PACKAGES_PAGE_SETTINGS = "PackagesPageSettings",
   CAMPAIGN = "Campaign",
+  RECIPE_CATEGORY = "RecipeCategory",
+  RECIPE_FOOD_GROUP = "RecipeFoodGroup",
+  RECIPE = "Recipe",
+  VIDEO = "Video",
+  FAQ_SECTION = "FaqSection",
+  FAQ_ITEM = "FaqItem",
+  PACKAGE = "Package",
 }

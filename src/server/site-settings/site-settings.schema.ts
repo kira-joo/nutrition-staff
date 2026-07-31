@@ -13,7 +13,10 @@ const socialLinkSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const seoSchema = new mongoose.Schema(
+// Exported for reuse anywhere else that needs an optional SEO override with
+// the exact same shape (e.g. Package.seoOverride) — one embedded-schema
+// definition, not a copy per consumer.
+export const seoSchema = new mongoose.Schema(
   {
     title: localizedStringField(),
     description: localizedStringField(),

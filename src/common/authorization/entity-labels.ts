@@ -10,4 +10,11 @@ export const ENTITY_PLURAL_LABELS: Record<EntityName, string> = {
   [EntityName.DOCTOR_PROFILE]: "Doctor Profile",
   [EntityName.PACKAGES_PAGE_SETTINGS]: "Packages Page Settings",
   [EntityName.CAMPAIGN]: "Campaigns",
+  [EntityName.RECIPE_CATEGORY]: "Recipe Categories",
+  [EntityName.RECIPE_FOOD_GROUP]: "Recipe Food Groups",
+  [EntityName.RECIPE]: "Recipes",
+  [EntityName.VIDEO]: "Videos",
+  [EntityName.FAQ_SECTION]: "FAQ Sections",
+  [EntityName.FAQ_ITEM]: "FAQ Items",
+  [EntityName.PACKAGE]: "Packages",
 };

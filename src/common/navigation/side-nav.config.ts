@@ -1,4 +1,20 @@
-import { Globe, Home, Images, Megaphone, MessageSquareQuote, Settings, ShieldCheck, SlidersHorizontal, Users } from "lucide-react";
+import {
+  ChefHat,
+  Globe,
+  HelpCircle,
+  Home,
+  Images,
+  ListTree,
+  Megaphone,
+  MessageSquareQuote,
+  Package as PackageIcon,
+  Salad,
+  Settings,
+  ShieldCheck,
+  SlidersHorizontal,
+  Users,
+  Video as VideoIcon,
+} from "lucide-react";
 import type { SideNavItemConfig, SideNavSectionConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { AppRoute } from "src/common/routes/app-route";
@@ -25,6 +41,67 @@ export const sideNavSections: SideNavSectionConfig[] = [
         href: AppRoute.campaigns,
         icon: Megaphone,
         permission: AppPermission.CAMPAIGN.READ,
+      },
+      {
+        key: "videos",
+        label: "Videos",
+        href: AppRoute.videos,
+        icon: VideoIcon,
+        permission: AppPermission.VIDEO.READ,
+      },
+      {
+        key: "packages",
+        label: "Packages",
+        href: AppRoute.packages,
+        icon: PackageIcon,
+        permission: AppPermission.PACKAGE.READ,
+      },
+    ],
+  },
+  {
+    key: "recipes",
+    label: "Recipes",
+    items: [
+      {
+        key: "recipes",
+        label: "Recipes",
+        href: AppRoute.recipes,
+        icon: ChefHat,
+        permission: AppPermission.RECIPE.READ,
+      },
+      {
+        key: "recipe-categories",
+        label: "Categories",
+        href: AppRoute.recipeCategories,
+        icon: ListTree,
+        permission: AppPermission.RECIPE_CATEGORY.READ,
+      },
+      {
+        key: "recipe-food-groups",
+        label: "Food Groups",
+        href: AppRoute.recipeFoodGroups,
+        icon: Salad,
+        permission: AppPermission.RECIPE_FOOD_GROUP.READ,
+      },
+    ],
+  },
+  {
+    key: "faq",
+    label: "FAQ",
+    items: [
+      {
+        key: "faq-sections",
+        label: "Sections",
+        href: AppRoute.faqSections,
+        icon: ListTree,
+        permission: AppPermission.FAQ_SECTION.READ,
+      },
+      {
+        key: "faq-items",
+        label: "Items",
+        href: AppRoute.faqItems,
+        icon: HelpCircle,
+        permission: AppPermission.FAQ_ITEM.READ,
       },
     ],
   },

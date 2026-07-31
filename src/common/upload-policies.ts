@@ -11,5 +11,8 @@ export {
   faviconImagePolicy,
   logoImagePolicy,
   ogImagePolicy,
+  recipeImagePolicy,
   reviewImagePolicy,
+  videoContentPolicy,
+  videoPosterPolicy,
 } from "../server/core/assets/upload-policies";

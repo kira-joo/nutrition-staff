@@ -56,3 +56,39 @@ export const campaignHeroPolicy: UploadPolicy = {
   minWidth: 600,
   minHeight: 300,
 };
+
+/** A recipe's hero photo — same real-world constraints as a review/doctor photo. */
+export const recipeImagePolicy: UploadPolicy = {
+  allowedMimeTypes: IMAGE_MIME_TYPES,
+  allowedFormats: IMAGE_FORMATS,
+  maxBytes: 8 * 1024 * 1024,
+  minWidth: 200,
+  minHeight: 200,
+};
+
+const VIDEO_MIME_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+const VIDEO_FORMATS = ["mp4", "webm", "mov"];
+
+/**
+ * An uploaded Video entry — per the plan's own flagged caveat, video files
+ * travel through this server on every upload; the 5-minute/100MB bounds
+ * here are a reasonable dev-time default, not a verified production
+ * limit. Confirm against the actual hosting platform's request body-size
+ * limit before this goes live (still an open item — see the checkpoint
+ * report).
+ */
+export const videoContentPolicy: UploadPolicy = {
+  allowedMimeTypes: VIDEO_MIME_TYPES,
+  allowedFormats: VIDEO_FORMATS,
+  maxBytes: 100 * 1024 * 1024,
+  maxDurationSeconds: 300,
+};
+
+/** A Video entry's optional poster/thumbnail override image. */
+export const videoPosterPolicy: UploadPolicy = {
+  allowedMimeTypes: IMAGE_MIME_TYPES,
+  allowedFormats: IMAGE_FORMATS,
+  maxBytes: 5 * 1024 * 1024,
+  minWidth: 200,
+  minHeight: 200,
+};
