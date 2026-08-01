@@ -24,10 +24,22 @@ export class UserSchema {
   @Searchable()
   name!: string;
 
-  @MongoField({ type: String, required: true })
+  /**
+   * Optional — a lead/client User (see `ClientProfile`) may have no email at
+   * all. Still required by the staff-facing `CreateUserDto`/`UserForm`; only
+   * the underlying schema constraint is relaxed here. Sparse so any number
+   * of Users can omit it without tripping the uniqueness constraint.
+   */
+  @MongoField({ type: String, required: false })
   @Searchable()
-  @Unique({ message: "A user with this email already exists" })
-  email!: string;
+  @Unique({ sparse: true, message: "A user with this email already exists" })
+  email?: string;
+
+  /** Optional — required by `CreateClientDto` for a new lead/client, but not by staff creation. Sparse for the same reason as `email`. */
+  @MongoField({ type: String, required: false })
+  @Searchable()
+  @Unique({ sparse: true, message: "A user with this phone number already exists" })
+  phone?: string;
 
   /**
    * Never returned by a normal read — only visible to a query that
@@ -54,12 +66,14 @@ export class UserSchema {
   @Filterable()
   status!: Status;
 
-  @MongoField({ type: Number, default: 0 })
+  /** Staff-only (HR) field. No default — a fabricated $0 would mislabel every lead/client User. */
+  @MongoField({ type: Number, required: false })
   @Filterable()
-  salary!: number;
+  salary?: number;
 
-  @MongoField({ type: String, default: () => new Date().toISOString().slice(0, 10) })
-  joinedAt!: string;
+  /** Staff-only (HR "date hired") field. No default — a fabricated today's-date would mislabel every lead/client User. */
+  @MongoField({ type: String, required: false })
+  joinedAt?: string;
 }
 
 export const UserModel = createMongoModel(EntityName.USER, UserSchema);

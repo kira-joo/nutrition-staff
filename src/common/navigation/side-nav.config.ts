@@ -12,6 +12,7 @@ import {
   Settings,
   ShieldCheck,
   SlidersHorizontal,
+  UserRoundCog,
   Users,
   Video as VideoIcon,
 } from "lucide-react";
@@ -23,6 +24,19 @@ export const sideNavSections: SideNavSectionConfig[] = [
   {
     key: "general",
     items: [{ key: "home", label: "Home", href: AppRoute.home, icon: Home }],
+  },
+  {
+    key: "clients",
+    label: "Clients",
+    items: [
+      {
+        key: "clients",
+        label: "Clients & Leads",
+        href: AppRoute.clients,
+        icon: UserRoundCog,
+        permission: AppPermission.CLIENT.READ,
+      },
+    ],
   },
   {
     key: "content",

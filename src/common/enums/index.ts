@@ -4,3 +4,6 @@ export * from "./currency.enum";
 export * from "./campaign-block-type.enum";
 export * from "./package-variant.enum";
 export * from "./icon-key.enum";
+export * from "./client-lifecycle.enum";
+export * from "./client-source.enum";
+export * from "./gender.enum";

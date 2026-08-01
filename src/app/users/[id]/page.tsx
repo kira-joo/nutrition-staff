@@ -45,10 +45,10 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <PageSection icon={IdCard} title="User information">
               <div className="flex flex-col gap-3">
-                <InfoRow label="Email" value={user.email} />
+                <InfoRow label="Email" value={user.email ?? "—"} />
                 <InfoRow label="Role" value={user.roles.map((role) => role.name).join(", ") || "—"} />
-                <InfoRow label="Salary" value={`$${user.salary.toLocaleString()}`} />
-                <InfoRow label="Joined At" value={user.joinedAt} />
+                <InfoRow label="Salary" value={user.salary !== undefined ? `$${user.salary.toLocaleString()}` : "—"} />
+                <InfoRow label="Joined At" value={user.joinedAt ?? "—"} />
               </div>
             </PageSection>
             <PageSection icon={Activity} title="Status & activity">

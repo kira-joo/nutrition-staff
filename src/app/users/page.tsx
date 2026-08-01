@@ -61,9 +61,9 @@ export default function UsersPage() {
       key: "salary",
       header: "Salary",
       align: "right",
-      render: (user) => `$${user.salary.toLocaleString()}`,
+      render: (user) => (user.salary !== undefined ? `$${user.salary.toLocaleString()}` : "—"),
     },
-    { key: "joinedAt", header: "Joined At" },
+    { key: "joinedAt", header: "Joined At", render: (user) => user.joinedAt ?? "—" },
   ];
 
   return (

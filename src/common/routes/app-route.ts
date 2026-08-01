@@ -50,4 +50,13 @@ export const AppRoute = {
   packageUpdate: "/packages/[id]/update",
   settings: "/settings",
   settingsPassword: "/settings/password",
+  clients: "/clients",
+  clientCreate: "/clients/create",
+  clientDetails: "/clients/[id]",
+  clientOverview: "/clients/[id]/overview",
+  clientProfile: "/clients/[id]/profile",
+  clientMeasurements: "/clients/[id]/measurements",
+  clientAssessments: "/clients/[id]/assessments",
+  clientCalculations: "/clients/[id]/calculations",
+  clientInteractions: "/clients/[id]/interactions",
 } as const;
