@@ -21,4 +21,5 @@ export const ENTITY_PLURAL_LABELS: Record<EntityName, string> = {
   [EntityName.STAFF]: "Staff Profiles",
   [EntityName.CLIENT_MEASUREMENT]: "Measurements",
   [EntityName.NUTRITION_ASSESSMENT]: "Nutrition Assessments",
+  [EntityName.NUTRITION_CALCULATION]: "Nutrition Calculations",
 };

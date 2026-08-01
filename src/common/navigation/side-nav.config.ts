@@ -1,5 +1,6 @@
 import {
   ChefHat,
+  FlaskConical,
   Globe,
   HelpCircle,
   Home,
@@ -35,6 +36,13 @@ export const sideNavSections: SideNavSectionConfig[] = [
         href: AppRoute.clients,
         icon: UserRoundCog,
         permission: AppPermission.CLIENT.READ,
+      },
+      {
+        key: "calculators",
+        label: "Calculators",
+        href: AppRoute.calculators,
+        icon: FlaskConical,
+        permission: AppPermission.NUTRITION_CALCULATION.CREATE,
       },
     ],
   },

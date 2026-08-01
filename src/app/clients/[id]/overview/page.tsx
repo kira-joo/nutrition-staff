@@ -77,7 +77,12 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               >
                 Create assessment
               </CustomButton>
-              <CustomButton variant="outline" leftIcon={FlaskConical} disabled title="Available once the Calculation Workspace checkpoint ships">
+              <CustomButton
+                variant="outline"
+                leftIcon={FlaskConical}
+                onClick={() => navigate(AppRoute.clientCalculationNew, { id: params.id })}
+                disabled={!can(AppPermission.NUTRITION_CALCULATION.CREATE)}
+              >
                 Run calculator
               </CustomButton>
               <CustomButton variant="outline" leftIcon={CalendarClock} disabled title="Available once the Interactions checkpoint ships">

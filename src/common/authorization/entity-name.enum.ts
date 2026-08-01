@@ -18,4 +18,5 @@ export enum EntityName {
   STAFF = "Staff",
   CLIENT_MEASUREMENT = "ClientMeasurement",
   NUTRITION_ASSESSMENT = "NutritionAssessment",
+  NUTRITION_CALCULATION = "NutritionCalculation",
 }
