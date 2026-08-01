@@ -24,12 +24,6 @@ export function NutritionCalculationInputForm({ defaultValues, onComputed }: Nut
       label: "Gender",
       options: Object.values(Gender).map((v) => ({ label: v, value: v })),
     },
-    {
-      type: FieldType.SELECT,
-      name: "bmrGenderOverride",
-      label: "BMR sex override (only used if gender above is left blank)",
-      options: Object.values(Gender).map((v) => ({ label: v, value: v })),
-    },
     { type: FieldType.DATE, name: "dateOfBirth", label: "Date of birth" },
     { type: FieldType.INPUT, name: "birthYear", label: "Birth year (if exact date unknown)", inputType: "number" },
     { type: FieldType.INPUT, name: "heightCm", label: "Height (cm)", inputType: "number", rules: { required: true } },

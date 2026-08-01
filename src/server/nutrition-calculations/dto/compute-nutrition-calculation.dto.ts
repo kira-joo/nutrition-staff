@@ -9,14 +9,16 @@ import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "src/common/enu
  * out-of-range values outright rather than silently clamping them.
  */
 export class ComputeNutritionCalculationDto {
-  /** Optional — absent means not specified, which is exactly when `bmrGenderOverride` matters. */
+  /**
+   * Optional — absent means not specified. The gender used for *this
+   * calculation only*: prefilled from the client's stored profile in the
+   * client-based flow, freely editable, never written back to it. When
+   * absent, BMR-dependent outputs are simply not calculated (see
+   * runNutritionCalculation) rather than guessed.
+   */
   @IsOptional()
   @IsEnum(Gender)
   gender?: Gender;
-
-  @IsOptional()
-  @IsEnum(Gender)
-  bmrGenderOverride?: Gender;
 
   @IsOptional()
   @ToDate()

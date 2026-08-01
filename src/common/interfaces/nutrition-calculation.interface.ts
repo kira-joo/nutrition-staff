@@ -3,7 +3,6 @@ import type { ClientUserSummary } from "./client.interface";
 
 export interface ComputeNutritionCalculationInputs {
   gender?: Gender;
-  bmrGenderOverride?: Gender;
   dateOfBirth?: string;
   birthYear?: number;
   heightCm: number;

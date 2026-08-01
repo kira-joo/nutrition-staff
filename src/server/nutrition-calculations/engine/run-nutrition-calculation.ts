@@ -15,10 +15,15 @@ const MIN_SUPPORTED_AGE_YEARS = 10;
 const MAX_SUPPORTED_AGE_YEARS = 110;
 
 export interface NutritionCalculationEngineInput {
-  /** Absent means not specified — there's no sentinel "unspecified" value; the BMR chain requires either this or `bmrGenderOverride`. */
+  /**
+   * Absent means not specified — no sentinel "unspecified" value. This is
+   * the gender used for *this calculation only*; like every other field
+   * here, it's a local, per-calculation input (prefilled from the client's
+   * stored profile in the client-based flow, but never written back to it
+   * — see "temporary input changes must not overwrite stored client
+   * data"), not a second, separate override concept.
+   */
   gender?: Gender;
-  /** Only used when `gender` is absent — an explicit, per-calculation choice, never inferred and never applied back to the client's stored profile. */
-  bmrGenderOverride?: Gender;
   dateOfBirth?: Date;
   birthYear?: number;
   heightCm: number;
@@ -78,19 +83,11 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
   }
   const ageOutOfSupportedRange = age !== null && (age.ageYears < MIN_SUPPORTED_AGE_YEARS || age.ageYears > MAX_SUPPORTED_AGE_YEARS);
 
-  let sex: Gender | undefined;
-  if (input.gender) {
-    sex = input.gender;
-  } else if (input.bmrGenderOverride) {
-    sex = input.bmrGenderOverride;
-    assumptions.push(
-      `Gender is unspecified for this client — the doctor explicitly selected "${input.bmrGenderOverride}" as the BMR coefficient for this calculation only; the client's stored profile was not changed.`
-    );
-  }
+  const sex = input.gender;
 
   if (!sex) {
     assumptions.push(
-      "BMR, maintenance calories, goal calories, and macros were not calculated: gender is unspecified and no BMR sex override was provided for this calculation."
+      "BMR, maintenance calories, goal calories, and macros were not calculated: gender was not provided for this calculation."
     );
   } else if (!age) {
     assumptions.push(
