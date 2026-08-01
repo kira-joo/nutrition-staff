@@ -57,6 +57,8 @@ export const AppRoute = {
   clientProfile: "/clients/[id]/profile",
   clientMeasurements: "/clients/[id]/measurements",
   clientAssessments: "/clients/[id]/assessments",
+  clientAssessmentCreate: "/clients/[id]/assessments/create",
+  clientAssessmentDetails: "/clients/[id]/assessments/[assessmentId]",
   clientCalculations: "/clients/[id]/calculations",
   clientInteractions: "/clients/[id]/interactions",
 } as const;

@@ -9,3 +9,8 @@ export * from "./client-source.enum";
 export * from "./gender.enum";
 export * from "./profile-type.enum";
 export * from "./body-composition-method.enum";
+export * from "./nutrition-goal.enum";
+export * from "./activity-level.enum";
+export * from "./sleep-quality.enum";
+export * from "./smoking-status.enum";
+export * from "./alcohol-use.enum";

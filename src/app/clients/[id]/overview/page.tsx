@@ -69,7 +69,12 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               >
                 Add measurement
               </CustomButton>
-              <CustomButton variant="outline" leftIcon={NotebookPen} disabled title="Available once the Assessments checkpoint ships">
+              <CustomButton
+                variant="outline"
+                leftIcon={NotebookPen}
+                onClick={() => navigate(AppRoute.clientAssessmentCreate, { id: params.id })}
+                disabled={!can(AppPermission.NUTRITION_ASSESSMENT.CREATE)}
+              >
                 Create assessment
               </CustomButton>
               <CustomButton variant="outline" leftIcon={FlaskConical} disabled title="Available once the Calculation Workspace checkpoint ships">

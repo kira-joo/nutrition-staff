@@ -21,11 +21,11 @@ const LIFECYCLE_BADGE_VARIANT: Record<ClientLifecycle, "success" | "secondary" |
 
 /**
  * Single source of truth for the Client Details workspace's tabs — id,
- * label, route, and permission all live here once. Assessments/
- * Calculations/Interactions are still gated on `CLIENT.READ` because their
- * own permission entities don't exist until the checkpoint that builds
- * them — update each tab's `permission` to its real entity at that point;
- * nothing else about this config needs to change.
+ * label, route, and permission all live here once. Calculations/
+ * Interactions are still gated on `CLIENT.READ` because their own
+ * permission entities don't exist until the checkpoint that builds them —
+ * update each tab's `permission` to its real entity at that point; nothing
+ * else about this config needs to change.
  */
 const CLIENT_DETAILS_TABS: RouteTabItem<string>[] = [
   { id: "overview", label: "Overview", path: AppRoute.clientOverview, permission: AppPermission.CLIENT.READ },
@@ -40,7 +40,7 @@ const CLIENT_DETAILS_TABS: RouteTabItem<string>[] = [
     id: "assessments",
     label: "Assessments",
     path: AppRoute.clientAssessments,
-    permission: AppPermission.CLIENT.READ,
+    permission: AppPermission.NUTRITION_ASSESSMENT.READ,
   },
   {
     id: "calculations",
