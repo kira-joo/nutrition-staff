@@ -1,6 +1,6 @@
 import { BaseFindQueryDto } from "@kira-joo/backend-toolkit-core";
 import { IsEnum, IsMongoId, IsOptional } from "class-validator";
-import { Status } from "../../../common/enums";
+import { ProfileType, Status } from "../../../common/enums";
 
 export class ListUsersQueryDto extends BaseFindQueryDto {
   @IsOptional()
@@ -10,4 +10,9 @@ export class ListUsersQueryDto extends BaseFindQueryDto {
   @IsOptional()
   @IsMongoId()
   roles?: string;
+
+  /** Derived filter — resolved against ClientProfile/StaffProfile existence, not a stored User field. */
+  @IsOptional()
+  @IsEnum(ProfileType)
+  profileType?: ProfileType;
 }

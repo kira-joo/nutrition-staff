@@ -67,9 +67,8 @@ export default function SettingsPage() {
             <PageSection icon={IdCard} title="Account information">
               <div className="flex flex-col gap-3">
                 <InfoRow label="Email" value={user.email ?? "—"} />
+                <InfoRow label="Phone" value={user.phone ?? "—"} />
                 <InfoRow label="Role" value={user.roles.map((role) => role.name).join(", ") || "—"} />
-                <InfoRow label="Salary" value={user.salary !== undefined ? `$${user.salary.toLocaleString()}` : "—"} />
-                <InfoRow label="Joined At" value={user.joinedAt ?? "—"} />
               </div>
             </PageSection>
             <PageSection icon={Activity} title="Status & activity">

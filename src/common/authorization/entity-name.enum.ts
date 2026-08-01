@@ -15,4 +15,5 @@ export enum EntityName {
   FAQ_ITEM = "FaqItem",
   PACKAGE = "Package",
   CLIENT = "Client",
+  STAFF = "Staff",
 }

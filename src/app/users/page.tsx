@@ -19,7 +19,7 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
 import { EntityName } from "src/common/authorization/entity-name.enum";
-import { Status } from "src/common/enums";
+import { ProfileType, Status } from "src/common/enums";
 import { User } from "src/common/interfaces/user.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
@@ -46,7 +46,8 @@ export default function UsersPage() {
         </AppLink>
       ),
     },
-    { key: "email", header: "Email" },
+    { key: "email", header: "Email", render: (user) => user.email ?? "—" },
+    { key: "phone", header: "Phone", render: (user) => user.phone ?? "—" },
     {
       key: "roles",
       header: "Roles",
@@ -58,19 +59,23 @@ export default function UsersPage() {
       render: (user) => <Badge variant={user.status === Status.ACTIVE ? "success" : "secondary"}>{user.status}</Badge>,
     },
     {
-      key: "salary",
-      header: "Salary",
-      align: "right",
-      render: (user) => (user.salary !== undefined ? `$${user.salary.toLocaleString()}` : "—"),
+      key: "profiles",
+      header: "Profiles",
+      render: (user) => (
+        <div className="flex gap-1">
+          {user.hasStaffProfile ? <Badge variant="secondary">Staff</Badge> : null}
+          {user.hasClientProfile ? <Badge variant="secondary">Client</Badge> : null}
+          {!user.hasStaffProfile && !user.hasClientProfile ? <span>—</span> : null}
+        </div>
+      ),
     },
-    { key: "joinedAt", header: "Joined At", render: (user) => user.joinedAt ?? "—" },
   ];
 
   return (
     <PageShell
       icon={Users}
-      title="Users"
-      description="Manage staff users"
+      title="People & Accounts"
+      description="Every identity in the system — staff, clients, and anyone with neither profile yet"
       actions={
         <RouteButton path={AppRoute.userCreate} permission={AppPermission.USER.CREATE} leftIcon={Plus}>
           Add User
@@ -88,6 +93,16 @@ export default function UsersPage() {
             options: [
               { label: "Active", value: Status.ACTIVE },
               { label: "Inactive", value: Status.INACTIVE },
+            ],
+          },
+          {
+            key: "profileType",
+            header: "Profile",
+            options: [
+              { label: "Identity only", value: ProfileType.IDENTITY_ONLY },
+              { label: "Client only", value: ProfileType.CLIENT_ONLY },
+              { label: "Staff only", value: ProfileType.STAFF_ONLY },
+              { label: "Both", value: ProfileType.BOTH },
             ],
           },
           {

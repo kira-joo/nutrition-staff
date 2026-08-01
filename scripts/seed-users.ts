@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { Status } from "../src/common/enums";
 import { RoleModel } from "../src/server/core/authorization/role.model";
 import { connectToDatabase } from "../src/server/core/db/connect";
+import { StaffProfileModel } from "../src/server/staff/staff-profile.schema";
 import { UserModel } from "../src/server/users/user.schema";
 
 // Dev-only password shared by every seeded sample user, so there's a way to
@@ -62,17 +63,25 @@ async function seed() {
   const roles = await RoleModel.find({}).lean();
   const roleIdByName = new Map(roles.map((role) => [role.name, role._id]));
 
-  const sampleUsers = SAMPLE_USERS.map(({ roleName, ...user }) => {
+  const sampleUsers = SAMPLE_USERS.map(({ roleName, salary, joinedAt, ...user }) => {
     const roleId = roleIdByName.get(roleName);
     if (!roleId) {
       throw new Error(`Role "${roleName}" was not found — run \`npm run seed:roles\` before seeding users.`);
     }
-    return { ...user, passwordHash, tokenVersion: 1, roles: [roleId] };
+    return { user: { ...user, passwordHash, tokenVersion: 1, roles: [roleId] }, staffProfile: { salary, joinedAt } };
   });
 
   await UserModel.deleteMany({});
-  const inserted = await UserModel.insertMany(sampleUsers);
-  console.log(`Seeded ${inserted.length} users (password for all: "${DEV_PASSWORD}", dev-only)`);
+  await StaffProfileModel.deleteMany({});
+
+  const insertedUsers = await UserModel.insertMany(sampleUsers.map((sample) => sample.user));
+  await StaffProfileModel.insertMany(
+    insertedUsers.map((user, index) => ({ userId: user._id, ...sampleUsers[index].staffProfile }))
+  );
+
+  console.log(
+    `Seeded ${insertedUsers.length} users, each with a StaffProfile (password for all: "${DEV_PASSWORD}", dev-only)`
+  );
   await mongoose.disconnect();
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { ApiErrorState, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { Briefcase, IdCard } from "lucide-react";
+import { IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getRolesEndpoint } from "../../../api/role.endpoints";
 import type { createUserEndpoint, updateUserEndpoint } from "../../../api/user.endpoints";
@@ -18,6 +18,12 @@ export interface UserFormProps {
   endpoint: typeof createUserEndpoint | typeof updateUserEndpoint;
 }
 
+/**
+ * Identity + account fields only (name/email/roles/status) — this is the
+ * generic identity record for anyone in the system, not a staff-only form.
+ * Employment details (salary/joined date) live on the separate StaffProfile,
+ * edited from the User Details page's "Staff details" section instead.
+ */
 export function UserForm({ defaultValues, endpoint }: UserFormProps) {
   const router = useRouter();
   const { can } = usePermissions();
@@ -70,26 +76,9 @@ export function UserForm({ defaultValues, endpoint }: UserFormProps) {
     },
   ];
 
-  const employmentFields: FormFieldConfig<UserFormValues>[] = [
-    {
-      type: FieldType.INPUT,
-      name: "salary",
-      label: "Salary",
-      inputType: "number",
-    },
-    {
-      type: FieldType.DATE,
-      name: "joinedAt",
-      label: "Joined At",
-    },
-  ];
-
   return (
     <CustomForm<UserFormValues, typeof endpoint>
-      sections={[
-        { title: "Basic information", icon: IdCard, fields: basicInfoFields },
-        { title: "Employment details", icon: Briefcase, fields: employmentFields },
-      ]}
+      sections={[{ title: "Identity & account", icon: IdCard, fields: basicInfoFields }]}
       defaultValues={
         defaultValues ? { ...defaultValues, roles: defaultValues.roles.map((role) => role._id) } : undefined
       }

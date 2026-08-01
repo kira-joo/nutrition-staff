@@ -12,6 +12,14 @@ import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Status } from "../../common/enums";
 
+/**
+ * The master identity/account record for every person in the system —
+ * general identity, contact info, and authorization (`roles`) only.
+ * Participation as a lead/client or as a staff member lives in the
+ * optional, independent `ClientProfile`/`StaffProfile` — a `User` may have
+ * neither, either, or both. Never inferred from `roles`, and there is no
+ * `UserType`/mutually-exclusive category field here on purpose.
+ */
 @MongoSchema({ timestamps: true })
 export class UserSchema {
   // Undecorated on purpose — Mongoose adds `_id` automatically at the schema
@@ -65,15 +73,6 @@ export class UserSchema {
   @Searchable()
   @Filterable()
   status!: Status;
-
-  /** Staff-only (HR) field. No default — a fabricated $0 would mislabel every lead/client User. */
-  @MongoField({ type: Number, required: false })
-  @Filterable()
-  salary?: number;
-
-  /** Staff-only (HR "date hired") field. No default — a fabricated today's-date would mislabel every lead/client User. */
-  @MongoField({ type: String, required: false })
-  joinedAt?: string;
 }
 
 export const UserModel = createMongoModel(EntityName.USER, UserSchema);

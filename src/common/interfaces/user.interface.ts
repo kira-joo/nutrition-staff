@@ -9,10 +9,13 @@ export interface User {
   phone?: string;
   roles: RoleSummary[];
   status: Status;
-  /** Staff-only field — undefined on a lead/client User created without HR details. */
-  salary?: number;
-  /** Staff-only field ("date hired") — undefined on a lead/client User. */
-  joinedAt?: string;
+  /**
+   * Derived (not stored) — whether this identity has a linked `ClientProfile`/
+   * `StaffProfile`. Only present on responses from `GET /api/users`, which
+   * computes them per page; absent elsewhere.
+   */
+  hasClientProfile?: boolean;
+  hasStaffProfile?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,8 +25,6 @@ export interface CreateUserDto {
   email: string;
   roles?: string[];
   status: Status;
-  salary?: number;
-  joinedAt?: string;
 }
 
 export type UpdateUserDto = Partial<CreateUserDto>;
@@ -33,7 +34,4 @@ export interface UserFormValues {
   email: string;
   roles: string[];
   status: Status;
-  /** Native number input round-trips as a string until it's coerced on submit. */
-  salary?: number;
-  joinedAt?: string;
 }

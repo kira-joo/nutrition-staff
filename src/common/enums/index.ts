@@ -7,3 +7,4 @@ export * from "./icon-key.enum";
 export * from "./client-lifecycle.enum";
 export * from "./client-source.enum";
 export * from "./gender.enum";
+export * from "./profile-type.enum";
