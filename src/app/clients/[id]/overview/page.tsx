@@ -10,6 +10,8 @@ import { ClientLifecycleForm } from "src/common/forms/client-lifecycle-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
 import { getClientByIdEndpoint } from "../../../../../api/client.endpoints";
+import { getClientMeasurementsEndpoint } from "../../../../../api/client-measurement.endpoints";
+import { SortOrder } from "@kira-joo/frontend-toolkit-core";
 
 /** Derived, not stored — a quick "how ready is this record" signal for staff, based on what's filled in so far. */
 function profileCompleteness(client: {
@@ -17,8 +19,8 @@ function profileCompleteness(client: {
   gender?: string;
   heightCm?: number;
   source?: string;
-}): { filled: number; total: number } {
-  const checks = [client.dateOfBirth, client.gender, client.heightCm, client.source];
+}, hasMeasurement: boolean): { filled: number; total: number } {
+  const checks = [client.dateOfBirth, client.gender, client.heightCm, client.source, hasMeasurement];
   return { filled: checks.filter(Boolean).length, total: checks.length };
 }
 
@@ -32,10 +34,18 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
     options: { params: { id: params.id } },
   });
 
+  const latestMeasurementQuery = useRequesterQuery({
+    endpoint: getClientMeasurementsEndpoint,
+    options: {
+      query: { clientProfileId: params.id, sortBy: "measuredAt", sortOrder: SortOrder.DESC, limit: 1, page: 1 },
+    },
+  });
+  const latestMeasurement = latestMeasurementQuery.data?.data[0];
+
   return (
     <QueryState query={clientQuery} entityName="Client">
       {(client) => {
-        const completeness = profileCompleteness(client);
+        const completeness = profileCompleteness(client, Boolean(latestMeasurement));
 
         return (
           <div className="flex flex-col gap-4">
@@ -51,7 +61,12 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               <CustomButton variant="outline" onClick={() => navigate(AppRoute.clientProfile, { id: params.id })}>
                 Edit profile
               </CustomButton>
-              <CustomButton variant="outline" leftIcon={Ruler} disabled title="Available once the Measurements checkpoint ships">
+              <CustomButton
+                variant="outline"
+                leftIcon={Ruler}
+                onClick={() => navigate(AppRoute.clientMeasurements, { id: params.id })}
+                disabled={!can(AppPermission.CLIENT_MEASUREMENT.CREATE)}
+              >
                 Add measurement
               </CustomButton>
               <CustomButton variant="outline" leftIcon={NotebookPen} disabled title="Available once the Assessments checkpoint ships">
@@ -88,6 +103,18 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
                   <InfoRow label="Profile completeness" value={`${completeness.filled}/${completeness.total} fields`} />
                   <InfoRow label="Created" value={<DateText value={client.createdAt} />} />
                 </div>
+              </PageSection>
+              <PageSection icon={Ruler} title="Latest measurement">
+                {latestMeasurement ? (
+                  <div className="flex flex-col gap-3">
+                    <InfoRow label="Measured on" value={<DateText value={latestMeasurement.measuredAt} />} />
+                    <InfoRow label="Weight" value={latestMeasurement.weightKg ? `${latestMeasurement.weightKg} kg` : "—"} />
+                    <InfoRow label="BMI" value={latestMeasurement.bmi ?? "—"} />
+                    <InfoRow label="Waist" value={latestMeasurement.waistCm ? `${latestMeasurement.waistCm} cm` : "—"} />
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">No measurements recorded yet.</p>
+                )}
               </PageSection>
             </div>
 

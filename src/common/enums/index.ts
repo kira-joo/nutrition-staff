@@ -8,3 +8,4 @@ export * from "./client-lifecycle.enum";
 export * from "./client-source.enum";
 export * from "./gender.enum";
 export * from "./profile-type.enum";
+export * from "./body-composition-method.enum";
