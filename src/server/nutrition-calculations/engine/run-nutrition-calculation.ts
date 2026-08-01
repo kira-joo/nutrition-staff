@@ -1,4 +1,4 @@
-import { ActivityLevel, BmrFormula, BmrSex, Gender, NutritionGoal } from "src/common/enums";
+import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "src/common/enums";
 import { calculateBmi } from "./bmi";
 import { calculateBmr } from "./bmr";
 import { calculateGoalCalories } from "./goal-calories";
@@ -15,9 +15,10 @@ const MIN_SUPPORTED_AGE_YEARS = 10;
 const MAX_SUPPORTED_AGE_YEARS = 110;
 
 export interface NutritionCalculationEngineInput {
-  gender: Gender;
-  /** Only used when `gender` is `UNSPECIFIED` — an explicit, per-calculation choice, never inferred and never applied back to the client's stored profile. */
-  bmrGenderOverride?: BmrSex;
+  /** Absent means not specified — there's no sentinel "unspecified" value; the BMR chain requires either this or `bmrGenderOverride`. */
+  gender?: Gender;
+  /** Only used when `gender` is absent — an explicit, per-calculation choice, never inferred and never applied back to the client's stored profile. */
+  bmrGenderOverride?: Gender;
   dateOfBirth?: Date;
   birthYear?: number;
   heightCm: number;
@@ -77,10 +78,10 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
   }
   const ageOutOfSupportedRange = age !== null && (age.ageYears < MIN_SUPPORTED_AGE_YEARS || age.ageYears > MAX_SUPPORTED_AGE_YEARS);
 
-  let sex: BmrSex | undefined;
-  if (input.gender === Gender.MALE) sex = BmrSex.MALE;
-  else if (input.gender === Gender.FEMALE) sex = BmrSex.FEMALE;
-  else if (input.bmrGenderOverride) {
+  let sex: Gender | undefined;
+  if (input.gender) {
+    sex = input.gender;
+  } else if (input.bmrGenderOverride) {
     sex = input.bmrGenderOverride;
     assumptions.push(
       `Gender is unspecified for this client — the doctor explicitly selected "${input.bmrGenderOverride}" as the BMR coefficient for this calculation only; the client's stored profile was not changed.`

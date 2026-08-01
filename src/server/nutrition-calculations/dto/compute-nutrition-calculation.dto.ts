@@ -1,7 +1,7 @@
 import { ToBoolean, ToDate, ToNumber } from "@kira-joo/backend-toolkit-core";
 import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, Max, Min } from "class-validator";
 import "reflect-metadata";
-import { ActivityLevel, BmrFormula, BmrSex, Gender, NutritionGoal } from "src/common/enums";
+import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "src/common/enums";
 
 /**
  * The exact input set the workspace collects — becomes the persisted
@@ -9,12 +9,14 @@ import { ActivityLevel, BmrFormula, BmrSex, Gender, NutritionGoal } from "src/co
  * out-of-range values outright rather than silently clamping them.
  */
 export class ComputeNutritionCalculationDto {
+  /** Optional — absent means not specified, which is exactly when `bmrGenderOverride` matters. */
+  @IsOptional()
   @IsEnum(Gender)
-  gender!: Gender;
+  gender?: Gender;
 
   @IsOptional()
-  @IsEnum(BmrSex)
-  bmrGenderOverride?: BmrSex;
+  @IsEnum(Gender)
+  bmrGenderOverride?: Gender;
 
   @IsOptional()
   @ToDate()

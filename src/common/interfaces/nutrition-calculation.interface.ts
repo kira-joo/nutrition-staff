@@ -1,9 +1,9 @@
-import { ActivityLevel, BmrFormula, BmrSex, CalculationType, Gender, NutritionGoal } from "../enums";
+import { ActivityLevel, BmrFormula, CalculationType, Gender, NutritionGoal } from "../enums";
 import type { ClientUserSummary } from "./client.interface";
 
 export interface ComputeNutritionCalculationInputs {
-  gender: Gender;
-  bmrGenderOverride?: BmrSex;
+  gender?: Gender;
+  bmrGenderOverride?: Gender;
   dateOfBirth?: string;
   birthYear?: number;
   heightCm: number;

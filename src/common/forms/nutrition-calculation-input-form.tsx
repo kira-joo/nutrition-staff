@@ -1,7 +1,7 @@
 "use client";
 
 import { CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { ActivityLevel, BmrFormula, BmrSex, Gender, NutritionGoal } from "../enums";
+import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "../enums";
 import { computeNutritionCalculationEndpoint } from "../../../api/nutrition-calculation.endpoints";
 import { ComputeNutritionCalculationInputs, ComputeNutritionCalculationResponse } from "../interfaces/nutrition-calculation.interface";
 
@@ -23,13 +23,12 @@ export function NutritionCalculationInputForm({ defaultValues, onComputed }: Nut
       name: "gender",
       label: "Gender",
       options: Object.values(Gender).map((v) => ({ label: v, value: v })),
-      rules: { required: true },
     },
     {
       type: FieldType.SELECT,
       name: "bmrGenderOverride",
-      label: "BMR sex override (only used if gender is Unspecified)",
-      options: Object.values(BmrSex).map((v) => ({ label: v, value: v })),
+      label: "BMR sex override (only used if gender above is left blank)",
+      options: Object.values(Gender).map((v) => ({ label: v, value: v })),
     },
     { type: FieldType.DATE, name: "dateOfBirth", label: "Date of birth" },
     { type: FieldType.INPUT, name: "birthYear", label: "Birth year (if exact date unknown)", inputType: "number" },

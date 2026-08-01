@@ -1,4 +1,4 @@
-import { BmrSex, NutritionGoal } from "src/common/enums";
+import { Gender, NutritionGoal } from "src/common/enums";
 
 /** Percentage-based defaults (scale with the individual, unlike a flat kcal cut) — doctor-overridable via `adjustmentPercent` or a flat `adjustmentKcalOverride`. */
 export const DEFAULT_GOAL_ADJUSTMENT_PERCENT: Record<NutritionGoal, number> = {
@@ -11,9 +11,9 @@ export const DEFAULT_GOAL_ADJUSTMENT_PERCENT: Record<NutritionGoal, number> = {
 };
 
 /** Widely-cited safe floors — never recommended below this without an explicit doctor override. */
-export const SAFE_FLOOR_KCAL: Record<BmrSex, number> = {
-  [BmrSex.FEMALE]: 1200,
-  [BmrSex.MALE]: 1500,
+export const SAFE_FLOOR_KCAL: Record<Gender, number> = {
+  [Gender.FEMALE]: 1200,
+  [Gender.MALE]: 1500,
 };
 
 export interface CalculateGoalCaloriesParams {
@@ -21,7 +21,7 @@ export interface CalculateGoalCaloriesParams {
   goal?: NutritionGoal;
   adjustmentPercent?: number;
   adjustmentKcalOverride?: number;
-  sex: BmrSex;
+  sex: Gender;
   acknowledgeBelowSafeFloor?: boolean;
 }
 
