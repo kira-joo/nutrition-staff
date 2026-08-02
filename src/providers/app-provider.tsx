@@ -5,6 +5,7 @@ import {
   APIConfig,
   AppLinkConfig,
   AuthUserProvider,
+  Logger,
   QueryParamsRouterProvider,
   ToolkitProviders,
   createToolkitQueryClient,
@@ -30,6 +31,11 @@ import { useNextQueryParamsRouter } from "../common/routes/use-next-query-params
 // mutation settling, regardless of retries or how many components observe
 // the same query key.
 export const queryClient = createToolkitQueryClient({ onError: showApiErrorToast });
+
+// Gates buildAppHref's unresolved-route-param throw (dev/test only, logs
+// instead in production) and Logger.log/.warn — set once, at the same
+// module-load point as the rest of this file's global config.
+Logger.env = process.env.NODE_ENV;
 
 APIConfig.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 

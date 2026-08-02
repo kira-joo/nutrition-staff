@@ -46,7 +46,7 @@ export default function ClientCalculationDetailsPage({ params }: { params: { id:
     <QueryState
       query={calculationQuery}
       entityName="Calculation"
-      backRoute={{ path: AppRoute.clientCalculations, label: "Back to Calculations" }}
+      backRoute={{ path: AppRoute.clientCalculations, label: "Back to Calculations", params: { id: params.id } }}
     >
       {(calculation) => (
         <PageShell icon={FlaskConical} title={<DateText value={calculation.calculatedAt} />}>

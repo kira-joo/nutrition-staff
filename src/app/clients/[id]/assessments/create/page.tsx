@@ -21,7 +21,7 @@ export default function ClientAssessmentCreatePage({ params }: { params: { id: s
     <QueryState
       query={clientQuery}
       entityName="Client"
-      backRoute={{ path: AppRoute.clientAssessments, label: "Back to Assessments" }}
+      backRoute={{ path: AppRoute.clientAssessments, label: "Back to Assessments", params: { id: params.id } }}
     >
       {(client) => (
         <PageShell icon={NotebookPen} title="New Assessment">

@@ -1,11 +1,11 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { useRouter } from "next/navigation";
 import type { createCampaignEndpoint, updateCampaignEndpoint } from "../../../api/campaign.endpoints";
 import { ContentStatus } from "../enums";
 import { Campaign, CampaignFormValues } from "../interfaces/campaign.interface";
 import { AppRoute } from "../routes/app-route";
+import { useNavigate } from "../routes/use-navigate";
 
 export interface CampaignFormProps {
   defaultValues?: Campaign;
@@ -15,7 +15,7 @@ export interface CampaignFormProps {
 const EMPTY_LOCALIZED = { ar: "", en: "" };
 
 export function CampaignForm({ defaultValues, endpoint }: CampaignFormProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const fields: FormFieldConfig<CampaignFormValues>[] = [
     { type: FieldType.LOCALIZED_INPUT, name: "title", label: "Title" },
@@ -54,7 +54,7 @@ export function CampaignForm({ defaultValues, endpoint }: CampaignFormProps) {
       warnOnUnsavedChanges
       onSuccess={(campaign) => {
         toast.success("Campaign saved");
-        if (!defaultValues) router.push(AppRoute.campaignDetails.replace("[id]", campaign._id));
+        if (!defaultValues) navigate(AppRoute.campaignDetails, { id: campaign._id });
       }}
       layout="grid"
       columns={2}

@@ -36,7 +36,7 @@ export default function ClientCalculationNewPage({ params }: { params: { id: str
     <QueryState
       query={clientQuery}
       entityName="Client"
-      backRoute={{ path: AppRoute.clientCalculations, label: "Back to Calculations" }}
+      backRoute={{ path: AppRoute.clientCalculations, label: "Back to Calculations", params: { id: params.id } }}
     >
       {(client) => (
         <PageShell icon={FlaskConical} title="Run Calculator">

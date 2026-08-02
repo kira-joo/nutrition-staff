@@ -36,7 +36,7 @@ export default function ClientAssessmentDetailsPage({ params }: { params: { id: 
     <QueryState
       query={clientQuery}
       entityName="Client"
-      backRoute={{ path: AppRoute.clientAssessments, label: "Back to Assessments" }}
+      backRoute={{ path: AppRoute.clientAssessments, label: "Back to Assessments", params: { id: params.id } }}
     >
       {(client) => (
         <QueryState query={assessmentQuery} entityName="Assessment">
