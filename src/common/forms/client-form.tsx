@@ -82,6 +82,12 @@ export function ClientForm({ endpoint }: ClientFormProps) {
       optionLabel: "name",
       optionValue: "_id",
       placeholder: "Select a staff member",
+      // Defaults to (and is restricted to) the current user — reassigning to
+      // someone else is a Profile-tab edit, kept out of this deliberately
+      // thin creation form. Also sidesteps getUsersEndpoint's default page
+      // size (10): without this, "assigned to me" wouldn't reliably show as
+      // selected once /users (staff + every client) grows past one page.
+      query: { ids: [currentUserQuery.data._id] },
     },
   ];
 
