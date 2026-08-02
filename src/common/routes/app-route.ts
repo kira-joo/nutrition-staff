@@ -1,5 +1,6 @@
 export const AppRoute = {
   home: "/",
+  dashboard: "/dashboard",
   login: "/login",
   signup: "/signup",
   users: "/users",

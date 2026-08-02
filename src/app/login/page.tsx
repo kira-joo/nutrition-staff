@@ -43,7 +43,7 @@ export default function LoginPage() {
               submitButtonText="Sign in"
               onSuccess={(data) => {
                 setAccessToken(data.accessToken);
-                router.push(AppRoute.users);
+                router.push(AppRoute.dashboard);
               }}
             />
           </Card>

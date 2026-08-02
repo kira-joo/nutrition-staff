@@ -5,6 +5,7 @@ import {
   HelpCircle,
   Home,
   Images,
+  LayoutDashboard,
   ListTree,
   Megaphone,
   MessageSquareQuote,
@@ -24,7 +25,10 @@ import { AppRoute } from "src/common/routes/app-route";
 export const sideNavSections: SideNavSectionConfig[] = [
   {
     key: "general",
-    items: [{ key: "home", label: "Home", href: AppRoute.home, icon: Home }],
+    items: [
+      { key: "dashboard", label: "Dashboard", href: AppRoute.dashboard, icon: LayoutDashboard, permission: AppPermission.DASHBOARD.READ },
+      { key: "home", label: "Home", href: AppRoute.home, icon: Home },
+    ],
   },
   {
     key: "clients",
