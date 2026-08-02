@@ -23,7 +23,7 @@ export interface NutritionCalculationResultsViewProps {
 export function NutritionCalculationResultsView({ results, assumptions }: NutritionCalculationResultsViewProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {results.bmi ? <StatCard label="BMI" value={`${results.bmi.value}`} sub={results.bmi.category} /> : null}
         {results.bmr ? <StatCard label="BMR" value={`${results.bmr.value} kcal/day`} sub={results.bmr.formula as string} /> : null}
         {results.maintenanceCalories ? (
