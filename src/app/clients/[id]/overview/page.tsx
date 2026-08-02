@@ -85,7 +85,12 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               >
                 Run calculator
               </CustomButton>
-              <CustomButton variant="outline" leftIcon={CalendarClock} disabled title="Available once the Interactions checkpoint ships">
+              <CustomButton
+                variant="outline"
+                leftIcon={CalendarClock}
+                onClick={() => navigate(AppRoute.clientInteractions, { id: params.id })}
+                disabled={!can(AppPermission.CLIENT_INTERACTION.CREATE)}
+              >
                 Add interaction
               </CustomButton>
             </div>

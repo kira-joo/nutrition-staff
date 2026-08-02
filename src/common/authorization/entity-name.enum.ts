@@ -19,4 +19,5 @@ export enum EntityName {
   CLIENT_MEASUREMENT = "ClientMeasurement",
   NUTRITION_ASSESSMENT = "NutritionAssessment",
   NUTRITION_CALCULATION = "NutritionCalculation",
+  CLIENT_INTERACTION = "ClientInteraction",
 }

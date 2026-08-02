@@ -1,5 +1,5 @@
-import { BaseFindQueryDto } from "@kira-joo/backend-toolkit-core";
-import { IsEnum, IsMongoId, IsOptional, IsString } from "class-validator";
+import { BaseFindQueryDto, ToBoolean } from "@kira-joo/backend-toolkit-core";
+import { IsBoolean, IsEnum, IsMongoId, IsOptional, IsString } from "class-validator";
 import { ClientLifecycle, ClientSource } from "src/common/enums";
 
 export class ListClientsQueryDto extends BaseFindQueryDto {
@@ -18,4 +18,10 @@ export class ListClientsQueryDto extends BaseFindQueryDto {
   @IsOptional()
   @IsString()
   tags?: string;
+
+  /** True: nextFollowUpAt is set and due today or overdue — the cross-client "who do I call today" view. */
+  @IsOptional()
+  @ToBoolean()
+  @IsBoolean()
+  followUpDue?: boolean;
 }

@@ -16,3 +16,4 @@ export * from "./smoking-status.enum";
 export * from "./alcohol-use.enum";
 export * from "./calculation-type.enum";
 export * from "./bmr-formula.enum";
+export * from "./interaction-type.enum";

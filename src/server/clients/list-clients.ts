@@ -11,6 +11,7 @@ import { userRepository } from "src/server/users/users.repository";
  * `ClientProfile` by the matched `userId`s.
  */
 export async function listClients(query: ListClientsQueryDto) {
+  const { followUpDue, ...rest } = query;
   const where: Record<string, unknown> = {};
 
   if (query.search) {
@@ -20,8 +21,12 @@ export async function listClients(query: ListClientsQueryDto) {
     where.userId = { $in: matchingUsers.map((user) => user._id) };
   }
 
+  if (followUpDue) {
+    where.nextFollowUpAt = { $exists: true, $lte: new Date() };
+  }
+
   return clientProfileRepository.findAllAndCountPublic({
-    query,
+    query: rest,
     where,
     relations: ["userId", "assignedToUserId"],
   });

@@ -16,9 +16,9 @@ export const PUT = createPutRoute({
   params: FindClientParamsDto,
   body: UpdateClientDto,
   auth: { permissions: [AppPermission.CLIENT.UPDATE] },
-  handler: async ({ params, body }) => {
+  handler: async ({ params, body, user }) => {
     const clientProfile = await clientProfileRepository.findOne({ where: { _id: params.id }, lean: false });
-    return updateClient(params.id, String(clientProfile.userId), body);
+    return updateClient(params.id, String(clientProfile.userId), body, user._id);
   },
 });
 

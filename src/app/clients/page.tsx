@@ -115,6 +115,11 @@ export default function ClientsPage() {
             optionValue: "_id",
             placeholder: "Filter by assigned staff",
           },
+          {
+            key: "followUpDue",
+            header: "Follow-up",
+            options: [{ label: "Due or overdue", value: "true" }],
+          },
         ]}
         columns={columns}
         rowActions={[
