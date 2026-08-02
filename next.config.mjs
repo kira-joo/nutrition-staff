@@ -13,6 +13,9 @@ const nextConfig = {
     // `require()` it directly at runtime avoids that entirely.
     serverComponentsExternalPackages: ["argon2", "puppeteer", "puppeteer-core", "chromium-bidi", "ws"],
   },
+  outputFileTracingIncludes: {
+    "/*": ["./node_modules/argon2/prebuilds/**/*"],
+  },
   // Belt-and-suspenders alongside serverComponentsExternalPackages above:
   // that experimental flag doesn't reliably stop deeply-nested transitive
   // requires (like `ws`'s own optional-native-binding loader) from still
