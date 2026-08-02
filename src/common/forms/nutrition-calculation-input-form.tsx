@@ -3,9 +3,12 @@
 import { CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "../enums";
 import { computeNutritionCalculationEndpoint } from "../../../api/nutrition-calculation.endpoints";
-import { ComputeNutritionCalculationInputs, ComputeNutritionCalculationResponse } from "../interfaces/nutrition-calculation.interface";
+import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "../enums";
+import {
+  ComputeNutritionCalculationInputs,
+  ComputeNutritionCalculationResponse,
+} from "../interfaces/nutrition-calculation.interface";
 
 export interface NutritionCalculationInputFormProps {
   defaultValues?: Partial<ComputeNutritionCalculationInputs>;
@@ -19,7 +22,14 @@ export interface NutritionCalculationInputFormProps {
  * save/assign action (owned by the caller) persists the returned snapshot.
  */
 export function NutritionCalculationInputForm({ defaultValues, onComputed }: NutritionCalculationInputFormProps) {
-  const form = useForm<ComputeNutritionCalculationInputs>({ defaultValues });
+  const form = useForm<ComputeNutritionCalculationInputs>({
+    defaultValues: {
+      acknowledgeBelowSafeFloor: true,
+      bmrFormula: BmrFormula.MIFFLIN_ST_JEOR,
+      goal: NutritionGoal.WEIGHT_LOSS,
+      ...defaultValues,
+    },
+  });
 
   const dateOfBirth = form.watch("dateOfBirth");
 
@@ -49,7 +59,12 @@ export function NutritionCalculationInputForm({ defaultValues, onComputed }: Nut
     },
     { type: FieldType.INPUT, name: "heightCm", label: "Height (cm)", inputType: "number", rules: { required: true } },
     { type: FieldType.INPUT, name: "weightKg", label: "Weight (kg)", inputType: "number", rules: { required: true } },
-    { type: FieldType.INPUT, name: "bodyFatPercentage", label: "Body fat % (enables Katch-McArdle)", inputType: "number" },
+    {
+      type: FieldType.INPUT,
+      name: "bodyFatPercentage",
+      label: "Body fat % (enables Katch-McArdle)",
+      inputType: "number",
+    },
   ];
 
   const formulaFields: FormFieldConfig<ComputeNutritionCalculationInputs>[] = [
@@ -64,21 +79,38 @@ export function NutritionCalculationInputForm({ defaultValues, onComputed }: Nut
       name: "activityLevel",
       label: "Activity level",
       options: Object.values(ActivityLevel).map((v) => ({ label: v, value: v })),
+      rules: { required: true },
     },
     {
       type: FieldType.SELECT,
       name: "goal",
       label: "Goal",
       options: Object.values(NutritionGoal).map((v) => ({ label: v, value: v })),
+      rules: { required: true },
     },
   ];
 
   const adjustmentFields: FormFieldConfig<ComputeNutritionCalculationInputs>[] = [
-    { type: FieldType.INPUT, name: "goalAdjustmentPercent", label: "Goal calorie adjustment (%, e.g. -15)", inputType: "number" },
-    { type: FieldType.INPUT, name: "goalAdjustmentKcalOverride", label: "Or a flat kcal adjustment instead", inputType: "number" },
+    {
+      type: FieldType.INPUT,
+      name: "goalAdjustmentPercent",
+      label: "Goal calorie adjustment (%, e.g. -15)",
+      inputType: "number",
+    },
+    {
+      type: FieldType.INPUT,
+      name: "goalAdjustmentKcalOverride",
+      label: "Or a flat kcal adjustment instead",
+      inputType: "number",
+    },
     { type: FieldType.INPUT, name: "proteinGPerKgMin", label: "Protein range min (g/kg)", inputType: "number" },
     { type: FieldType.INPUT, name: "proteinGPerKgMax", label: "Protein range max (g/kg)", inputType: "number" },
-    { type: FieldType.INPUT, name: "fatPercentOfCalories", label: "Fat (% of calories, default 25)", inputType: "number" },
+    {
+      type: FieldType.INPUT,
+      name: "fatPercentOfCalories",
+      label: "Fat (% of calories, default 25)",
+      inputType: "number",
+    },
     { type: FieldType.SWITCH, name: "acknowledgeBelowSafeFloor", label: "Acknowledge below safe-floor calories" },
   ];
 
