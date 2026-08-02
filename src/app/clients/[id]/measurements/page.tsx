@@ -2,12 +2,12 @@
 
 import { SortOrder, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
+  CustomButton,
   DateText,
   DeltaIndicator,
   EmptyState,
   FeatureTable,
   Modal,
-  CustomButton,
   type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
@@ -15,22 +15,26 @@ import { Plus, Ruler } from "lucide-react";
 import { useRef, useState } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
+import { AppRoute } from "src/common/routes/app-route";
+import { useNavigate } from "src/common/routes/use-navigate";
 import { ClientMeasurementForm } from "src/common/forms/client-measurement-form";
 import { ClientMeasurement } from "src/common/interfaces/client-measurement.interface";
 import {
-  createClientMeasurementEndpoint,
   getClientMeasurementsEndpoint,
   updateClientMeasurementEndpoint,
 } from "../../../../../api/client-measurement.endpoints";
 
 export default function ClientMeasurementsPage({ params }: { params: { id: string } }) {
+  const navigate = useNavigate();
   const { can } = usePermissions();
   const tableRef = useRef<FeatureTableHandle>(null);
-  const [dialogState, setDialogState] = useState<{ open: boolean; measurement?: ClientMeasurement }>({ open: false });
+  const [editingMeasurement, setEditingMeasurement] = useState<ClientMeasurement | null>(null);
 
   const latestTwoQuery = useRequesterQuery({
     endpoint: getClientMeasurementsEndpoint,
-    options: { query: { clientProfileId: params.id, sortBy: "measuredAt", sortOrder: SortOrder.DESC, limit: 2, page: 1 } },
+    options: {
+      query: { clientProfileId: params.id, sortBy: "measuredAt", sortOrder: SortOrder.DESC, limit: 2, page: 1 },
+    },
   });
 
   const [latest, previous] = latestTwoQuery.data?.data ?? [];
@@ -51,10 +55,20 @@ export default function ClientMeasurementsPage({ params }: { params: { id: strin
           {latest ? (
             <>
               {latest.weightKg !== undefined ? (
-                <DeltaIndicator current={latest.weightKg} previous={previous?.weightKg} unit="kg" label="since last visit" />
+                <DeltaIndicator
+                  current={latest.weightKg}
+                  previous={previous?.weightKg}
+                  unit="kg"
+                  label="since last visit"
+                />
               ) : null}
               {latest.waistCm !== undefined ? (
-                <DeltaIndicator current={latest.waistCm} previous={previous?.waistCm} unit="cm waist" label="since last visit" />
+                <DeltaIndicator
+                  current={latest.waistCm}
+                  previous={previous?.waistCm}
+                  unit="cm waist"
+                  label="since last visit"
+                />
               ) : null}
             </>
           ) : (
@@ -62,7 +76,10 @@ export default function ClientMeasurementsPage({ params }: { params: { id: strin
           )}
         </div>
         {can(AppPermission.CLIENT_MEASUREMENT.CREATE) ? (
-          <CustomButton leftIcon={Plus} onClick={() => setDialogState({ open: true })}>
+          <CustomButton
+            leftIcon={Plus}
+            onClick={() => navigate(AppRoute.clientMeasurementCreate, { id: params.id })}
+          >
             Add measurement
           </CustomButton>
         ) : null}
@@ -79,31 +96,37 @@ export default function ClientMeasurementsPage({ params }: { params: { id: strin
           rowActions={[
             {
               label: "Edit",
-              onClick: (measurement) => setDialogState({ open: true, measurement }),
+              onClick: (measurement) => setEditingMeasurement(measurement),
               hidden: !can(AppPermission.CLIENT_MEASUREMENT.UPDATE),
             },
           ]}
         />
       ) : (
-        <EmptyState icon={Ruler} title="No measurements yet" description="Add the client's first measurement to start tracking progress." />
+        <EmptyState
+          icon={Ruler}
+          title="No measurements yet"
+          description="Add the client's first measurement to start tracking progress."
+        />
       )}
 
       <Modal
-        open={dialogState.open}
-        onOpenChange={(open) => setDialogState((state) => ({ ...state, open }))}
-        title={dialogState.measurement ? "Edit measurement" : "Add measurement"}
+        open={editingMeasurement !== null}
+        onOpenChange={(open) => !open && setEditingMeasurement(null)}
+        title="Edit measurement"
         size="lg"
       >
-        <ClientMeasurementForm
-          clientProfileId={params.id}
-          defaultValues={dialogState.measurement}
-          endpoint={dialogState.measurement ? updateClientMeasurementEndpoint : createClientMeasurementEndpoint}
-          onSuccess={() => {
-            setDialogState({ open: false });
-            tableRef.current?.refetch();
-            latestTwoQuery.refetch();
-          }}
-        />
+        {editingMeasurement ? (
+          <ClientMeasurementForm
+            clientProfileId={params.id}
+            defaultValues={editingMeasurement}
+            endpoint={updateClientMeasurementEndpoint}
+            onSuccess={() => {
+              setEditingMeasurement(null);
+              tableRef.current?.refetch();
+              latestTwoQuery.refetch();
+            }}
+          />
+        ) : null}
       </Modal>
     </div>
   );

@@ -108,7 +108,7 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               <CustomButton
                 variant="outline"
                 leftIcon={Ruler}
-                onClick={() => navigate(AppRoute.clientMeasurements, { id: params.id })}
+                onClick={() => navigate(AppRoute.clientMeasurementCreate, { id: params.id })}
                 disabled={!can(AppPermission.CLIENT_MEASUREMENT.CREATE)}
                 title={!can(AppPermission.CLIENT_MEASUREMENT.CREATE) ? NO_PERMISSION_TITLE : undefined}
               >
