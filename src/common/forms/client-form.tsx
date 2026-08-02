@@ -1,9 +1,16 @@
 "use client";
 
-import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  CenteredSpinner,
+  CustomForm,
+  FieldType,
+  toast,
+  type FormFieldConfig,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Contact, IdCard } from "lucide-react";
-import { getUsersEndpoint } from "../../../api/user.endpoints";
+import { useCurrentUser } from "src/common/auth/use-current-user";
 import type { createClientEndpoint } from "../../../api/client.endpoints";
+import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { ClientSource } from "../enums";
 import { CreateClientFormValues } from "../interfaces/client.interface";
 import { AppRoute } from "../routes/app-route";
@@ -21,6 +28,17 @@ export interface ClientFormProps {
  */
 export function ClientForm({ endpoint }: ClientFormProps) {
   const navigate = useNavigate();
+  const currentUserQuery = useCurrentUser();
+
+  /**
+   * defaultValues is read once by react-hook-form at mount, so the
+   * "assigned to me by default" value must be known before the form
+   * renders — this briefly gates on /auth/me rather than defaulting to
+   * unassigned then never correcting it.
+   */
+  if (!currentUserQuery.data) {
+    return <CenteredSpinner />;
+  }
 
   const fields: FormFieldConfig<CreateClientFormValues>[] = [
     {
@@ -73,6 +91,7 @@ export function ClientForm({ endpoint }: ClientFormProps) {
         { title: "Identity", icon: IdCard, fields },
         { title: "How they found us", icon: Contact, fields: crmFields },
       ]}
+      defaultValues={{ assignedToUserId: currentUserQuery.data._id }}
       submitEndpoint={endpoint}
       onSuccess={(client) => {
         toast.success("Client added");
