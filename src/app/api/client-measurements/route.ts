@@ -5,6 +5,8 @@ import { CreateClientMeasurementDto } from "src/server/measurements/dto/create-c
 import { ListClientMeasurementsQueryDto } from "src/server/measurements/dto/list-client-measurements-query.dto";
 import { clientMeasurementRepository } from "src/server/measurements/client-measurements.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListClientMeasurementsQueryDto,
   auth: { permissions: [AppPermission.CLIENT_MEASUREMENT.READ] },

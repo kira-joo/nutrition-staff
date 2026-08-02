@@ -3,6 +3,8 @@ import { PublicListRecipesQueryDto } from "src/server/recipes/dto/public-list-re
 import { recipeRepository } from "src/server/recipes/recipes.repository";
 import { ContentStatus } from "src/common/enums";
 
+export const dynamic = "force-dynamic";
+
 // Public, unauthenticated read surface for the future nutrition-client —
 // same "backend complete" convention as every other module. Always
 // hardcodes status: published; the query DTO has no status field at all.

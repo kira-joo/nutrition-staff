@@ -9,6 +9,8 @@ import { ListVideosQueryDto } from "src/server/videos/dto/list-videos-query.dto"
 import { VIDEO_ASSET_FIELDS, VIDEO_ASSET_FOLDER } from "src/server/videos/video-asset-fields";
 import { videoRepository } from "src/server/videos/videos.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListVideosQueryDto,
   auth: { permissions: [AppPermission.VIDEO.READ] },

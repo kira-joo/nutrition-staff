@@ -5,6 +5,8 @@ import { FindPackageParamsDto } from "src/server/packages/dto/find-package-param
 import { UpdatePackageDto } from "src/server/packages/dto/update-package.dto";
 import { packageRepository } from "src/server/packages/packages.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindPackageParamsDto,
   auth: { permissions: [AppPermission.PACKAGE.READ_ONE] },

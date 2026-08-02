@@ -5,6 +5,8 @@ import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { CreateCampaignDto } from "src/server/campaigns/dto/create-campaign.dto";
 import { ListCampaignsQueryDto } from "src/server/campaigns/dto/list-campaigns-query.dto";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListCampaignsQueryDto,
   auth: { permissions: [AppPermission.CAMPAIGN.READ] },

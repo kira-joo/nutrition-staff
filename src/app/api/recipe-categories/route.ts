@@ -5,6 +5,8 @@ import { CreateRecipeCategoryDto } from "src/server/recipe-categories/dto/create
 import { ListRecipeCategoriesQueryDto } from "src/server/recipe-categories/dto/list-recipe-categories-query.dto";
 import { recipeCategoryRepository } from "src/server/recipe-categories/recipe-categories.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListRecipeCategoriesQueryDto,
   auth: { permissions: [AppPermission.RECIPE_CATEGORY.READ] },

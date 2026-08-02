@@ -5,6 +5,8 @@ import { CreateRecipeFoodGroupDto } from "src/server/recipe-food-groups/dto/crea
 import { ListRecipeFoodGroupsQueryDto } from "src/server/recipe-food-groups/dto/list-recipe-food-groups-query.dto";
 import { recipeFoodGroupRepository } from "src/server/recipe-food-groups/recipe-food-groups.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListRecipeFoodGroupsQueryDto,
   auth: { permissions: [AppPermission.RECIPE_FOOD_GROUP.READ] },

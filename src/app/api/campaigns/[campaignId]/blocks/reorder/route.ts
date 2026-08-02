@@ -4,6 +4,8 @@ import { createPutRoute } from "src/server/core/route-factories";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 import { ReorderCampaignBlocksDto } from "src/server/campaigns/dto/reorder-campaign-blocks.dto";
 
+export const dynamic = "force-dynamic";
+
 export const PUT = createPutRoute({
   params: FindCampaignParamsDto,
   body: ReorderCampaignBlocksDto,

@@ -5,6 +5,8 @@ import { CreateClientDto } from "src/server/clients/dto/create-client.dto";
 import { ListClientsQueryDto } from "src/server/clients/dto/list-clients-query.dto";
 import { listClients } from "src/server/clients/list-clients";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListClientsQueryDto,
   auth: { permissions: [AppPermission.CLIENT.READ] },

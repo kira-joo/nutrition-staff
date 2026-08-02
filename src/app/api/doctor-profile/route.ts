@@ -16,6 +16,8 @@ import {
 import { doctorProfileRepository } from "src/server/doctor-profile/doctor-profile.repository";
 import { UpdateDoctorProfileDto } from "src/server/doctor-profile/dto/update-doctor-profile.dto";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   auth: { permissions: [AppPermission.DOCTOR_PROFILE.READ_ONE] },
   handler: async () => getOrCreateSingleton(doctorProfileRepository, {}),

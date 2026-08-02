@@ -4,6 +4,8 @@ import { FindNutritionCalculationParamsDto } from "src/server/nutrition-calculat
 import { UpdateNutritionCalculationDto } from "src/server/nutrition-calculations/dto/update-nutrition-calculation.dto";
 import { nutritionCalculationRepository } from "src/server/nutrition-calculations/nutrition-calculations.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindNutritionCalculationParamsDto,
   auth: { permissions: [AppPermission.NUTRITION_CALCULATION.READ_ONE] },

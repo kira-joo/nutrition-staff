@@ -5,6 +5,8 @@ import { UpsertStaffProfileDto } from "src/server/staff/dto/upsert-staff-profile
 import { staffProfileRepository } from "src/server/staff/staff-profiles.repository";
 import { upsertStaffProfile } from "src/server/staff/upsert-staff-profile";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindStaffProfileParamsDto,
   auth: { permissions: [AppPermission.STAFF.READ_ONE] },

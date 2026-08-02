@@ -5,6 +5,8 @@ import { FindFaqItemParamsDto } from "src/server/faq-items/dto/find-faq-item-par
 import { UpdateFaqItemDto } from "src/server/faq-items/dto/update-faq-item.dto";
 import { faqItemRepository } from "src/server/faq-items/faq-items.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindFaqItemParamsDto,
   auth: { permissions: [AppPermission.FAQ_ITEM.READ_ONE] },

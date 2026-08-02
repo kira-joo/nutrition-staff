@@ -5,6 +5,8 @@ import { CreatePackageDto } from "src/server/packages/dto/create-package.dto";
 import { ListPackagesQueryDto } from "src/server/packages/dto/list-packages-query.dto";
 import { packageRepository } from "src/server/packages/packages.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListPackagesQueryDto,
   auth: { permissions: [AppPermission.PACKAGE.READ] },

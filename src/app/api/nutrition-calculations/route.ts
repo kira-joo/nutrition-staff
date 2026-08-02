@@ -5,6 +5,8 @@ import { ListNutritionCalculationsQueryDto } from "src/server/nutrition-calculat
 import { createNutritionCalculation } from "src/server/nutrition-calculations/create-nutrition-calculation";
 import { nutritionCalculationRepository } from "src/server/nutrition-calculations/nutrition-calculations.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListNutritionCalculationsQueryDto,
   auth: { permissions: [AppPermission.NUTRITION_CALCULATION.READ] },

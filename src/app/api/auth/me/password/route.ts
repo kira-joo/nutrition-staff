@@ -5,6 +5,8 @@ import { UpdateOwnPasswordDto } from "src/server/users/dto/update-own-password.d
 import { UserModel } from "src/server/users/user.schema";
 import { userRepository } from "src/server/users/users.repository";
 
+export const dynamic = "force-dynamic";
+
 export const PUT = createPutRoute({
   body: UpdateOwnPasswordDto,
   auth: true,

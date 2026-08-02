@@ -8,6 +8,8 @@ import { ListReviewsQueryDto } from "src/server/reviews/dto/list-reviews-query.d
 import { REVIEW_ASSET_FIELDS, REVIEW_ASSET_FOLDER } from "src/server/reviews/review-asset-fields";
 import { reviewRepository } from "src/server/reviews/reviews.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListReviewsQueryDto,
   auth: { permissions: [AppPermission.REVIEW.READ] },

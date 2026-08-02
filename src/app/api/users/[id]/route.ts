@@ -4,6 +4,8 @@ import { FindUserParamsDto } from "src/server/users/dto/find-user-params.dto";
 import { UpdateUserDto } from "src/server/users/dto/update-user.dto";
 import { userRepository } from "src/server/users/users.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindUserParamsDto,
   auth: { permissions: [AppPermission.USER.READ_ONE] },

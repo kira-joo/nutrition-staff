@@ -5,6 +5,8 @@ import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 import { UpdateCampaignDto } from "src/server/campaigns/dto/update-campaign.dto";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindCampaignParamsDto,
   auth: { permissions: [AppPermission.CAMPAIGN.READ_ONE] },

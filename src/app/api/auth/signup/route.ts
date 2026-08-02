@@ -5,6 +5,8 @@ import { resolveUser } from "src/server/core/auth/resolve-user";
 import { createPostRoute } from "src/server/core/route-factories";
 import { userRepository } from "src/server/users/users.repository";
 
+export const dynamic = "force-dynamic";
+
 // Public self-service signup. New users get zero roles (secure by default —
 // an admin assigns roles afterward via the Users management UI) and are
 // signed in immediately on success.

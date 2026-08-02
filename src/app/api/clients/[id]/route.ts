@@ -5,6 +5,8 @@ import { FindClientParamsDto } from "src/server/clients/dto/find-client-params.d
 import { UpdateClientDto } from "src/server/clients/dto/update-client.dto";
 import { updateClient } from "src/server/clients/update-client";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindClientParamsDto,
   auth: { permissions: [AppPermission.CLIENT.READ_ONE] },

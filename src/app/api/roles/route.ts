@@ -4,6 +4,8 @@ import { ListRolesQueryDto } from "src/server/core/authorization/dto/list-roles-
 import { roleRepository } from "src/server/core/authorization/role.repository";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListRolesQueryDto,
   auth: { permissions: [AppPermission.ROLE.READ] },

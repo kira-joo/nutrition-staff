@@ -4,6 +4,8 @@ import { FindNutritionAssessmentParamsDto } from "src/server/assessments/dto/fin
 import { UpdateNutritionAssessmentDto } from "src/server/assessments/dto/update-nutrition-assessment.dto";
 import { nutritionAssessmentRepository } from "src/server/assessments/nutrition-assessments.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindNutritionAssessmentParamsDto,
   auth: { permissions: [AppPermission.NUTRITION_ASSESSMENT.READ_ONE] },

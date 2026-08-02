@@ -3,6 +3,8 @@ import { createPostRoute } from "src/server/core/route-factories";
 import { ComputeNutritionCalculationDto } from "src/server/nutrition-calculations/dto/compute-nutrition-calculation.dto";
 import { runNutritionCalculation } from "src/server/nutrition-calculations/engine/run-nutrition-calculation";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Stateless — never persists anything. The frontend holds the full
  * response (echoing `inputs` back alongside `results`/`assumptions`/

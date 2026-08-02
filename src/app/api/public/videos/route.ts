@@ -3,6 +3,8 @@ import { PublicListVideosQueryDto } from "src/server/videos/dto/public-list-vide
 import { videoRepository } from "src/server/videos/videos.repository";
 import { ContentStatus } from "src/common/enums";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: PublicListVideosQueryDto,
   auth: false,

@@ -4,6 +4,8 @@ import { FindGalleryItemParamsDto } from "src/server/doctor-profile/dto/find-gal
 import { removeGalleryItem } from "src/server/doctor-profile/gallery/remove-gallery-item";
 import { replaceGalleryItem } from "src/server/doctor-profile/gallery/replace-gallery-item";
 
+export const dynamic = "force-dynamic";
+
 // No `body` here — multipart-only, same convention as any asset-bearing route.
 export const PUT = createPutRoute({
   params: FindGalleryItemParamsDto,

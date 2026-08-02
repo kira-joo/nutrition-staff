@@ -5,6 +5,8 @@ import { CreateNutritionAssessmentDto } from "src/server/assessments/dto/create-
 import { ListNutritionAssessmentsQueryDto } from "src/server/assessments/dto/list-nutrition-assessments-query.dto";
 import { nutritionAssessmentRepository } from "src/server/assessments/nutrition-assessments.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListNutritionAssessmentsQueryDto,
   auth: { permissions: [AppPermission.NUTRITION_ASSESSMENT.READ] },

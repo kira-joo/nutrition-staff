@@ -3,6 +3,8 @@ import { FindRecipeParamsDto } from "src/server/recipes/dto/find-recipe-params.d
 import { recipeRepository } from "src/server/recipes/recipes.repository";
 import { ContentStatus } from "src/common/enums";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindRecipeParamsDto,
   auth: false,

@@ -3,6 +3,8 @@ import { AppPermission } from "src/server/core/authorization/authorization-regis
 import { createDeleteRoute, createPutRoute } from "src/server/core/route-factories";
 import { FindCampaignBlockParamsDto } from "src/server/campaigns/dto/find-campaign-block-params.dto";
 
+export const dynamic = "force-dynamic";
+
 // No `body` here — multipart-only, same convention as any asset-bearing route.
 export const PUT = createPutRoute({
   params: FindCampaignBlockParamsDto,

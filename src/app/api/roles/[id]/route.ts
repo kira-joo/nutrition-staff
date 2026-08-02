@@ -4,6 +4,8 @@ import { UpdateRoleDto } from "src/server/core/authorization/dto/update-role.dto
 import { roleRepository } from "src/server/core/authorization/role.repository";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindRoleParamsDto,
   auth: { permissions: [AppPermission.ROLE.READ_ONE] },

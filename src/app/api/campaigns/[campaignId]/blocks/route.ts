@@ -3,6 +3,8 @@ import { AppPermission } from "src/server/core/authorization/authorization-regis
 import { createPostRoute } from "src/server/core/route-factories";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 
+export const dynamic = "force-dynamic";
+
 // No `body` here — multipart-only, same convention as any asset-bearing route.
 export const POST = createPostRoute({
   params: FindCampaignParamsDto,

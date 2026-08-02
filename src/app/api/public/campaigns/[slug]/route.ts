@@ -3,6 +3,8 @@ import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { FindCampaignBySlugParamsDto } from "src/server/campaigns/dto/find-campaign-by-slug-params.dto";
 import { ContentStatus } from "src/common/enums";
 
+export const dynamic = "force-dynamic";
+
 // Public, unauthenticated read surface for the future nutrition-client —
 // same "backend complete" convention as every other module. Per the plan's
 // active-campaign timing decision, a Published campaign may be set active

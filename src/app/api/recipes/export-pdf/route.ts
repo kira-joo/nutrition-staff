@@ -10,6 +10,9 @@ import {
 } from "@kira-joo/backend-toolkit-next";
 import type { NextRequest } from "next/server";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
+
+export const dynamic = "force-dynamic";
+
 // Side-effect import: every route.ts must trigger this itself — Next.js dev
 // mode compiles each route as a separate bundle, so configuration done by
 // another route's own import of this file isn't visible here. Routes built

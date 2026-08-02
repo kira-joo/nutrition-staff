@@ -5,6 +5,8 @@ import { CreateClientInteractionDto } from "src/server/interactions/dto/create-c
 import { ListClientInteractionsQueryDto } from "src/server/interactions/dto/list-client-interactions-query.dto";
 import { clientInteractionRepository } from "src/server/interactions/client-interactions.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListClientInteractionsQueryDto,
   auth: { permissions: [AppPermission.CLIENT_INTERACTION.READ] },

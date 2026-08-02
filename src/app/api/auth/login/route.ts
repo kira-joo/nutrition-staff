@@ -5,6 +5,8 @@ import { resolveUser } from "src/server/core/auth/resolve-user";
 import { createPostRoute } from "src/server/core/route-factories";
 import { UserModel } from "src/server/users/user.schema";
 
+export const dynamic = "force-dynamic";
+
 export const POST = createPostRoute({
   body: LoginDto,
   auth: false,

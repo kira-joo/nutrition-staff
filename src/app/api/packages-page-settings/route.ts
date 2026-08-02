@@ -4,6 +4,8 @@ import { getOrCreateSingleton, upsertSingleton } from "src/server/core/singleton
 import { UpdatePackagesPageSettingsDto } from "src/server/packages-page-settings/dto/update-packages-page-settings.dto";
 import { packagesPageSettingsRepository } from "src/server/packages-page-settings/packages-page-settings.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   auth: { permissions: [AppPermission.PACKAGES_PAGE_SETTINGS.READ_ONE] },
   handler: async () => getOrCreateSingleton(packagesPageSettingsRepository, {}),

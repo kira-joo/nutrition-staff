@@ -14,6 +14,8 @@ import { UpdateRecipeDto } from "src/server/recipes/dto/update-recipe.dto";
 import { RECIPE_ASSET_FIELDS, RECIPE_ASSET_FOLDER } from "src/server/recipes/recipe-asset-fields";
 import { recipeRepository } from "src/server/recipes/recipes.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindRecipeParamsDto,
   auth: { permissions: [AppPermission.RECIPE.READ_ONE] },

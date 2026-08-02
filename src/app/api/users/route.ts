@@ -5,6 +5,8 @@ import { ListUsersQueryDto } from "src/server/users/dto/list-users-query.dto";
 import { listUsers } from "src/server/users/list-users";
 import { userRepository } from "src/server/users/users.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListUsersQueryDto,
   auth: { permissions: [AppPermission.USER.READ] },

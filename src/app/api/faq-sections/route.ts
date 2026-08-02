@@ -5,6 +5,8 @@ import { CreateFaqSectionDto } from "src/server/faq-sections/dto/create-faq-sect
 import { ListFaqSectionsQueryDto } from "src/server/faq-sections/dto/list-faq-sections-query.dto";
 import { faqSectionRepository } from "src/server/faq-sections/faq-sections.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListFaqSectionsQueryDto,
   auth: { permissions: [AppPermission.FAQ_SECTION.READ] },

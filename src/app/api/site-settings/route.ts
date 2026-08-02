@@ -13,6 +13,14 @@ import { SITE_SETTINGS_ASSET_FIELDS, SITE_SETTINGS_ASSET_FOLDER } from "src/serv
 import { UpdateSiteSettingsDto } from "src/server/site-settings/dto/update-site-settings.dto";
 import { siteSettingsRepository } from "src/server/site-settings/site-settings.repository";
 
+// Every Route Handler in this app reads live, mutable MongoDB state (and
+// authenticated ones also read request.headers via the shared auth
+// pipeline) — none of them are safe candidates for static generation.
+// Explicit per-file opt-out of Next's build-time static-render attempt,
+// since route-segment config must be a literal export in this exact file
+// (Next's static analyzer can't see through the shared route factory).
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   auth: { permissions: [AppPermission.SITE_SETTINGS.READ_ONE] },
   handler: async () => getOrCreateSingleton(siteSettingsRepository, {}),

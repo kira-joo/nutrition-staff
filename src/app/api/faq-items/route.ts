@@ -5,6 +5,8 @@ import { CreateFaqItemDto } from "src/server/faq-items/dto/create-faq-item.dto";
 import { ListFaqItemsQueryDto } from "src/server/faq-items/dto/list-faq-items-query.dto";
 import { faqItemRepository } from "src/server/faq-items/faq-items.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   query: ListFaqItemsQueryDto,
   auth: { permissions: [AppPermission.FAQ_ITEM.READ] },

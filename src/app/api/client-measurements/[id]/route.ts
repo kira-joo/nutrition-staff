@@ -5,6 +5,8 @@ import { FindClientMeasurementParamsDto } from "src/server/measurements/dto/find
 import { UpdateClientMeasurementDto } from "src/server/measurements/dto/update-client-measurement.dto";
 import { updateClientMeasurement } from "src/server/measurements/update-client-measurement";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindClientMeasurementParamsDto,
   auth: { permissions: [AppPermission.CLIENT_MEASUREMENT.READ_ONE] },

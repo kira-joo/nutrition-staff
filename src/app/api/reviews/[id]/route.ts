@@ -13,6 +13,8 @@ import { UpdateReviewDto } from "src/server/reviews/dto/update-review.dto";
 import { REVIEW_ASSET_FIELDS, REVIEW_ASSET_FOLDER } from "src/server/reviews/review-asset-fields";
 import { reviewRepository } from "src/server/reviews/reviews.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindReviewParamsDto,
   auth: { permissions: [AppPermission.REVIEW.READ_ONE] },

@@ -5,6 +5,8 @@ import { FindFaqSectionParamsDto } from "src/server/faq-sections/dto/find-faq-se
 import { UpdateFaqSectionDto } from "src/server/faq-sections/dto/update-faq-section.dto";
 import { faqSectionRepository } from "src/server/faq-sections/faq-sections.repository";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindFaqSectionParamsDto,
   auth: { permissions: [AppPermission.FAQ_SECTION.READ_ONE] },

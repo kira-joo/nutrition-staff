@@ -6,6 +6,8 @@ import { UpdateClientInteractionDto } from "src/server/interactions/dto/update-c
 import { clientInteractionRepository } from "src/server/interactions/client-interactions.repository";
 import { updateClientInteraction } from "src/server/interactions/update-client-interaction";
 
+export const dynamic = "force-dynamic";
+
 export const GET = createGetRoute({
   params: FindClientInteractionParamsDto,
   auth: { permissions: [AppPermission.CLIENT_INTERACTION.READ_ONE] },
