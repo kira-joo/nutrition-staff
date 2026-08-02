@@ -2,6 +2,8 @@
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Contact, IdCard, NotebookPen, Ruler } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { updateClientEndpoint } from "../../../api/client.endpoints";
 import { Gender, ProfileType } from "../enums";
@@ -16,6 +18,35 @@ export interface ClientProfileFormProps {
 
 /** The Client Details "Profile" tab's editable card — everything except lifecycle, which has its own dedicated quick action. */
 export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps) {
+  const form = useForm<ClientProfileFormValues>({
+    defaultValues: {
+      name: client.userId.name,
+      phone: client.userId.phone,
+      email: client.userId.email,
+      dateOfBirth: client.dateOfBirth,
+      birthYear: client.birthYear,
+      gender: client.gender,
+      heightCm: client.heightCm,
+      targetWeightKg: client.targetWeightKg,
+      assignedToUserId: client.assignedToUserId?._id,
+      tagsInput: client.tags.join(", "),
+      nextFollowUpAt: client.nextFollowUpAt,
+      marketingConsent: client.marketingConsent,
+      generalNotes: client.generalNotes,
+    },
+  });
+
+  const dateOfBirth = form.watch("dateOfBirth");
+
+  // birthYear only exists as a fallback for when the exact date is unknown —
+  // once dateOfBirth is set, it's derived and locked rather than left to
+  // silently disagree with the real date.
+  useEffect(() => {
+    if (!dateOfBirth) return;
+    const year = new Date(dateOfBirth).getFullYear();
+    if (!Number.isNaN(year)) form.setValue("birthYear", year);
+  }, [dateOfBirth, form]);
+
   const identityFields: FormFieldConfig<ClientProfileFormValues>[] = [
     { type: FieldType.INPUT, name: "name", label: "Name", rules: { required: true } },
     { type: FieldType.INPUT, name: "phone", label: "Phone", rules: { required: true } },
@@ -24,7 +55,13 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
 
   const personalFields: FormFieldConfig<ClientProfileFormValues>[] = [
     { type: FieldType.DATE, name: "dateOfBirth", label: "Date of birth" },
-    { type: FieldType.INPUT, name: "birthYear", label: "Birth year (if exact date unknown)", inputType: "number" },
+    {
+      type: FieldType.INPUT,
+      name: "birthYear",
+      label: "Birth year (if exact date unknown)",
+      inputType: "number",
+      disabled: Boolean(dateOfBirth),
+    },
     {
       type: FieldType.SELECT,
       name: "gender",
@@ -60,27 +97,13 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
 
   return (
     <CustomForm<ClientProfileFormValues, typeof updateClientEndpoint>
+      form={form}
       sections={[
         { title: "Identity", icon: IdCard, fields: identityFields },
         { title: "Personal details", icon: Ruler, fields: personalFields },
         { title: "CRM", icon: Contact, fields: crmFields },
         { title: "Notes", icon: NotebookPen, fields: notesFields },
       ]}
-      defaultValues={{
-        name: client.userId.name,
-        phone: client.userId.phone,
-        email: client.userId.email,
-        dateOfBirth: client.dateOfBirth,
-        birthYear: client.birthYear,
-        gender: client.gender,
-        heightCm: client.heightCm,
-        targetWeightKg: client.targetWeightKg,
-        assignedToUserId: client.assignedToUserId?._id,
-        tagsInput: client.tags.join(", "),
-        nextFollowUpAt: client.nextFollowUpAt,
-        marketingConsent: client.marketingConsent,
-        generalNotes: client.generalNotes,
-      }}
       transformValues={({ tagsInput, ...values }) => ({
         ...values,
         tags: tagsInput

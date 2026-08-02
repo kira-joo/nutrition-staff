@@ -1,6 +1,8 @@
 "use client";
 
 import { CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "../enums";
 import { computeNutritionCalculationEndpoint } from "../../../api/nutrition-calculation.endpoints";
 import { ComputeNutritionCalculationInputs, ComputeNutritionCalculationResponse } from "../interfaces/nutrition-calculation.interface";
@@ -17,6 +19,19 @@ export interface NutritionCalculationInputFormProps {
  * save/assign action (owned by the caller) persists the returned snapshot.
  */
 export function NutritionCalculationInputForm({ defaultValues, onComputed }: NutritionCalculationInputFormProps) {
+  const form = useForm<ComputeNutritionCalculationInputs>({ defaultValues });
+
+  const dateOfBirth = form.watch("dateOfBirth");
+
+  // birthYear only exists as a fallback for when the exact date is unknown —
+  // once dateOfBirth is set, it's derived and locked rather than left to
+  // silently disagree with the real date.
+  useEffect(() => {
+    if (!dateOfBirth) return;
+    const year = new Date(dateOfBirth).getFullYear();
+    if (!Number.isNaN(year)) form.setValue("birthYear", year);
+  }, [dateOfBirth, form]);
+
   const biometricFields: FormFieldConfig<ComputeNutritionCalculationInputs>[] = [
     {
       type: FieldType.SELECT,
@@ -25,7 +40,13 @@ export function NutritionCalculationInputForm({ defaultValues, onComputed }: Nut
       options: Object.values(Gender).map((v) => ({ label: v, value: v })),
     },
     { type: FieldType.DATE, name: "dateOfBirth", label: "Date of birth" },
-    { type: FieldType.INPUT, name: "birthYear", label: "Birth year (if exact date unknown)", inputType: "number" },
+    {
+      type: FieldType.INPUT,
+      name: "birthYear",
+      label: "Birth year (if exact date unknown)",
+      inputType: "number",
+      disabled: Boolean(dateOfBirth),
+    },
     { type: FieldType.INPUT, name: "heightCm", label: "Height (cm)", inputType: "number", rules: { required: true } },
     { type: FieldType.INPUT, name: "weightKg", label: "Weight (kg)", inputType: "number", rules: { required: true } },
     { type: FieldType.INPUT, name: "bodyFatPercentage", label: "Body fat % (enables Katch-McArdle)", inputType: "number" },
@@ -63,12 +84,12 @@ export function NutritionCalculationInputForm({ defaultValues, onComputed }: Nut
 
   return (
     <CustomForm<ComputeNutritionCalculationInputs, typeof computeNutritionCalculationEndpoint>
+      form={form}
       sections={[
         { title: "Biometrics", fields: biometricFields },
         { title: "Formula & activity", fields: formulaFields },
         { title: "Adjustments (optional overrides)", fields: adjustmentFields },
       ]}
-      defaultValues={defaultValues}
       submitEndpoint={computeNutritionCalculationEndpoint}
       submitButtonText="Calculate"
       onSuccess={onComputed}
