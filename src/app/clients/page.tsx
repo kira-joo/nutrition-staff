@@ -19,7 +19,7 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
 import { EntityName } from "src/common/authorization/entity-name.enum";
-import { ClientLifecycle, ClientSource } from "src/common/enums";
+import { ClientLifecycle, ClientSource, ProfileType } from "src/common/enums";
 import { Client } from "src/common/interfaces/client.interface";
 import { calculateProfileCompleteness } from "src/common/utils/profile-completeness";
 import { AppRoute } from "src/common/routes/app-route";
@@ -59,7 +59,12 @@ export default function ClientsPage() {
       ),
     },
     { key: "phone", header: "Phone", render: (client) => client.userId.phone ?? "—" },
-    { key: "email", header: "Email", render: (client) => client.userId.email ?? "—" },
+    {
+      key: "email",
+      header: "Email",
+      className: "max-w-[180px] truncate",
+      render: (client) => client.userId.email ?? "—",
+    },
     {
       key: "lifecycle",
       header: "Lifecycle",
@@ -92,7 +97,12 @@ export default function ClientsPage() {
         return `${completeness.filled}/${completeness.total}`;
       },
     },
-    { key: "tags", header: "Tags", render: (client) => (client.tags.length > 0 ? client.tags.join(", ") : "—") },
+    {
+      key: "tags",
+      header: "Tags",
+      className: "max-w-[180px] truncate",
+      render: (client) => (client.tags.length > 0 ? client.tags.join(", ") : "—"),
+    },
   ];
 
   return (
@@ -128,6 +138,12 @@ export default function ClientsPage() {
             optionLabel: "name",
             optionValue: "_id",
             placeholder: "Filter by assigned staff",
+            // /users lists every client/lead alongside staff — without this,
+            // a client could be offered here as an "assigned staff" filter.
+            // STAFF_ONLY here means "has a staff profile" (see
+            // buildProfileTypeWhere), so a person who is both staff and a
+            // client of the clinic still appears.
+            endpointQuery: { profileType: ProfileType.STAFF_ONLY },
           },
           {
             key: "followUpDue",

@@ -4,7 +4,7 @@ import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/fr
 import { Contact, IdCard, NotebookPen, Ruler } from "lucide-react";
 import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { updateClientEndpoint } from "../../../api/client.endpoints";
-import { Gender } from "../enums";
+import { Gender, ProfileType } from "../enums";
 import { Client, UpdateClientDto } from "../interfaces/client.interface";
 
 type ClientProfileFormValues = Omit<UpdateClientDto, "tags"> & { tagsInput?: string };
@@ -43,6 +43,11 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
       endpoint: getUsersEndpoint,
       optionLabel: "name",
       optionValue: "_id",
+      // /users lists every client/lead alongside staff — without this, a
+      // client could be offered here as an "assignable staff member".
+      // STAFF_ONLY here means "has a staff profile" (see buildProfileTypeWhere),
+      // so a person who is both staff and a client is still assignable.
+      query: { profileType: ProfileType.STAFF_ONLY },
     },
     { type: FieldType.INPUT, name: "tagsInput", label: "Tags (comma-separated)" },
     { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up" },

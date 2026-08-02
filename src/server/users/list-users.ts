@@ -8,6 +8,15 @@ async function userIdSet(rows: { userId: unknown }[]): Promise<Set<string>> {
   return new Set(rows.map((row) => String(row.userId)));
 }
 
+/**
+ * STAFF_ONLY/CLIENT_ONLY are existence checks on that one profile type,
+ * independent of the other — a person who is both staff and a client of the
+ * clinic still matches STAFF_ONLY (e.g. "assign to any staff member" combobox
+ * usages need exactly this: excluding them because they're also a client
+ * would be wrong). Only BOTH/IDENTITY_ONLY are true mutual-exclusive checks,
+ * since each is inherently about the combination (both present / neither
+ * present) rather than one profile type alone.
+ */
 function buildProfileTypeWhere(
   profileType: ProfileType,
   clientUserIds: Set<string>,
@@ -17,9 +26,9 @@ function buildProfileTypeWhere(
     case ProfileType.BOTH:
       return { _id: { $in: [...clientUserIds].filter((id) => staffUserIds.has(id)) } };
     case ProfileType.CLIENT_ONLY:
-      return { _id: { $in: [...clientUserIds].filter((id) => !staffUserIds.has(id)) } };
+      return { _id: { $in: [...clientUserIds] } };
     case ProfileType.STAFF_ONLY:
-      return { _id: { $in: [...staffUserIds].filter((id) => !clientUserIds.has(id)) } };
+      return { _id: { $in: [...staffUserIds] } };
     case ProfileType.IDENTITY_ONLY:
       return { _id: { $nin: [...new Set([...clientUserIds, ...staffUserIds])] } };
   }
