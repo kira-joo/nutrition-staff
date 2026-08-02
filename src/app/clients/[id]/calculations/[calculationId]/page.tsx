@@ -7,6 +7,9 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { NutritionCalculationResultsView } from "src/common/forms/nutrition-calculation-results";
 import { AppRoute } from "src/common/routes/app-route";
+import { useNavigate } from "src/common/routes/use-navigate";
+import { getClientMeasurementByIdEndpoint } from "../../../../../../api/client-measurement.endpoints";
+import { getNutritionAssessmentByIdEndpoint } from "../../../../../../api/nutrition-assessment.endpoints";
 import {
   getNutritionCalculationByIdEndpoint,
   updateNutritionCalculationEndpoint,
@@ -18,10 +21,25 @@ interface NotesFormValues {
 
 export default function ClientCalculationDetailsPage({ params }: { params: { id: string; calculationId: string } }) {
   const { can } = usePermissions();
+  const navigate = useNavigate();
 
   const calculationQuery = useRequesterQuery({
     endpoint: getNutritionCalculationByIdEndpoint,
     options: { params: { id: params.calculationId } },
+  });
+
+  const linkedMeasurementId = calculationQuery.data?.measurementId;
+  const linkedMeasurementQuery = useRequesterQuery({
+    endpoint: getClientMeasurementByIdEndpoint,
+    options: { params: { id: linkedMeasurementId ?? "" } },
+    queryOptions: { enabled: Boolean(linkedMeasurementId) },
+  });
+
+  const linkedAssessmentId = calculationQuery.data?.assessmentId;
+  const linkedAssessmentQuery = useRequesterQuery({
+    endpoint: getNutritionAssessmentByIdEndpoint,
+    options: { params: { id: linkedAssessmentId ?? "" } },
+    queryOptions: { enabled: Boolean(linkedAssessmentId) },
   });
 
   return (
@@ -38,6 +56,40 @@ export default function ClientCalculationDetailsPage({ params }: { params: { id:
                 <InfoRow label="Calculated by" value={calculation.calculatedByUserId.name} />
                 <InfoRow label="Engine version" value={calculation.engineVersion} />
                 <InfoRow label="Assigned" value={calculation.assignedAt ? <DateText value={calculation.assignedAt} /> : "N/A (calculated directly for this client)"} />
+                <InfoRow
+                  label="Based on measurement"
+                  value={
+                    linkedMeasurementQuery.data ? (
+                      <button
+                        type="button"
+                        className="text-left underline hover:text-slate-900"
+                        onClick={() => navigate(AppRoute.clientMeasurements, { id: params.id })}
+                      >
+                        <DateText value={linkedMeasurementQuery.data.measuredAt} />
+                      </button>
+                    ) : (
+                      "—"
+                    )
+                  }
+                />
+                <InfoRow
+                  label="Based on assessment"
+                  value={
+                    linkedAssessmentQuery.data ? (
+                      <button
+                        type="button"
+                        className="text-left underline hover:text-slate-900"
+                        onClick={() =>
+                          navigate(AppRoute.clientAssessmentDetails, { id: params.id, assessmentId: linkedAssessmentQuery.data._id })
+                        }
+                      >
+                        <DateText value={linkedAssessmentQuery.data.assessedAt} />
+                      </button>
+                    ) : (
+                      "—"
+                    )
+                  }
+                />
               </div>
             </PageSection>
 

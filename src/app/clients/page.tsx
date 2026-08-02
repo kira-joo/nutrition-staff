@@ -21,6 +21,7 @@ import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ClientLifecycle, ClientSource } from "src/common/enums";
 import { Client } from "src/common/interfaces/client.interface";
+import { calculateProfileCompleteness } from "src/common/utils/profile-completeness";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
 import { getUsersEndpoint } from "../../../api/user.endpoints";
@@ -77,6 +78,19 @@ export default function ClientsPage() {
         ) : (
           "—"
         ),
+    },
+    {
+      key: "lastContactedAt",
+      header: "Last contacted",
+      render: (client) => (client.lastContactedAt ? new Date(client.lastContactedAt).toLocaleDateString() : "—"),
+    },
+    {
+      key: "profileCompleteness",
+      header: "Profile",
+      render: (client) => {
+        const completeness = calculateProfileCompleteness(client);
+        return `${completeness.filled}/${completeness.total}`;
+      },
     },
     { key: "tags", header: "Tags", render: (client) => (client.tags.length > 0 ? client.tags.join(", ") : "—") },
   ];

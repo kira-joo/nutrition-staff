@@ -3,6 +3,7 @@
 import { SortOrder, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
   DateText,
+  DeltaIndicator,
   EmptyState,
   FeatureTable,
   Modal,
@@ -10,7 +11,7 @@ import {
   type FeatureTableHandle,
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { ArrowDown, ArrowUp, Minus, Plus, Ruler } from "lucide-react";
+import { Plus, Ruler } from "lucide-react";
 import { useRef, useState } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -21,26 +22,6 @@ import {
   getClientMeasurementsEndpoint,
   updateClientMeasurementEndpoint,
 } from "../../../../../api/client-measurement.endpoints";
-
-function DeltaBadge({ current, previous, unit }: { current?: number; previous?: number; unit: string }) {
-  if (current === undefined || previous === undefined) return null;
-  const delta = Math.round((current - previous) * 10) / 10;
-  if (delta === 0) {
-    return (
-      <span className="inline-flex items-center gap-1 text-sm text-slate-500">
-        <Minus className="h-3 w-3" /> No change since last visit
-      </span>
-    );
-  }
-  const isIncrease = delta > 0;
-  return (
-    <span className={`inline-flex items-center gap-1 text-sm ${isIncrease ? "text-amber-600" : "text-emerald-600"}`}>
-      {isIncrease ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-      {isIncrease ? "+" : ""}
-      {delta} {unit} since last visit
-    </span>
-  );
-}
 
 export default function ClientMeasurementsPage({ params }: { params: { id: string } }) {
   const { can } = usePermissions();
@@ -69,8 +50,12 @@ export default function ClientMeasurementsPage({ params }: { params: { id: strin
         <div className="flex flex-col gap-1">
           {latest ? (
             <>
-              <DeltaBadge current={latest.weightKg} previous={previous?.weightKg} unit="kg" />
-              <DeltaBadge current={latest.waistCm} previous={previous?.waistCm} unit="cm waist" />
+              {latest.weightKg !== undefined ? (
+                <DeltaIndicator current={latest.weightKg} previous={previous?.weightKg} unit="kg" label="since last visit" />
+              ) : null}
+              {latest.waistCm !== undefined ? (
+                <DeltaIndicator current={latest.waistCm} previous={previous?.waistCm} unit="cm waist" label="since last visit" />
+              ) : null}
             </>
           ) : (
             <span className="text-sm text-slate-500">No measurements recorded yet</span>
