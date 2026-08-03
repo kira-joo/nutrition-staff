@@ -16,10 +16,10 @@
     "sync-user-indexes": "node --env-file=.env --import tsx scripts/sync-user-indexes.ts"
   },
   "dependencies": {
-    "@kira-joo/backend-toolkit-cloudinary": "^0.1.0",
-    "@kira-joo/backend-toolkit-core": "^0.3.3",
-    "@kira-joo/backend-toolkit-mongoose": "^0.3.0",
-    "@kira-joo/backend-toolkit-next": "^0.3.0",
+    "@kira-joo/backend-toolkit-cloudinary": "^0.1.1",
+    "@kira-joo/backend-toolkit-core": "^0.3.4",
+    "@kira-joo/backend-toolkit-mongoose": "^0.3.2",
+    "@kira-joo/backend-toolkit-next": "^0.3.1",
     "@kira-joo/frontend-toolkit-core": "^0.4.2",
     "@kira-joo/frontend-toolkit-tailwind": "^0.4.0",
     "@kira-joo/toolkit-common": "^0.2.0",

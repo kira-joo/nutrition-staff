@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Nutrition Staff",
-  description: "Smoke test app for @kira-joo/frontend-toolkit-core and @kira-joo/frontend-toolkit-tailwind",
+  description: "Nutrition Staff Management System for Dr. Omnia.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
