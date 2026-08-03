@@ -11,10 +11,7 @@ const nextConfig = {
     // to a broken stub inside the route-handler bundle ("bufferUtil.mask is
     // not a function") — excluding it from bundling and letting Node
     // `require()` it directly at runtime avoids that entirely.
-    serverComponentsExternalPackages: ["argon2", "puppeteer", "puppeteer-core", "chromium-bidi", "ws"],
-  },
-  outputFileTracingIncludes: {
-    "/*": ["./node_modules/argon2/prebuilds/**/*"],
+    serverComponentsExternalPackages: ["puppeteer", "puppeteer-core", "chromium-bidi", "ws"],
   },
   // Belt-and-suspenders alongside serverComponentsExternalPackages above:
   // that experimental flag doesn't reliably stop deeply-nested transitive
@@ -22,7 +19,7 @@ const nextConfig = {
   // being bundled — a direct webpack externals push does.
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals.push("argon2", "puppeteer", "puppeteer-core", "chromium-bidi", "ws");
+      config.externals.push("puppeteer", "puppeteer-core", "chromium-bidi", "ws");
     }
     return config;
   },
