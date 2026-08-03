@@ -12,7 +12,6 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { MessageSquareQuote, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { deleteReviewEndpoint, getReviewsEndpoint } from "../../../api/review.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
@@ -21,6 +20,7 @@ import { ContentStatus } from "src/common/enums";
 import { Review } from "src/common/interfaces/review.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
+import { deleteReviewEndpoint, getReviewsEndpoint } from "../../../api/review.endpoints";
 
 export default function ReviewsPage() {
   const navigate = useNavigate();
@@ -34,11 +34,15 @@ export default function ReviewsPage() {
 
   const columns: TableColumn<Review>[] = [
     {
-      key: "content",
-      header: "Content",
+      key: "authorName",
+      header: "author name",
       render: (review) => (
         <AppLink path={AppRoute.reviewDetails} params={{ id: review._id }}>
-          {review.content?.en || review.content?.ar || (review.image ? "(image only)" : "(untitled)")}
+          {review.authorName?.en ||
+            review.authorName?.ar ||
+            review.content?.en ||
+            review.content?.ar ||
+            (review.image ? "(image only)" : "(untitled)")}
         </AppLink>
       ),
     },
