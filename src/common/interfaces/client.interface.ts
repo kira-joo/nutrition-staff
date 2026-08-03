@@ -63,7 +63,7 @@ export type CreateClientFormValues = CreateClientDto;
 
 export type ClientProfileFormValues = Omit<UpdateClientDto, "name" | "phone" | "email">;
 
-/** Same field set as `ClientProfileFormValues` — `lifecycle` is simply never rendered by `AttachClientProfileForm`, defaulting server-side to LEAD. */
+/** Same field set as `ClientProfileFormValues` — `lifecycle` is simply never rendered in "attach" mode, defaulting server-side to LEAD. */
 export type AttachClientProfileFormValues = ClientProfileFormValues;
 
 /** The structured `details` of a 409 Conflict from `createClient` — an existing identity matched by phone/email. */

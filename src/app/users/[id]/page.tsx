@@ -18,7 +18,7 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Status } from "src/common/enums";
-import { AttachClientProfileForm } from "src/common/forms/attach-client-profile-form";
+import { ClientProfileForm } from "src/common/forms/client-profile-form";
 import { StaffProfileForm } from "src/common/forms/staff-profile-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { getClientByUserIdEndpoint } from "../../../../api/client-profile.endpoints";
@@ -179,8 +179,8 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
           </Modal>
 
           <Modal open={clientDialogOpen} onOpenChange={setClientDialogOpen} title="Add client profile" size="full">
-            <AttachClientProfileForm
-              userId={user._id}
+            <ClientProfileForm
+              target={{ mode: "attach", userId: user._id }}
               onSuccess={() => {
                 setClientDialogOpen(false);
                 clientProfileQuery.refetch();

@@ -4,37 +4,65 @@ import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/fr
 import { Contact, IdCard, NotebookPen, Ruler } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { getUsersEndpoint } from "../../../api/user.endpoints";
+import { attachClientProfileEndpoint } from "../../../api/client-profile.endpoints";
 import { updateClientEndpoint } from "../../../api/client.endpoints";
+import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { Gender, ProfileType } from "../enums";
-import { Client, UpdateClientDto } from "../interfaces/client.interface";
+import type { AttachClientProfileFormValues, Client } from "../interfaces/client.interface";
 
-type ClientProfileFormValues = Omit<UpdateClientDto, "tags"> & { tagsInput?: string };
+type FormValues = AttachClientProfileFormValues & { name?: string; phone?: string; email?: string; tagsInput?: string };
+
+export type ClientProfileFormTarget =
+  | { mode: "edit"; client: Client }
+  /** `initialValues` carries over whatever the operator already typed before a duplicate-identity conflict was detected — attaching shouldn't mean re-entering the same information. */
+  | { mode: "attach"; userId: string; initialValues?: Partial<AttachClientProfileFormValues> };
 
 export interface ClientProfileFormProps {
-  client: Client;
-  onSuccess: () => void;
+  target: ClientProfileFormTarget;
+  onSuccess: (client: Client) => void;
 }
 
-/** The Client Details "Profile" tab's editable card — everything except lifecycle, which has its own dedicated quick action. */
-export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps) {
-  const form = useForm<ClientProfileFormValues>({
-    defaultValues: {
-      name: client.userId.name,
-      phone: client.userId.phone,
-      email: client.userId.email,
-      dateOfBirth: client.dateOfBirth,
-      birthYear: client.birthYear,
-      gender: client.gender,
-      heightCm: client.heightCm,
-      targetWeightKg: client.targetWeightKg,
-      assignedToUserId: client.assignedToUserId?._id,
-      tagsInput: client.tags.join(", "),
-      nextFollowUpAt: client.nextFollowUpAt,
-      marketingConsent: client.marketingConsent,
-      generalNotes: client.generalNotes,
-    },
-  });
+/**
+ * The one ClientProfile form, in either of two modes:
+ * - `edit` — the Client Details "Profile" tab, editing an existing
+ *   ClientProfile (plus its User's identity fields). Everything except
+ *   lifecycle, which has its own dedicated quick action.
+ * - `attach` — creating a ClientProfile for an existing User (from User
+ *   Details), reusing their identity automatically. No identity fields
+ *   (the User already has them) and no lifecycle field either (defaults
+ *   to LEAD server-side, same as a brand-new client).
+ *
+ * Kept as one component specifically so these two flows never drift into
+ * two near-duplicate field lists over time — the only real differences
+ * are which fields are shown and which endpoint the result is submitted to.
+ */
+export function ClientProfileForm({ target, onSuccess }: ClientProfileFormProps) {
+  const isEdit = target.mode === "edit";
+
+  const defaultValues: FormValues = isEdit
+    ? {
+        name: target.client.userId.name,
+        phone: target.client.userId.phone,
+        email: target.client.userId.email,
+        dateOfBirth: target.client.dateOfBirth,
+        birthYear: target.client.birthYear,
+        gender: target.client.gender,
+        heightCm: target.client.heightCm,
+        targetWeightKg: target.client.targetWeightKg,
+        source: target.client.source,
+        sourceNote: target.client.sourceNote,
+        assignedToUserId: target.client.assignedToUserId?._id,
+        tagsInput: target.client.tags.join(", "),
+        nextFollowUpAt: target.client.nextFollowUpAt,
+        marketingConsent: target.client.marketingConsent,
+        generalNotes: target.client.generalNotes,
+      }
+    : {
+        ...target.initialValues,
+        tagsInput: target.initialValues?.tags?.join(", ") ?? "",
+      };
+
+  const form = useForm<FormValues>({ defaultValues });
 
   const dateOfBirth = form.watch("dateOfBirth");
 
@@ -47,13 +75,13 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
     if (!Number.isNaN(year)) form.setValue("birthYear", year);
   }, [dateOfBirth, form]);
 
-  const identityFields: FormFieldConfig<ClientProfileFormValues>[] = [
+  const identityFields: FormFieldConfig<FormValues>[] = [
     { type: FieldType.INPUT, name: "name", label: "Name", rules: { required: true } },
     { type: FieldType.INPUT, name: "phone", label: "Phone", rules: { required: true } },
     { type: FieldType.INPUT, name: "email", label: "Email", inputType: "email" },
   ];
 
-  const personalFields: FormFieldConfig<ClientProfileFormValues>[] = [
+  const personalFields: FormFieldConfig<FormValues>[] = [
     { type: FieldType.DATE, name: "dateOfBirth", label: "Date of birth" },
     {
       type: FieldType.INPUT,
@@ -72,7 +100,7 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
     { type: FieldType.INPUT, name: "targetWeightKg", label: "Target weight (kg)", inputType: "number" },
   ];
 
-  const crmFields: FormFieldConfig<ClientProfileFormValues>[] = [
+  const crmFields: FormFieldConfig<FormValues>[] = [
     {
       type: FieldType.FEATURE_COMBOBOX,
       name: "assignedToUserId",
@@ -91,34 +119,57 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
     { type: FieldType.SWITCH, name: "marketingConsent", label: "Marketing consent" },
   ];
 
-  const notesFields: FormFieldConfig<ClientProfileFormValues>[] = [
+  const notesFields: FormFieldConfig<FormValues>[] = [
     { type: FieldType.TEXTAREA, name: "generalNotes", label: "General notes" },
   ];
 
+  const sections = [
+    ...(isEdit ? [{ title: "Identity", icon: IdCard, fields: identityFields }] : []),
+    { title: "Personal details", icon: Ruler, fields: personalFields },
+    { title: "CRM", icon: Contact, fields: crmFields },
+    { title: "Notes", icon: NotebookPen, fields: notesFields },
+  ];
+
+  const transformValues = ({ tagsInput, ...values }: FormValues) => ({
+    ...values,
+    tags: tagsInput
+      ? tagsInput
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+      : [],
+  });
+
+  if (isEdit) {
+    return (
+      <CustomForm<FormValues, typeof updateClientEndpoint>
+        form={form}
+        sections={sections}
+        transformValues={transformValues}
+        submitEndpoint={updateClientEndpoint}
+        submitParams={{ id: target.client._id }}
+        onSuccess={(client) => {
+          toast.success("Client profile updated");
+          onSuccess(client);
+        }}
+        layout="grid"
+        columns={2}
+      />
+    );
+  }
+
   return (
-    <CustomForm<ClientProfileFormValues, typeof updateClientEndpoint>
+    <CustomForm<FormValues, typeof attachClientProfileEndpoint>
       form={form}
-      sections={[
-        { title: "Identity", icon: IdCard, fields: identityFields },
-        { title: "Personal details", icon: Ruler, fields: personalFields },
-        { title: "CRM", icon: Contact, fields: crmFields },
-        { title: "Notes", icon: NotebookPen, fields: notesFields },
-      ]}
-      transformValues={({ tagsInput, ...values }) => ({
-        ...values,
-        tags: tagsInput
-          ? tagsInput
-              .split(",")
-              .map((tag) => tag.trim())
-              .filter(Boolean)
-          : [],
-      })}
-      submitEndpoint={updateClientEndpoint}
-      submitParams={{ id: client._id }}
-      onSuccess={() => {
-        toast.success("Client profile updated");
-        onSuccess();
+      sections={sections}
+      transformValues={transformValues}
+      submitEndpoint={attachClientProfileEndpoint}
+      submitParams={{ userId: target.userId }}
+      onSuccess={(client) => {
+        toast.success("Client profile added");
+        onSuccess(client);
       }}
+      submitButtonText="Add client profile"
       layout="grid"
       columns={2}
     />

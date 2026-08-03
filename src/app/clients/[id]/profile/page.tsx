@@ -13,7 +13,7 @@ export default function ClientProfilePage({ params }: { params: { id: string } }
 
   return (
     <QueryState query={clientQuery} entityName="Client">
-      {(client) => <ClientProfileForm client={client} onSuccess={() => clientQuery.refetch()} />}
+      {(client) => <ClientProfileForm target={{ mode: "edit", client }} onSuccess={() => clientQuery.refetch()} />}
     </QueryState>
   );
 }
