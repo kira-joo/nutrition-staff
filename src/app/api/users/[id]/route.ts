@@ -1,5 +1,6 @@
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { deleteUser } from "src/server/users/delete-user";
 import { FindUserParamsDto } from "src/server/users/dto/find-user-params.dto";
 import { UpdateUserDto } from "src/server/users/dto/update-user.dto";
 import { userRepository } from "src/server/users/users.repository";
@@ -23,6 +24,6 @@ export const DELETE = createDeleteRoute({
   params: FindUserParamsDto,
   auth: { permissions: [AppPermission.USER.DELETE] },
   handler: async ({ params }) => {
-    await userRepository.delete({ where: { _id: params.id } });
+    await deleteUser(params.id);
   },
 });

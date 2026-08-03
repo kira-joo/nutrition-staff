@@ -62,3 +62,15 @@ export interface UpdateClientDto {
 export type CreateClientFormValues = CreateClientDto;
 
 export type ClientProfileFormValues = Omit<UpdateClientDto, "name" | "phone" | "email">;
+
+/** Same field set as `ClientProfileFormValues` — `lifecycle` is simply never rendered by `AttachClientProfileForm`, defaulting server-side to LEAD. */
+export type AttachClientProfileFormValues = ClientProfileFormValues;
+
+/** The structured `details` of a 409 Conflict from `createClient` — an existing identity matched by phone/email. */
+export interface CreateClientConflictDetails {
+  field: "phone" | "email";
+  existingUserId: string;
+  existingUserName: string;
+  hasClientProfile: boolean;
+  clientProfileId?: string;
+}

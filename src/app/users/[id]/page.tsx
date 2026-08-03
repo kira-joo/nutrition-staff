@@ -12,20 +12,23 @@ import {
   QueryState,
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
-import { Activity, Briefcase, IdCard, Pencil, UserRound } from "lucide-react";
+import { Activity, Briefcase, Contact, IdCard, Pencil, UserPlus, UserRound } from "lucide-react";
 import { useState } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Status } from "src/common/enums";
+import { AttachClientProfileForm } from "src/common/forms/attach-client-profile-form";
 import { StaffProfileForm } from "src/common/forms/staff-profile-form";
 import { AppRoute } from "src/common/routes/app-route";
+import { getClientByUserIdEndpoint } from "../../../../api/client-profile.endpoints";
 import { getStaffProfileByUserIdEndpoint } from "../../../../api/staff-profile.endpoints";
 import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
 
 export default function UserDetailsPage({ params }: { params: { id: string } }) {
   const { can } = usePermissions();
   const [staffDialogOpen, setStaffDialogOpen] = useState(false);
+  const [clientDialogOpen, setClientDialogOpen] = useState(false);
 
   const userQuery = useRequesterQuery({
     endpoint: getUserByIdEndpoint,
@@ -37,8 +40,17 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
     options: { params: { userId: params.id } },
   });
 
+  const clientProfileQuery = useRequesterQuery({
+    endpoint: getClientByUserIdEndpoint,
+    options: { params: { userId: params.id } },
+  });
+
   return (
-    <QueryState query={userQuery} entityName={EntityName.USER} backRoute={{ path: AppRoute.users, label: "Back to Users" }}>
+    <QueryState
+      query={userQuery}
+      entityName={EntityName.USER}
+      backRoute={{ path: AppRoute.users, label: "Back to Users" }}
+    >
       {(user) => (
         <PageShell
           icon={UserRound}
@@ -92,7 +104,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
                       label="Salary"
                       value={
                         staffProfileQuery.data.salary !== undefined
-                          ? `$${staffProfileQuery.data.salary.toLocaleString()}`
+                          ? `EGP ${staffProfileQuery.data.salary.toLocaleString()}`
                           : "—"
                       }
                     />
@@ -105,6 +117,54 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
                 )}
               </div>
             </PageSection>
+            <PageSection icon={Contact} title="Client details">
+              <div className="flex flex-col gap-3">
+                {clientProfileQuery.data ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">Client</Badge>
+                    </div>
+                    <InfoRow label="Lifecycle" value={clientProfileQuery.data.lifecycle} />
+                    <InfoRow label="Source" value={clientProfileQuery.data.source ?? "—"} />
+                    <InfoRow
+                      label="Next follow-up"
+                      value={
+                        clientProfileQuery.data.nextFollowUpAt ? (
+                          <DateText value={clientProfileQuery.data.nextFollowUpAt} />
+                        ) : (
+                          "—"
+                        )
+                      }
+                    />
+                    <RouteButton
+                      path={AppRoute.clientOverview}
+                      params={{ id: clientProfileQuery.data._id }}
+                      permission={AppPermission.CLIENT.READ_ONE}
+                      variant="outline"
+                      className="self-start"
+                    >
+                      Open Client Workspace
+                    </RouteButton>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-slate-500">
+                      This identity has no client profile yet — it isn't a current or former client.
+                    </p>
+                    {can(AppPermission.CLIENT.CREATE) ? (
+                      <CustomButton
+                        variant="outline"
+                        className="self-start"
+                        leftIcon={UserPlus}
+                        onClick={() => setClientDialogOpen(true)}
+                      >
+                        Add Client Profile
+                      </CustomButton>
+                    ) : null}
+                  </>
+                )}
+              </div>
+            </PageSection>
           </div>
 
           <Modal open={staffDialogOpen} onOpenChange={setStaffDialogOpen} title="Edit staff details">
@@ -114,6 +174,16 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
               onSuccess={() => {
                 setStaffDialogOpen(false);
                 staffProfileQuery.refetch();
+              }}
+            />
+          </Modal>
+
+          <Modal open={clientDialogOpen} onOpenChange={setClientDialogOpen} title="Add client profile" size="full">
+            <AttachClientProfileForm
+              userId={user._id}
+              onSuccess={() => {
+                setClientDialogOpen(false);
+                clientProfileQuery.refetch();
               }}
             />
           </Modal>

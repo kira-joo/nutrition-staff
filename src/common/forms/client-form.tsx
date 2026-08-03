@@ -1,23 +1,33 @@
 "use client";
 
+import { useRequesterMutation, type ApiError } from "@kira-joo/frontend-toolkit-core";
 import {
   CenteredSpinner,
+  Card,
+  CustomButton,
   CustomForm,
   FieldType,
   toast,
   type FormFieldConfig,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Contact, IdCard } from "lucide-react";
+import { useState } from "react";
 import { useCurrentUser } from "src/common/auth/use-current-user";
+import { attachClientProfileEndpoint } from "../../../api/client-profile.endpoints";
 import type { createClientEndpoint } from "../../../api/client.endpoints";
 import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { ClientSource } from "../enums";
-import { CreateClientFormValues } from "../interfaces/client.interface";
+import { CreateClientConflictDetails, CreateClientFormValues } from "../interfaces/client.interface";
 import { AppRoute } from "../routes/app-route";
 import { useNavigate } from "../routes/use-navigate";
 
 export interface ClientFormProps {
   endpoint: typeof createClientEndpoint;
+}
+
+interface ConflictState {
+  details: CreateClientConflictDetails;
+  crmValues: Pick<CreateClientFormValues, "source" | "sourceNote" | "assignedToUserId">;
 }
 
 /**
@@ -29,6 +39,15 @@ export interface ClientFormProps {
 export function ClientForm({ endpoint }: ClientFormProps) {
   const navigate = useNavigate();
   const currentUserQuery = useCurrentUser();
+  const [conflict, setConflict] = useState<ConflictState | null>(null);
+
+  const attachMutation = useRequesterMutation<typeof attachClientProfileEndpoint>({
+    endpoint: attachClientProfileEndpoint,
+    onSuccess: (client) => {
+      toast.success("Client profile attached to existing identity");
+      navigate(AppRoute.clientOverview, { id: client._id });
+    },
+  });
 
   /**
    * defaultValues is read once by react-hook-form at mount, so the
@@ -38,6 +57,60 @@ export function ClientForm({ endpoint }: ClientFormProps) {
    */
   if (!currentUserQuery.data) {
     return <CenteredSpinner />;
+  }
+
+  // A duplicate-identity conflict replaces the form entirely rather than
+  // just showing an inline error — the correct next step (attach to the
+  // existing identity, or open their existing client) is a distinct
+  // decision, not something to squeeze into a field-level error message.
+  if (conflict) {
+    const { details, crmValues } = conflict;
+    return (
+      <Card
+        title="This person already exists"
+        description={`A user was found with a matching ${details.field}: "${details.existingUserName}".`}
+      >
+        <div className="flex flex-col gap-4">
+          {details.hasClientProfile ? (
+            <>
+              <p className="text-sm text-slate-600">
+                This identity already has a client profile — open it instead of creating a new one.
+              </p>
+              <div className="flex gap-2">
+                <CustomButton onClick={() => navigate(AppRoute.clientOverview, { id: details.clientProfileId as string })}>
+                  Open existing client
+                </CustomButton>
+                <CustomButton variant="outline" onClick={() => setConflict(null)}>
+                  Try a different email/phone
+                </CustomButton>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-slate-600">
+                Attach a client profile to this existing identity instead of creating a duplicate person.
+              </p>
+              <div className="flex gap-2">
+                <CustomButton
+                  loading={attachMutation.loading}
+                  onClick={() =>
+                    attachMutation.mutate({
+                      params: { userId: details.existingUserId },
+                      body: crmValues,
+                    })
+                  }
+                >
+                  Attach client profile to {details.existingUserName}
+                </CustomButton>
+                <CustomButton variant="outline" onClick={() => setConflict(null)} disabled={attachMutation.loading}>
+                  Try a different email/phone
+                </CustomButton>
+              </div>
+            </>
+          )}
+        </div>
+      </Card>
+    );
   }
 
   const fields: FormFieldConfig<CreateClientFormValues>[] = [
@@ -102,6 +175,15 @@ export function ClientForm({ endpoint }: ClientFormProps) {
       onSuccess={(client) => {
         toast.success("Client added");
         navigate(AppRoute.clientOverview, { id: client._id });
+      }}
+      onError={(error: ApiError, values) => {
+        if (error.statusCode !== 409) return;
+        const details = (error.raw as { details?: CreateClientConflictDetails } | undefined)?.details;
+        if (!details) return;
+        setConflict({
+          details,
+          crmValues: { source: values.source, sourceNote: values.sourceNote, assignedToUserId: values.assignedToUserId },
+        });
       }}
       layout="grid"
       columns={2}
