@@ -73,7 +73,7 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
   return (
     <QueryState query={clientQuery} entityName="Client">
       {(client) => {
-        const completeness = calculateProfileCompleteness(client, Boolean(latestMeasurement));
+        const completeness = calculateProfileCompleteness({ ...client, hasMeasurement: Boolean(latestMeasurement) });
         const isFollowUpOverdue = Boolean(client.nextFollowUpAt && new Date(client.nextFollowUpAt) < new Date());
 
         return (
@@ -173,7 +173,23 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
                     label="Last contacted"
                     value={client.lastContactedAt ? <DateText value={client.lastContactedAt} /> : "Never"}
                   />
-                  <InfoRow label="Profile completeness" value={`${completeness.filled}/${completeness.total} fields`} />
+                  <InfoRow
+                    label="Profile completeness"
+                    value={
+                      <div className="flex flex-col gap-1">
+                        <span>
+                          {completeness.completed}/{completeness.total} fields ({completeness.percentage}%)
+                        </span>
+                        {completeness.missing.length > 0 ? (
+                          <ul className="flex flex-col gap-0.5 text-xs text-amber-600">
+                            {completeness.missing.map((item) => (
+                              <li key={item.key}>{item.label}</li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </div>
+                    }
+                  />
                   <InfoRow label="Created" value={<DateText value={client.createdAt} />} />
                 </div>
               </PageSection>

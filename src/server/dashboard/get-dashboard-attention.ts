@@ -65,15 +65,27 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
     })
     .map((client) => toAttentionItem(client, "not_contacted_recently", client.lastContactedAt ? `Last contacted ${client.lastContactedAt}` : "Never contacted"));
 
-  attention.incompleteProfile = nonTerminalClients
-    .filter((client) => {
-      const completeness = calculateProfileCompleteness(client);
-      return completeness.filled / completeness.total < INCOMPLETE_PROFILE_MAX_RATIO;
-    })
-    .map((client) => {
-      const completeness = calculateProfileCompleteness(client);
-      return toAttentionItem(client, "incomplete_profile", `${completeness.filled}/${completeness.total} profile fields filled`);
-    });
+  // Same "one batched query for the whole set, not per row" shape as the
+  // measurement/assessment checks below — needed so `hasMeasurement` (now a
+  // required part of `calculateProfileCompleteness`'s input, see that file)
+  // matches exactly what the Clients table and Client Overview compute,
+  // instead of silently reverting to a 4-check definition here.
+  const nonTerminalClientIds = nonTerminalClients.map((client) => client._id);
+  const measurementsForCompleteness = await clientMeasurementRepository.findAll({
+    where: { clientProfileId: { $in: nonTerminalClientIds } },
+    select: { clientProfileId: true },
+  });
+  const hasMeasurementByClient = new Set(
+    (measurementsForCompleteness as unknown as { clientProfileId: unknown }[]).map((row) => String(row.clientProfileId))
+  );
+
+  attention.incompleteProfile = nonTerminalClients.reduce<DashboardAttentionItem[]>((items, client) => {
+    const completeness = calculateProfileCompleteness({ ...client, hasMeasurement: hasMeasurementByClient.has(String(client._id)) });
+    if (completeness.completed / completeness.total < INCOMPLETE_PROFILE_MAX_RATIO) {
+      items.push(toAttentionItem(client, "incomplete_profile", `${completeness.completed}/${completeness.total} profile fields filled`));
+    }
+    return items;
+  }, []);
 
   if (permissions.canViewMeasurements) {
     const activeClientIds = activeClients.map((client) => client._id);

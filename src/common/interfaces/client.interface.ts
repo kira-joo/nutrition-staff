@@ -29,6 +29,8 @@ export interface Client {
   generalNotes?: string;
   createdAt: string;
   updatedAt: string;
+  /** Only present on `getClientsEndpoint`'s list response — see `listClients`'s batched lookup. */
+  hasMeasurement?: boolean;
 }
 
 export interface CreateClientDto {

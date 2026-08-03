@@ -93,8 +93,16 @@ export default function ClientsPage() {
       key: "profileCompleteness",
       header: "Profile",
       render: (client) => {
-        const completeness = calculateProfileCompleteness(client);
-        return `${completeness.filled}/${completeness.total}`;
+        const completeness = calculateProfileCompleteness({ ...client, hasMeasurement: Boolean(client.hasMeasurement) });
+        const missingSummary = completeness.missing.map((item) => item.label).join(", ");
+        return (
+          <Badge
+            variant={completeness.missing.length === 0 ? "success" : "warning"}
+            title={missingSummary || undefined}
+          >
+            {completeness.completed}/{completeness.total}
+          </Badge>
+        );
       },
     },
     {
