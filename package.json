@@ -12,6 +12,7 @@
     "seed": "npm run seed:roles && node --env-file=.env --import tsx scripts/seed-users.ts",
     "seed:roles": "node --env-file=.env --import tsx scripts/seed-roles-and-permissions.ts",
     "migrate:client-content": "node --env-file=.env --import tsx scripts/migrate-client-content.ts",
+    "migrate:reviews-videos": "node --env-file=.env --import tsx scripts/migrate-reviews-videos.ts",
     "migrate:staff-profiles": "node --env-file=.env --import tsx scripts/migrate-staff-profiles.ts",
     "sync-user-indexes": "node --env-file=.env --import tsx scripts/sync-user-indexes.ts"
   },
