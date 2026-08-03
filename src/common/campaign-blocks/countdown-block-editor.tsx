@@ -14,42 +14,18 @@ export interface CountdownBlockEditorProps {
 
 const EMPTY_LOCALIZED = { ar: "", en: "" };
 
-/** ISO datetime <-> the value a native <input type="datetime-local"> needs ("YYYY-MM-DDTHH:mm", local time, no seconds/offset). */
-function toDateTimeLocalValue(isoDate: string | undefined): string {
-  if (!isoDate) return "";
-  const date = new Date(isoDate);
-  if (Number.isNaN(date.getTime())) return "";
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
 /**
  * The countdown block's own editor — a heading, a target date/time, and an
- * optional expired-state label. No date+time picker exists anywhere in the
- * toolkit (`FieldType.DATE` is date-only) — rather than adding one for this
- * single use, a plain native `<input type="datetime-local">` is rendered
- * directly via `FieldType.CUSTOM`, converting to/from a real ISO string at
- * the field boundary.
+ * optional expired-state label. `FieldType.DATE`'s `includeTime` renders a
+ * real date+time picker (previously this used a hand-rolled
+ * `FieldType.CUSTOM` `<input type="datetime-local">`, converted via the
+ * browser's own local timezone rather than the clinic's configured one —
+ * replaced now that the shared field supports this directly).
  */
 export function CountdownBlockEditor({ defaultValues, endpoint, submitParams, onSuccess }: CountdownBlockEditorProps) {
   const fields: FormFieldConfig<CountdownBlockFormValues>[] = [
     { type: FieldType.LOCALIZED_INPUT, name: "heading", label: "Heading" },
-    {
-      type: FieldType.CUSTOM,
-      name: "targetDate",
-      label: "Target date & time",
-      render: ({ field }) => (
-        <input
-          type="datetime-local"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          value={toDateTimeLocalValue(field.value as string | undefined)}
-          onChange={(event) => {
-            const localValue = event.target.value;
-            field.onChange(localValue ? new Date(localValue).toISOString() : "");
-          }}
-        />
-      ),
-    },
+    { type: FieldType.DATE, name: "targetDate", label: "Target date & time", includeTime: true },
     { type: FieldType.LOCALIZED_INPUT, name: "expiredLabel", label: "Expired-state label (optional)" },
   ];
 

@@ -1,4 +1,4 @@
-import { SortOrder } from "@kira-joo/toolkit-common";
+import { addDaysInZone, SortOrder, startOfDayInZone } from "@kira-joo/toolkit-common";
 import type { Client } from "src/common/interfaces/client.interface";
 import type { DashboardFollowUpRow, DashboardFollowUps } from "src/common/interfaces/dashboard.interface";
 import { clientProfileRepository } from "src/server/clients/client-profiles.repository";
@@ -26,8 +26,8 @@ function toRow(client: Client): DashboardFollowUpRow {
 export async function getDashboardFollowUps(query: DashboardQueryDto): Promise<DashboardFollowUps> {
   const { assignedToUserId } = query;
   const now = new Date();
-  const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const startOfTomorrow = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
+  const startOfToday = startOfDayInZone(now);
+  const startOfTomorrow = addDaysInZone(now, 1);
 
   const [today, overdue] = await Promise.all([
     clientProfileRepository.findAll({

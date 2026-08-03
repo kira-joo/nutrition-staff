@@ -1,4 +1,5 @@
 import type { AuthUser } from "@kira-joo/backend-toolkit-core";
+import { addDaysInZone, startOfDayInZone } from "@kira-joo/toolkit-common";
 import { ClientLifecycle } from "src/common/enums";
 import type { DashboardKpis, KpiMetric } from "src/common/interfaces/dashboard.interface";
 import { clientMeasurementRepository } from "src/server/measurements/client-measurements.repository";
@@ -67,8 +68,8 @@ export async function getDashboardKpis(query: DashboardQueryDto, user: AuthUser)
   const permissions = resolveDashboardPermissions(user);
 
   const now = new Date();
-  const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const startOfTomorrow = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
+  const startOfToday = startOfDayInZone(now);
+  const startOfTomorrow = addDaysInZone(now, 1);
 
   const [totalClients, activeClients, todaysFollowUpsCount, overdueFollowUpsCount, newLeads, newClients] = await Promise.all([
     clientProfileRepository.count({ where: withAssignedStaffWhere({}, assignedToUserId) }),

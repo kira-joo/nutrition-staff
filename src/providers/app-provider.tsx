@@ -12,7 +12,9 @@ import {
   type AppLinkComponentProps,
 } from "@kira-joo/frontend-toolkit-core";
 import { Toaster, showApiErrorToast } from "@kira-joo/frontend-toolkit-tailwind";
+import { DateTimeConfig } from "@kira-joo/toolkit-common";
 import Link from "next/link";
+import { APP_TIMEZONE } from "../common/config/app-timezone.constant";
 import { AppRoute } from "../common/routes/app-route";
 import { getAccessToken, removeAccessToken } from "../common/auth/token-storage";
 import { usePermissions } from "../common/auth/use-permissions";
@@ -36,6 +38,11 @@ export const queryClient = createToolkitQueryClient({ onError: showApiErrorToast
 // instead in production) and Logger.log/.warn — set once, at the same
 // module-load point as the rest of this file's global config.
 Logger.env = process.env.NODE_ENV;
+
+// The clinic's one configured timezone — every DateText/CustomDatePicker
+// display and edit defaults to this, so no page/component/form needs to
+// pass it manually. See src/common/config/app-timezone.constant.ts.
+DateTimeConfig.timeZone = APP_TIMEZONE;
 
 APIConfig.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 

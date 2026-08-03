@@ -26,6 +26,7 @@ import {
   UserRoundCheck,
   Users,
 } from "lucide-react";
+import { addDaysInZone, formatZonedDate } from "@kira-joo/toolkit-common";
 import { useMemo, useState } from "react";
 import { AppRoute } from "src/common/routes/app-route";
 import { ClientLifecycle, ProfileType } from "src/common/enums";
@@ -65,12 +66,17 @@ const ATTENTION_LABELS = {
   measurementWithoutCalculation: "Measurement without calculation",
 } as const;
 
+// "Today" must mean the clinic's local calendar day (Africa/Cairo, via the
+// app-wide DateTimeConfig default — see app-provider.tsx), not the
+// browser's own timezone or UTC — otherwise a preset's bounds disagree
+// with what the backend (which resolves the same configured timezone)
+// considers "today".
 function isoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return formatZonedDate(date);
 }
 
 function daysBefore(now: Date, days: number): Date {
-  return new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  return addDaysInZone(now, -days);
 }
 
 function resolvePresetRange(presetId: string, customRange: DashboardDateRange, now: Date): DashboardDateRange {
@@ -82,7 +88,7 @@ function resolvePresetRange(presetId: string, customRange: DashboardDateRange, n
     case "3m":
       return { from: isoDate(daysBefore(now, 89)), to: isoDate(now) };
     case "year":
-      return { from: isoDate(new Date(Date.UTC(now.getUTCFullYear(), 0, 1))), to: isoDate(now) };
+      return { from: `${isoDate(now).slice(0, 4)}-01-01`, to: isoDate(now) };
     default:
       return customRange;
   }

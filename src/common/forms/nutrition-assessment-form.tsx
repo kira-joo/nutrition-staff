@@ -54,7 +54,7 @@ export function NutritionAssessmentForm({
   const showReproductiveHealth = clientGender !== Gender.MALE;
 
   const goalActivityFields: FormFieldConfig<FormValues>[] = [
-    { type: FieldType.DATE, name: "assessedAt", label: "Assessed on", rules: { required: true } },
+    { type: FieldType.DATE, name: "assessedAt", label: "Assessed on", includeTime: true, rules: { required: true } },
     {
       type: FieldType.SELECT,
       name: "goal",

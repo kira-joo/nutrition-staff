@@ -20,8 +20,8 @@ export function CampaignForm({ defaultValues, endpoint }: CampaignFormProps) {
   const fields: FormFieldConfig<CampaignFormValues>[] = [
     { type: FieldType.LOCALIZED_INPUT, name: "title", label: "Title" },
     { type: FieldType.INPUT, name: "slug", label: "Slug", placeholder: "summer-sale" },
-    { type: FieldType.DATE, name: "startDate", label: "Start date" },
-    { type: FieldType.DATE, name: "endDate", label: "End date" },
+    { type: FieldType.DATE, name: "startDate", label: "Start date", includeTime: true },
+    { type: FieldType.DATE, name: "endDate", label: "End date", includeTime: true },
     {
       type: FieldType.SELECT,
       name: "status",

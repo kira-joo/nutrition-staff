@@ -1,3 +1,12 @@
+import {
+  addDaysInZone,
+  addMonthsInZone,
+  formatZonedDate,
+  resolveEndOfDayInZone,
+  startOfDayInZone,
+  startOfMonthInZone,
+  startOfWeekInZone,
+} from "@kira-joo/toolkit-common";
 import { DAILY_BUCKET_MAX_DAYS, DEFAULT_RANGE_DAYS, WEEKLY_BUCKET_MAX_DAYS } from "src/server/dashboard/dashboard.constants";
 
 export type BucketGranularity = "day" | "week" | "month";
@@ -9,26 +18,16 @@ export interface DashboardDateRange {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
 /**
- * A bare `YYYY-MM-DD` string (exactly what the dashboard filter bar's date
- * presets send for `to`) parses as that day's midnight, not "end of that
- * day" — left as-is, a `to` of "today" would exclude every event that
- * happened today after midnight, which is effectively all of them.
- * Extended to the last instant of that day so "to: today" actually means
- * through today. A full ISO datetime (anything with a time component) is
- * trusted as an exact instant and left untouched.
+ * Resolves the effective range for a period-based widget, defaulting to
+ * the last `DEFAULT_RANGE_DAYS` days when the caller supplies neither
+ * bound. Every day boundary here resolves against the app's configured
+ * timezone (`DateTimeConfig.timeZone`, set once in `instrumentation.ts`/
+ * `app-provider.tsx`) — not UTC, or "today" would roll over at whatever
+ * hour UTC midnight happens to land at locally.
  */
-function resolveEndOfDay(to: string): Date {
-  if (!DATE_ONLY_PATTERN.test(to)) return new Date(to);
-  const date = new Date(to);
-  return new Date(date.getTime() + MS_PER_DAY - 1);
-}
-
-/** Resolves the effective range for a period-based widget, defaulting to the last `DEFAULT_RANGE_DAYS` days when the caller supplies neither bound. */
 export function resolveDashboardRange(from?: string, to?: string): DashboardDateRange {
-  const effectiveTo = to ? resolveEndOfDay(to) : new Date();
+  const effectiveTo = to ? resolveEndOfDayInZone(to) : new Date();
   const effectiveFrom = from ? new Date(from) : new Date(effectiveTo.getTime() - DEFAULT_RANGE_DAYS * MS_PER_DAY);
   return { from: effectiveFrom, to: effectiveTo };
 }
@@ -47,40 +46,22 @@ export function resolveBucketGranularity({ from, to }: DashboardDateRange): Buck
   return "month";
 }
 
-function startOfUtcDay(date: Date): Date {
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-}
-
-function startOfUtcWeek(date: Date): Date {
-  const day = startOfUtcDay(date);
-  const weekday = day.getUTCDay(); // 0 = Sunday .. 6 = Saturday
-  const diffToMonday = weekday === 0 ? -6 : 1 - weekday;
-  day.setUTCDate(day.getUTCDate() + diffToMonday);
-  return day;
-}
-
-function startOfUtcMonth(date: Date): Date {
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
-}
-
-/** Truncates a timestamp down to the start of the bucket it falls into, for both boundary generation and grouping raw records. */
+/** Truncates a timestamp down to the start of the bucket it falls into (in the configured timezone), for both boundary generation and grouping raw records. */
 export function truncateToBucketStart(date: Date, granularity: BucketGranularity): Date {
-  if (granularity === "day") return startOfUtcDay(date);
-  if (granularity === "week") return startOfUtcWeek(date);
-  return startOfUtcMonth(date);
+  if (granularity === "day") return startOfDayInZone(date);
+  if (granularity === "week") return startOfWeekInZone(date);
+  return startOfMonthInZone(date);
 }
 
 function advanceBucket(date: Date, granularity: BucketGranularity): Date {
-  const next = new Date(date);
-  if (granularity === "day") next.setUTCDate(next.getUTCDate() + 1);
-  else if (granularity === "week") next.setUTCDate(next.getUTCDate() + 7);
-  else next.setUTCMonth(next.getUTCMonth() + 1);
-  return next;
+  if (granularity === "day") return addDaysInZone(date, 1);
+  if (granularity === "week") return addDaysInZone(date, 7);
+  return addMonthsInZone(date, 1);
 }
 
-/** A stable, sortable string key for a bucket start — also the `date` shown on the chart's x-axis. */
+/** A stable, sortable string key for a bucket start (its local calendar date) — also the `date` shown on the chart's x-axis. */
 export function bucketKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return formatZonedDate(date);
 }
 
 /** Every bucket boundary between `from` and `to`, inclusive — the contiguous spine a sparse aggregation result gets zero-filled against. */

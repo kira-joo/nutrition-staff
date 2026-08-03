@@ -23,7 +23,7 @@ export interface ScheduleFollowUpFormProps {
  */
 export function ScheduleFollowUpForm({ clientId, currentNextFollowUpAt, onSuccess }: ScheduleFollowUpFormProps) {
   const fields: FormFieldConfig<ScheduleFollowUpFormValues>[] = [
-    { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up date" },
+    { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up date", includeTime: true },
   ];
 
   return (

@@ -87,7 +87,7 @@ export function ClientProfileForm({ client, onSuccess }: ClientProfileFormProps)
       query: { profileType: ProfileType.STAFF_ONLY },
     },
     { type: FieldType.INPUT, name: "tagsInput", label: "Tags (comma-separated)" },
-    { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up" },
+    { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up", includeTime: true },
     { type: FieldType.SWITCH, name: "marketingConsent", label: "Marketing consent" },
   ];
 

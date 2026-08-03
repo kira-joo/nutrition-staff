@@ -38,8 +38,8 @@ export function ClientInteractionForm({ clientProfileId, defaultValues, endpoint
           } satisfies FormFieldConfig<CreateClientInteractionDto>,
         ]),
     { type: FieldType.TEXTAREA, name: "summary", label: "Summary", rules: { required: true } },
-    { type: FieldType.DATE, name: "happenedAt", label: "Happened on" },
-    { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up (optional)" },
+    { type: FieldType.DATE, name: "happenedAt", label: "Happened on", includeTime: true },
+    { type: FieldType.DATE, name: "nextFollowUpAt", label: "Next follow-up (optional)", includeTime: true },
   ];
 
   return (

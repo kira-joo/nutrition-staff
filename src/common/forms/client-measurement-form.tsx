@@ -15,7 +15,7 @@ export interface ClientMeasurementFormProps {
 
 export function ClientMeasurementForm({ clientProfileId, defaultValues, endpoint, onSuccess }: ClientMeasurementFormProps) {
   const coreFields: FormFieldConfig<CreateClientMeasurementDto>[] = [
-    { type: FieldType.DATE, name: "measuredAt", label: "Measured on", rules: { required: true } },
+    { type: FieldType.DATE, name: "measuredAt", label: "Measured on", includeTime: true, rules: { required: true } },
     { type: FieldType.INPUT, name: "weightKg", label: "Weight (kg)", inputType: "number" },
   ];
 
