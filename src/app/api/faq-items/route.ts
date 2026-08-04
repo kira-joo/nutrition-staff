@@ -1,6 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
+import { revalidateFaq } from "src/server/core/revalidation/revalidate-entity";
 import { CreateFaqItemDto } from "src/server/faq-items/dto/create-faq-item.dto";
 import { ListFaqItemsQueryDto } from "src/server/faq-items/dto/list-faq-items-query.dto";
 import { faqItemRepository } from "src/server/faq-items/faq-items.repository";
@@ -18,6 +19,8 @@ export const POST = createPostRoute({
   auth: { permissions: [AppPermission.FAQ_ITEM.CREATE] },
   handler: async ({ body }) => {
     assertPublishReady(body, body.status);
-    return faqItemRepository.save(body);
+    const saved = await faqItemRepository.save(body);
+    await revalidateFaq();
+    return saved;
   },
 });

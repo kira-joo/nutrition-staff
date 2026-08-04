@@ -1,6 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { revalidateCampaigns } from "src/server/core/revalidation/revalidate-entity";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 import { UpdateCampaignDto } from "src/server/campaigns/dto/update-campaign.dto";
@@ -23,7 +24,17 @@ export const PUT = createPutRoute({
     const nextStatus = body.status ?? campaign.status;
     const nextTitle = body.title ?? campaign.title;
     assertPublishReady({ title: nextTitle, blocks: campaign.blocks }, nextStatus);
-    return campaignRepository.update({ where: { _id: params.campaignId } }, body);
+    const updated = await campaignRepository.update({ where: { _id: params.campaignId } }, body);
+
+    // `slug` is updatable — revalidate the previous slug's cached detail
+    // page unconditionally, and the new one too if it changed, so neither
+    // is left serving stale content.
+    await revalidateCampaigns(campaign.slug);
+    if (body.slug && body.slug !== campaign.slug) {
+      await revalidateCampaigns(body.slug);
+    }
+
+    return updated;
   },
 });
 
@@ -34,6 +45,8 @@ export const DELETE = createDeleteRoute({
   params: FindCampaignParamsDto,
   auth: { permissions: [AppPermission.CAMPAIGN.DELETE] },
   handler: async ({ params }) => {
+    const campaign = await campaignRepository.findOne({ where: { _id: params.campaignId } });
     await campaignRepository.softDelete({ where: { _id: params.campaignId } });
+    await revalidateCampaigns(campaign.slug);
   },
 });
