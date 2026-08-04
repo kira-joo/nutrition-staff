@@ -1,3 +1,17 @@
+// reflect-metadata is a global polyfill (it mutates the ambient `Reflect`
+// object), so class-validator/class-transformer decorators only work once
+// SOMETHING has imported it in the current process. Individual DTO files
+// each self-import it, but that only helps once one of them has actually
+// been loaded — a public route whose query DTO happens to be the first
+// decorated class touched in a fresh process (very plausible on a
+// serverless cold start, and reproduced locally by hitting
+// /api/public/recipes|reviews|videos first) crashed with
+// "TypeError: Reflect.getMetadata is not a function" before this line
+// existed. Importing it here, in the one module Next.js guarantees runs
+// before the server accepts any request, removes the dependency on
+// incidental import ordering entirely.
+import "reflect-metadata";
+
 // Next.js startup hook (requires experimental.instrumentationHook on Next 14.x;
 // see next.config.mjs). Runs once per server instance at boot.
 export async function register() {
