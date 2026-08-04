@@ -1,6 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { revalidateRecipeFoodGroups } from "src/server/core/revalidation/revalidate-entity";
 import { FindRecipeFoodGroupParamsDto } from "src/server/recipe-food-groups/dto/find-recipe-food-group-params.dto";
 import { UpdateRecipeFoodGroupDto } from "src/server/recipe-food-groups/dto/update-recipe-food-group.dto";
 import { recipeFoodGroupRepository } from "src/server/recipe-food-groups/recipe-food-groups.repository";
@@ -21,7 +22,9 @@ export const PUT = createPutRoute({
     const existing = await recipeFoodGroupRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
     assertPublishReady({ ...existing, ...body }, nextStatus);
-    return recipeFoodGroupRepository.update({ where: { _id: params.id } }, body);
+    const updated = await recipeFoodGroupRepository.update({ where: { _id: params.id } }, body);
+    await revalidateRecipeFoodGroups();
+    return updated;
   },
 });
 
@@ -30,5 +33,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.RECIPE_FOOD_GROUP.DELETE] },
   handler: async ({ params }) => {
     await recipeFoodGroupRepository.softDelete({ where: { _id: params.id } });
+    await revalidateRecipeFoodGroups();
   },
 });

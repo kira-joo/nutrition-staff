@@ -1,6 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { revalidateFaq } from "src/server/core/revalidation/revalidate-entity";
 import { FindFaqSectionParamsDto } from "src/server/faq-sections/dto/find-faq-section-params.dto";
 import { UpdateFaqSectionDto } from "src/server/faq-sections/dto/update-faq-section.dto";
 import { faqSectionRepository } from "src/server/faq-sections/faq-sections.repository";
@@ -21,7 +22,9 @@ export const PUT = createPutRoute({
     const existing = await faqSectionRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
     assertPublishReady({ ...existing, ...body }, nextStatus);
-    return faqSectionRepository.update({ where: { _id: params.id } }, body);
+    const updated = await faqSectionRepository.update({ where: { _id: params.id } }, body);
+    await revalidateFaq();
+    return updated;
   },
 });
 
@@ -30,5 +33,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.FAQ_SECTION.DELETE] },
   handler: async ({ params }) => {
     await faqSectionRepository.softDelete({ where: { _id: params.id } });
+    await revalidateFaq();
   },
 });

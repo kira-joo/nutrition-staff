@@ -1,6 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { revalidatePackages } from "src/server/core/revalidation/revalidate-entity";
 import { FindPackageParamsDto } from "src/server/packages/dto/find-package-params.dto";
 import { UpdatePackageDto } from "src/server/packages/dto/update-package.dto";
 import { packageRepository } from "src/server/packages/packages.repository";
@@ -21,7 +22,9 @@ export const PUT = createPutRoute({
     const existing = await packageRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
     assertPublishReady({ ...existing, ...body }, nextStatus);
-    return packageRepository.update({ where: { _id: params.id } }, body);
+    const updated = await packageRepository.update({ where: { _id: params.id } }, body);
+    await revalidatePackages();
+    return updated;
   },
 });
 
@@ -33,5 +36,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.PACKAGE.DELETE] },
   handler: async ({ params }) => {
     await packageRepository.delete({ where: { _id: params.id } });
+    await revalidatePackages();
   },
 });

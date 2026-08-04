@@ -4,6 +4,7 @@ import { assertPublishReady } from "src/server/core/publishing";
 import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
+import { revalidateRecipes } from "src/server/core/revalidation/revalidate-entity";
 import { CreateRecipeDto } from "src/server/recipes/dto/create-recipe.dto";
 import { ListRecipesQueryDto } from "src/server/recipes/dto/list-recipes-query.dto";
 import { RECIPE_ASSET_FIELDS, RECIPE_ASSET_FOLDER } from "src/server/recipes/recipe-asset-fields";
@@ -35,7 +36,9 @@ export const POST = createPostRoute({
     try {
       const dto = await validateDto(CreateRecipeDto, payload);
       assertPublishReady(dto, dto.status);
-      return await recipeRepository.save(dto);
+      const recipe = await recipeRepository.save(dto);
+      await revalidateRecipes();
+      return recipe;
     } catch (error) {
       await destroyUploadedAssets(assetProvider, uploaded);
       throw error;
