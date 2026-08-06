@@ -9,7 +9,7 @@ import {
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateVideos } from "src/server/core/revalidation/revalidate-entity";
+import { VIDEOS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { FindVideoParamsDto } from "src/server/videos/dto/find-video-params.dto";
 import { UpdateVideoDto } from "src/server/videos/dto/update-video.dto";
 import { VIDEO_ASSET_FIELDS, VIDEO_ASSET_FOLDER } from "src/server/videos/video-asset-fields";
@@ -60,9 +60,9 @@ export const PUT = createPutRoute({
       previousDocument: previousDocument as unknown as Record<string, unknown>,
     });
 
-    await revalidateVideos();
     return saved;
   },
+  revalidateTags: VIDEOS_TAGS,
 });
 
 export const DELETE = createDeleteRoute({
@@ -70,6 +70,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.VIDEO.DELETE] },
   handler: async ({ params }) => {
     await videoRepository.softDelete({ where: { _id: params.id } });
-    await revalidateVideos();
   },
+  revalidateTags: VIDEOS_TAGS,
 });

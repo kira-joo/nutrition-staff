@@ -8,7 +8,7 @@ import {
 } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateReviews } from "src/server/core/revalidation/revalidate-entity";
+import { REVIEWS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { FindReviewParamsDto } from "src/server/reviews/dto/find-review-params.dto";
 import { UpdateReviewDto } from "src/server/reviews/dto/update-review.dto";
 import { REVIEW_ASSET_FIELDS, REVIEW_ASSET_FOLDER } from "src/server/reviews/review-asset-fields";
@@ -59,9 +59,9 @@ export const PUT = createPutRoute({
       previousDocument: previousDocument as unknown as Record<string, unknown>,
     });
 
-    await revalidateReviews();
     return saved;
   },
+  revalidateTags: REVIEWS_TAGS,
 });
 
 // Soft delete — every embedded Cloudinary asset stays untouched and
@@ -72,6 +72,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.REVIEW.DELETE] },
   handler: async ({ params }) => {
     await reviewRepository.softDelete({ where: { _id: params.id } });
-    await revalidateReviews();
   },
+  revalidateTags: REVIEWS_TAGS,
 });

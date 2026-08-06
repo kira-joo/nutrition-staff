@@ -1,6 +1,6 @@
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidatePackagesPageSettings } from "src/server/core/revalidation/revalidate-entity";
+import { PACKAGES_PAGE_SETTINGS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { getOrCreateSingleton, upsertSingleton } from "src/server/core/singleton";
 import { UpdatePackagesPageSettingsDto } from "src/server/packages-page-settings/dto/update-packages-page-settings.dto";
 import { packagesPageSettingsRepository } from "src/server/packages-page-settings/packages-page-settings.repository";
@@ -17,9 +17,6 @@ export const GET = createGetRoute({
 export const PUT = createPutRoute({
   body: UpdatePackagesPageSettingsDto,
   auth: { permissions: [AppPermission.PACKAGES_PAGE_SETTINGS.UPDATE] },
-  handler: async ({ body }) => {
-    const result = await upsertSingleton(packagesPageSettingsRepository, body);
-    await revalidatePackagesPageSettings();
-    return result;
-  },
+  handler: async ({ body }) => upsertSingleton(packagesPageSettingsRepository, body),
+  revalidateTags: PACKAGES_PAGE_SETTINGS_TAGS,
 });

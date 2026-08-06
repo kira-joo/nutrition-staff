@@ -8,7 +8,7 @@ import {
 } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateSiteSettings } from "src/server/core/revalidation/revalidate-entity";
+import { SITE_SETTINGS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { getOrCreateSingleton } from "src/server/core/singleton";
 import { SITE_SETTINGS_ASSET_FIELDS, SITE_SETTINGS_ASSET_FOLDER } from "src/server/site-settings/site-settings-asset-fields";
 import { UpdateSiteSettingsDto } from "src/server/site-settings/dto/update-site-settings.dto";
@@ -64,7 +64,7 @@ export const PUT = createPutRoute({
       previousDocument: previousDocument as unknown as Record<string, unknown>,
     });
 
-    await revalidateSiteSettings();
     return saved;
   },
+  revalidateTags: SITE_SETTINGS_TAGS,
 });

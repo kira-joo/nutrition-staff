@@ -2,18 +2,24 @@ const REVALIDATION_TIMEOUT_MS = 2500;
 
 /**
  * Tells nutrition-client's `/api/revalidate` route to bust the given Next.js
- * Data Cache tags, right after a mutating route here successfully commits a
- * write — the on-demand counterpart to the per-domain fallback intervals
+ * Data Cache tags — registered as `cache.publishRevalidation` in
+ * `toolkit.config.ts`, so `createRoute` (from `@kira-joo/backend-toolkit-next`
+ * ^0.4.0) calls this automatically for any route declaring `revalidateTags`,
+ * once per request, right after that route's handler commits a write. The
+ * on-demand counterpart to the per-domain fallback intervals
  * nutrition-client's `cache-policy.ts` already applies.
  *
- * Awaited, not fire-and-forget — genuine detached fire-and-forget work is
- * unsafe on serverless (the function can freeze/terminate the instant the
- * response is sent, with no guarantee an unawaited promise ever runs) — but
- * bounded by a hard timeout via `AbortController`, and every failure is
- * swallowed rather than rethrown: a slow or unreachable nutrition-client
- * must never fail the write that triggered this call. Worst case,
- * nutrition-client's own fallback `revalidate` interval (see its
- * cache-policy.ts) catches up within its normal window.
+ * Bounded by a hard timeout via `AbortController` — genuine detached
+ * fire-and-forget work is unsafe on serverless (the function can
+ * freeze/terminate the instant the response is sent, with no guarantee an
+ * unawaited promise ever runs), so this is awaited, not fire-and-forget,
+ * but capped so a slow nutrition-client can't hang the request indefinitely.
+ *
+ * Throws (rather than swallowing) on timeout, a non-2xx response, or a
+ * network failure — `createRoute`'s `revalidateTags` machinery is what
+ * actually makes this best-effort: it catches and logs any rejection from
+ * this function and never lets it fail the HTTP response. Thrown messages
+ * deliberately never include `REVALIDATE_SECRET` or any request header.
  *
  * A no-op (not an error) when `NUTRITION_CLIENT_URL`/`REVALIDATE_SECRET`
  * aren't configured in this environment — e.g. local development against a
@@ -29,8 +35,9 @@ export async function publishRevalidation(tags: string[]): Promise<void> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REVALIDATION_TIMEOUT_MS);
 
+  let response: Response;
   try {
-    await fetch(new URL("/api/revalidate", nutritionClientUrl), {
+    response = await fetch(new URL("/api/revalidate", nutritionClientUrl), {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -39,9 +46,16 @@ export async function publishRevalidation(tags: string[]): Promise<void> {
       body: JSON.stringify({ tags }),
       signal: controller.signal,
     });
-  } catch {
-    // Best-effort — see the doc comment above.
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`nutrition-client revalidation timed out after ${REVALIDATION_TIMEOUT_MS}ms`);
+    }
+    throw new Error(`nutrition-client revalidation request failed: ${error instanceof Error ? error.message : "unknown network error"}`);
   } finally {
     clearTimeout(timeout);
+  }
+
+  if (!response.ok) {
+    throw new Error(`nutrition-client revalidation responded with ${response.status}`);
   }
 }

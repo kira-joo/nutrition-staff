@@ -4,7 +4,7 @@ import { assertPublishReady } from "src/server/core/publishing";
 import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
-import { revalidateVideos } from "src/server/core/revalidation/revalidate-entity";
+import { VIDEOS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { CreateVideoDto } from "src/server/videos/dto/create-video.dto";
 import { ListVideosQueryDto } from "src/server/videos/dto/list-videos-query.dto";
 import { VIDEO_ASSET_FIELDS, VIDEO_ASSET_FOLDER } from "src/server/videos/video-asset-fields";
@@ -36,12 +36,11 @@ export const POST = createPostRoute({
     try {
       const dto = await validateDto(CreateVideoDto, payload);
       assertPublishReady(dto, dto.status);
-      const video = await videoRepository.save(dto);
-      await revalidateVideos();
-      return video;
+      return await videoRepository.save(dto);
     } catch (error) {
       await destroyUploadedAssets(assetProvider, uploaded);
       throw error;
     }
   },
+  revalidateTags: VIDEOS_TAGS,
 });
