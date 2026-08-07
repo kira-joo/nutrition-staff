@@ -8,7 +8,7 @@ import {
 } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateDoctorProfile } from "src/server/core/revalidation/revalidate-entity";
+import { DOCTOR_PROFILE_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { getOrCreateSingleton } from "src/server/core/singleton";
 import {
   DOCTOR_PROFILE_ASSET_FIELDS,
@@ -60,7 +60,7 @@ export const PUT = createPutRoute({
       previousDocument: previousDocument as unknown as Record<string, unknown>,
     });
 
-    await revalidateDoctorProfile();
     return saved;
   },
+  revalidateTags: DOCTOR_PROFILE_TAGS,
 });

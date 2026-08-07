@@ -3,7 +3,7 @@ import { parseMultipartFormData } from "@kira-joo/backend-toolkit-next";
 import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
-import { revalidateReviews } from "src/server/core/revalidation/revalidate-entity";
+import { REVIEWS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { CreateReviewDto } from "src/server/reviews/dto/create-review.dto";
 import { ListReviewsQueryDto } from "src/server/reviews/dto/list-reviews-query.dto";
 import { REVIEW_ASSET_FIELDS, REVIEW_ASSET_FOLDER } from "src/server/reviews/review-asset-fields";
@@ -36,12 +36,11 @@ export const POST = createPostRoute({
 
     try {
       const dto = await validateDto(CreateReviewDto, payload);
-      const review = await reviewRepository.save(dto);
-      await revalidateReviews();
-      return review;
+      return await reviewRepository.save(dto);
     } catch (error) {
       await destroyUploadedAssets(assetProvider, uploaded);
       throw error;
     }
   },
+  revalidateTags: REVIEWS_TAGS,
 });

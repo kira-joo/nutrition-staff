@@ -1,7 +1,8 @@
+import { withRevalidationMeta } from "@kira-joo/backend-toolkit-next";
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateCampaigns } from "src/server/core/revalidation/revalidate-entity";
+import { campaignDetailTags, campaignSlugChangeTags } from "src/server/core/revalidation/revalidate-entity";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 import { UpdateCampaignDto } from "src/server/campaigns/dto/update-campaign.dto";
@@ -15,6 +16,10 @@ export const GET = createGetRoute({
 });
 
 // Header fields only — never touches `blocks` (see the blocks/ sub-resource routes).
+// `slug` is updatable, so the public response's own `slug` isn't enough to
+// know which cache tag(s) to bust — `previousSlug` is metadata the public
+// response shouldn't carry, hence `withRevalidationMeta` (see
+// revalidate-entity.ts's `campaignSlugChangeTags` for the actual tag logic).
 export const PUT = createPutRoute({
   params: FindCampaignParamsDto,
   body: UpdateCampaignDto,
@@ -25,17 +30,9 @@ export const PUT = createPutRoute({
     const nextTitle = body.title ?? campaign.title;
     assertPublishReady({ title: nextTitle, blocks: campaign.blocks }, nextStatus);
     const updated = await campaignRepository.update({ where: { _id: params.campaignId } }, body);
-
-    // `slug` is updatable — revalidate the previous slug's cached detail
-    // page unconditionally, and the new one too if it changed, so neither
-    // is left serving stale content.
-    await revalidateCampaigns(campaign.slug);
-    if (body.slug && body.slug !== campaign.slug) {
-      await revalidateCampaigns(body.slug);
-    }
-
-    return updated;
+    return withRevalidationMeta(updated, { previousSlug: campaign.slug });
   },
+  revalidateTags: ({ result: { response, meta } }) => campaignSlugChangeTags(meta.previousSlug, response.slug),
 });
 
 // Soft delete — every embedded block asset stays untouched and
@@ -47,6 +44,7 @@ export const DELETE = createDeleteRoute({
   handler: async ({ params }) => {
     const campaign = await campaignRepository.findOne({ where: { _id: params.campaignId } });
     await campaignRepository.softDelete({ where: { _id: params.campaignId } });
-    await revalidateCampaigns(campaign.slug);
+    return withRevalidationMeta(undefined, { slug: campaign.slug });
   },
+  revalidateTags: ({ result: { meta } }) => campaignDetailTags(meta.slug),
 });

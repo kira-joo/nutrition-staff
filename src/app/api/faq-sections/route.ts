@@ -1,7 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
-import { revalidateFaq } from "src/server/core/revalidation/revalidate-entity";
+import { FAQ_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { CreateFaqSectionDto } from "src/server/faq-sections/dto/create-faq-section.dto";
 import { ListFaqSectionsQueryDto } from "src/server/faq-sections/dto/list-faq-sections-query.dto";
 import { faqSectionRepository } from "src/server/faq-sections/faq-sections.repository";
@@ -19,8 +19,7 @@ export const POST = createPostRoute({
   auth: { permissions: [AppPermission.FAQ_SECTION.CREATE] },
   handler: async ({ body }) => {
     assertPublishReady(body, body.status);
-    const saved = await faqSectionRepository.save(body);
-    await revalidateFaq();
-    return saved;
+    return faqSectionRepository.save(body);
   },
+  revalidateTags: FAQ_TAGS,
 });

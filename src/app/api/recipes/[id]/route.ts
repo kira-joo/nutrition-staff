@@ -9,7 +9,7 @@ import {
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateRecipes } from "src/server/core/revalidation/revalidate-entity";
+import { recipeDetailTags } from "src/server/core/revalidation/revalidate-entity";
 import { FindRecipeParamsDto } from "src/server/recipes/dto/find-recipe-params.dto";
 import { UpdateRecipeDto } from "src/server/recipes/dto/update-recipe.dto";
 import { RECIPE_ASSET_FIELDS, RECIPE_ASSET_FOLDER } from "src/server/recipes/recipe-asset-fields";
@@ -61,9 +61,9 @@ export const PUT = createPutRoute({
       previousDocument: previousDocument as unknown as Record<string, unknown>,
     });
 
-    await revalidateRecipes(params.id);
     return saved;
   },
+  revalidateTags: ({ params }) => recipeDetailTags(params.id),
 });
 
 export const DELETE = createDeleteRoute({
@@ -71,6 +71,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.RECIPE.DELETE] },
   handler: async ({ params }) => {
     await recipeRepository.softDelete({ where: { _id: params.id } });
-    await revalidateRecipes(params.id);
   },
+  revalidateTags: ({ params }) => recipeDetailTags(params.id),
 });

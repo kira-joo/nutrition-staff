@@ -1,7 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
-import { revalidateRecipeCategories } from "src/server/core/revalidation/revalidate-entity";
+import { RECIPE_CATEGORIES_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { CreateRecipeCategoryDto } from "src/server/recipe-categories/dto/create-recipe-category.dto";
 import { ListRecipeCategoriesQueryDto } from "src/server/recipe-categories/dto/list-recipe-categories-query.dto";
 import { recipeCategoryRepository } from "src/server/recipe-categories/recipe-categories.repository";
@@ -19,8 +19,7 @@ export const POST = createPostRoute({
   auth: { permissions: [AppPermission.RECIPE_CATEGORY.CREATE] },
   handler: async ({ body }) => {
     assertPublishReady(body, body.status);
-    const saved = await recipeCategoryRepository.save(body);
-    await revalidateRecipeCategories();
-    return saved;
+    return recipeCategoryRepository.save(body);
   },
+  revalidateTags: RECIPE_CATEGORIES_TAGS,
 });

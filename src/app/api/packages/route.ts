@@ -1,7 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
-import { revalidatePackages } from "src/server/core/revalidation/revalidate-entity";
+import { PACKAGES_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { CreatePackageDto } from "src/server/packages/dto/create-package.dto";
 import { ListPackagesQueryDto } from "src/server/packages/dto/list-packages-query.dto";
 import { packageRepository } from "src/server/packages/packages.repository";
@@ -19,8 +19,7 @@ export const POST = createPostRoute({
   auth: { permissions: [AppPermission.PACKAGE.CREATE] },
   handler: async ({ body }) => {
     assertPublishReady(body, body.status);
-    const saved = await packageRepository.save(body);
-    await revalidatePackages();
-    return saved;
+    return packageRepository.save(body);
   },
+  revalidateTags: PACKAGES_TAGS,
 });

@@ -1,7 +1,7 @@
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
-import { revalidateRecipeCategories } from "src/server/core/revalidation/revalidate-entity";
+import { RECIPE_CATEGORIES_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { FindRecipeCategoryParamsDto } from "src/server/recipe-categories/dto/find-recipe-category-params.dto";
 import { UpdateRecipeCategoryDto } from "src/server/recipe-categories/dto/update-recipe-category.dto";
 import { recipeCategoryRepository } from "src/server/recipe-categories/recipe-categories.repository";
@@ -22,10 +22,9 @@ export const PUT = createPutRoute({
     const existing = await recipeCategoryRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
     assertPublishReady({ ...existing, ...body }, nextStatus);
-    const updated = await recipeCategoryRepository.update({ where: { _id: params.id } }, body);
-    await revalidateRecipeCategories();
-    return updated;
+    return recipeCategoryRepository.update({ where: { _id: params.id } }, body);
   },
+  revalidateTags: RECIPE_CATEGORIES_TAGS,
 });
 
 export const DELETE = createDeleteRoute({
@@ -33,6 +32,6 @@ export const DELETE = createDeleteRoute({
   auth: { permissions: [AppPermission.RECIPE_CATEGORY.DELETE] },
   handler: async ({ params }) => {
     await recipeCategoryRepository.softDelete({ where: { _id: params.id } });
-    await revalidateRecipeCategories();
   },
+  revalidateTags: RECIPE_CATEGORIES_TAGS,
 });
