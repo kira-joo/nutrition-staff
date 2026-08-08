@@ -12,6 +12,13 @@ export class VideoSchema {
   @Searchable({ subPaths: ["ar", "en"] })
   title!: LocalizedString;
 
+  // Optional: every existing Video document predates this field, and
+  // localizedStringField() is optional by default (mirrors Recipe's
+  // prepTime/cookTime/servings) — a required field here would break every
+  // existing record and every admin update until re-authored.
+  @MongoField(localizedStringField())
+  description?: LocalizedString;
+
   // At least one of video/externalUrl is required — enforced by
   // HasVideoSource, not the schema (mirrors Review's "at least one of"
   // business rule for the same reason: neither field alone is mandatory).

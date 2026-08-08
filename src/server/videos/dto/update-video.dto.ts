@@ -14,6 +14,11 @@ export class UpdateVideoDto {
 
   @IsOptional()
   @ValidateNested()
+  @Type(() => LocalizedStringDto)
+  description?: LocalizedStringDto;
+
+  @IsOptional()
+  @ValidateNested()
   @Type(() => VideoAssetDto)
   video?: VideoAssetDto | null;
 

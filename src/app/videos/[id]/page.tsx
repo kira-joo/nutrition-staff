@@ -61,6 +61,9 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
                 <p className="text-sm text-slate-500">No uploaded video or poster.</p>
               )}
               {video.externalUrl ? <InfoRow label="External URL" value={video.externalUrl} /> : null}
+              {video.description?.en || video.description?.ar ? (
+                <InfoRow label="Description" value={video.description.en || video.description.ar} />
+              ) : null}
             </PageSection>
             <PageSection icon={Activity} title="Status & activity">
               <div className="flex flex-col gap-3">

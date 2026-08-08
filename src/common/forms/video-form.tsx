@@ -21,6 +21,7 @@ export function VideoForm({ defaultValues, endpoint }: VideoFormProps) {
 
   const contentFields: FormFieldConfig<VideoFormValues>[] = [
     { type: FieldType.LOCALIZED_INPUT, name: "title", label: "Title" },
+    { type: FieldType.LOCALIZED_TEXTAREA, name: "description", label: "Description", rows: 3 },
     { type: FieldType.VIDEO_ASSET, name: "video", label: "Uploaded video", policy: videoContentPolicy },
     { type: FieldType.INPUT, name: "externalUrl", label: "External URL (e.g. a Facebook reel)", inputType: "url" },
     { type: FieldType.IMAGE_ASSET, name: "poster", label: "Poster / thumbnail override", policy: videoPosterPolicy },
@@ -44,6 +45,7 @@ export function VideoForm({ defaultValues, endpoint }: VideoFormProps) {
       ]}
       defaultValues={{
         title: defaultValues?.title ?? EMPTY_LOCALIZED,
+        description: defaultValues?.description ?? EMPTY_LOCALIZED,
         video: defaultValues?.video ?? null,
         externalUrl: defaultValues?.externalUrl,
         poster: defaultValues?.poster ?? null,

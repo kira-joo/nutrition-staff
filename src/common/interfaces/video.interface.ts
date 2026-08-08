@@ -4,6 +4,7 @@ import type { ContentStatus } from "../enums";
 export interface Video {
   _id: string;
   title: LocalizedString;
+  description?: LocalizedString;
   video?: VideoAsset | null;
   externalUrl?: string;
   poster?: ImageAsset | null;
@@ -14,6 +15,7 @@ export interface Video {
 
 export interface VideoFormValues {
   title: LocalizedString;
+  description: LocalizedString;
   video: VideoAsset | File | null;
   externalUrl?: string;
   poster: ImageAsset | File | null;
