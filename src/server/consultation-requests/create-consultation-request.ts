@@ -3,6 +3,7 @@ import { ClientSource } from "src/common/enums";
 import { clientProfileRepository } from "src/server/clients/client-profiles.repository";
 import { createClient } from "src/server/clients/create-client";
 import { attachClientProfile } from "src/server/clients/attach-client-profile";
+import { consultationRequestRepository } from "src/server/consultation-requests/consultation-requests.repository";
 import { CreateConsultationRequestDto } from "src/server/consultation-requests/dto/create-consultation-request.dto";
 import { checkRateLimit } from "src/server/core/rate-limit/simple-rate-limiter";
 
@@ -21,6 +22,15 @@ function buildTags(body: CreateConsultationRequestDto): string[] {
  * gives to *staff*, who are allowed to know it). See
  * docs/architecture.md-equivalent comment in the route file for the
  * anti-spam layers this sits behind.
+ *
+ * Also writes one `ConsultationRequest` row per real submission (after the
+ * honeypot/timing/rate-limit gates, so spam never reaches the log) —
+ * investigated first: a `ClientProfile` only ever holds the latest
+ * `sourceNote` and a tag union, so a returning lead's second submission
+ * previously left its own `message` nowhere. This row is that missing
+ * history, independent of whichever create/merge branch below resolved
+ * the shared `User`/`ClientProfile` identity — that CRM behavior is
+ * unchanged.
  */
 export async function createConsultationRequest(body: CreateConsultationRequestDto, ip: string): Promise<{ success: true }> {
   // Honeypot: a real visitor never fills this field in. Silently accept
@@ -44,6 +54,8 @@ export async function createConsultationRequest(body: CreateConsultationRequestD
   }
 
   const tags = buildTags(body);
+  let userId: string | undefined;
+  let clientProfileId: string | undefined;
 
   try {
     const created = await createClient({
@@ -54,6 +66,8 @@ export async function createConsultationRequest(body: CreateConsultationRequestD
       sourceNote: body.message,
     });
     await clientProfileRepository.update({ where: { _id: created._id } }, { tags });
+    userId = String(created.userId);
+    clientProfileId = String(created._id);
   } catch (error) {
     if (!(error instanceof ConflictError)) {
       throw error;
@@ -69,14 +83,33 @@ export async function createConsultationRequest(body: CreateConsultationRequestD
       const existing = await clientProfileRepository.findOne({ where: { _id: details.clientProfileId }, skipThrowError: true });
       const mergedTags = Array.from(new Set([...(existing?.tags ?? []), ...tags]));
       await clientProfileRepository.update({ where: { _id: details.clientProfileId } }, { tags: mergedTags });
+      userId = details.existingUserId;
+      clientProfileId = details.clientProfileId;
     } else if (details?.existingUserId) {
       // A User exists but has no ClientProfile yet (e.g. a signed-up
       // account) — attach one rather than creating a duplicate identity.
       const attached = await attachClientProfile(details.existingUserId, { source: ClientSource.WEBSITE, sourceNote: body.message });
       await clientProfileRepository.update({ where: { _id: attached._id } }, { tags });
+      userId = details.existingUserId;
+      clientProfileId = String(attached._id);
     }
     // Any other conflict shape: still respond success — never surface
-    // CRM-internal state to a public caller.
+    // CRM-internal state to a public caller. No userId resolved means no
+    // ConsultationRequest row either; there's nothing to link it to.
+  }
+
+  if (userId) {
+    await consultationRequestRepository.save({
+      name: body.name,
+      phone: body.phone,
+      email: body.email,
+      intent: body.intent,
+      packageKey: body.packageKey,
+      message: body.message,
+      userId,
+      clientProfileId,
+      ip,
+    });
   }
 
   return { success: true };

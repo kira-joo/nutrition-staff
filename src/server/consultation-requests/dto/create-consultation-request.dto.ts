@@ -1,11 +1,6 @@
 import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 import "reflect-metadata";
-
-export enum ConsultationRequestIntent {
-  CONSULTATION = "consultation",
-  PACKAGE_INQUIRY = "package_inquiry",
-  NEWSLETTER = "newsletter",
-}
+import { ConsultationRequestIntent } from "src/common/enums";
 
 /**
  * Public lead-capture shape — deliberately not `CreateClientDto`. A public

@@ -5,6 +5,7 @@ import {
   HelpCircle,
   Home,
   Images,
+  Inbox,
   LayoutDashboard,
   ListTree,
   Megaphone,
@@ -40,6 +41,13 @@ export const sideNavSections: SideNavSectionConfig[] = [
         href: AppRoute.clients,
         icon: UserRoundCog,
         permission: AppPermission.CLIENT.READ,
+      },
+      {
+        key: "consultation-requests",
+        label: "Consultation Requests",
+        href: AppRoute.consultationRequests,
+        icon: Inbox,
+        permission: AppPermission.CONSULTATION_REQUEST.READ,
       },
       {
         key: "calculators",
