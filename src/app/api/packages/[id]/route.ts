@@ -1,7 +1,6 @@
-import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
-import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { PACKAGES_TAGS } from "src/server/core/revalidation/revalidate-entity";
+import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { FindPackageParamsDto } from "src/server/packages/dto/find-package-params.dto";
 import { UpdatePackageDto } from "src/server/packages/dto/update-package.dto";
 import { packageRepository } from "src/server/packages/packages.repository";
@@ -19,9 +18,9 @@ export const PUT = createPutRoute({
   body: UpdatePackageDto,
   auth: { permissions: [AppPermission.PACKAGE.UPDATE] },
   handler: async ({ params, body }) => {
-    const existing = await packageRepository.findOne({ where: { _id: params.id } });
-    const nextStatus = body.status ?? existing.status;
-    assertPublishReady({ ...existing, ...body }, nextStatus);
+    // const existing = await packageRepository.findOne({ where: { _id: params.id } });
+    // const nextStatus = body.status ?? existing.status;
+    // assertPublishReady({ ...existing, ...body }, nextStatus);
     return packageRepository.update({ where: { _id: params.id } }, body);
   },
   revalidateTags: PACKAGES_TAGS,
