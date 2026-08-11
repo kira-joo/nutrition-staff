@@ -53,6 +53,11 @@ export default function ReviewsPage() {
         <Badge variant={review.status === ContentStatus.PUBLISHED ? "success" : "secondary"}>{review.status}</Badge>
       ),
     },
+    {
+      key: "rating",
+      header: "Rating",
+      render: (review) => review.rating ?? "—",
+    },
     { key: "featured", header: "Featured", render: (review) => (review.featured ? "Yes" : "—") },
   ];
 

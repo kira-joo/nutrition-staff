@@ -1,6 +1,6 @@
 "use client";
 
-import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { CustomForm, FieldType, FormFieldWrapper, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Image as ImageIcon, MessageSquareText, Settings2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { createReviewEndpoint, updateReviewEndpoint } from "../../../api/review.endpoints";
@@ -8,6 +8,7 @@ import { ContentStatus } from "../enums";
 import { Review, ReviewFormValues } from "../interfaces/review.interface";
 import { AppRoute } from "../routes/app-route";
 import { reviewImagePolicy } from "../upload-policies";
+import { StarRatingInput } from "./star-rating-input";
 
 export interface ReviewFormProps {
   defaultValues?: Review;
@@ -23,6 +24,17 @@ export function ReviewForm({ defaultValues, endpoint }: ReviewFormProps) {
     { type: FieldType.LOCALIZED_TEXTAREA, name: "content", label: "Content", rows: 4 },
     { type: FieldType.LOCALIZED_INPUT, name: "authorName", label: "Author name" },
     { type: FieldType.LOCALIZED_INPUT, name: "authorLabel", label: "Author label" },
+    {
+      type: FieldType.CUSTOM,
+      name: "rating",
+      label: "Rating",
+      rules: { required: true },
+      render: ({ field, error }) => (
+        <FormFieldWrapper label="Rating" required error={error}>
+          <StarRatingInput value={field.value as number | undefined} onChange={field.onChange} />
+        </FormFieldWrapper>
+      ),
+    },
   ];
 
   const mediaFields: FormFieldConfig<ReviewFormValues>[] = [
@@ -59,6 +71,7 @@ export function ReviewForm({ defaultValues, endpoint }: ReviewFormProps) {
               image: defaultValues.image ?? null,
               beforeImage: defaultValues.beforeImage ?? null,
               afterImage: defaultValues.afterImage ?? null,
+              rating: defaultValues.rating,
               featured: defaultValues.featured,
               sourceUrl: defaultValues.sourceUrl,
               status: defaultValues.status,

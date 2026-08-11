@@ -35,6 +35,14 @@ export class ReviewSchema {
   @MongoField(imageAssetField())
   afterImage?: ImageAsset | null;
 
+  // Optional at the schema level on purpose — reviews created before this
+  // field existed have no rating, and that must stay a valid, non-crashing
+  // state rather than something a migration has to backfill. Required
+  // going forward at the create-DTO/staff-form layer instead (see
+  // CreateReviewDto and ReviewForm).
+  @MongoField({ type: Number, required: false, min: 1, max: 5 })
+  rating?: number;
+
   @MongoField({ type: Boolean, default: false })
   @Filterable()
   featured!: boolean;

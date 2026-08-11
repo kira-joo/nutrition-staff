@@ -9,6 +9,8 @@ export interface Review {
   image?: ImageAsset | null;
   beforeImage?: ImageAsset | null;
   afterImage?: ImageAsset | null;
+  /** Optional for backward compatibility — reviews created before this field existed have no rating. */
+  rating?: number;
   featured: boolean;
   sourceUrl?: string;
   status: ContentStatus;
@@ -28,6 +30,8 @@ export interface ReviewFormValues {
   image: ImageAsset | File | null;
   beforeImage: ImageAsset | File | null;
   afterImage: ImageAsset | File | null;
+  /** Optional in the type since a legacy review may not have one yet — the form itself requires a value before submit. */
+  rating?: number;
   featured: boolean;
   sourceUrl?: string;
   status: ContentStatus;
