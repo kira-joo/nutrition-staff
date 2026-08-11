@@ -8,6 +8,8 @@ export interface LocalizedTextPairProps {
   value: LocalizedString;
   onChange: (value: LocalizedString) => void;
   multiline?: boolean;
+  /** Initial textarea height when `multiline`; the field stays manually resizable (vertical-only, via CustomTextarea). Defaults to a compact 2. */
+  rows?: number;
 }
 
 /**
@@ -18,17 +20,35 @@ export interface LocalizedTextPairProps {
  * individually RHF-registered fields, so the toolkit's RHF-bound
  * components don't apply here.
  */
-export function LocalizedTextPair({ label, value, onChange, multiline = false }: LocalizedTextPairProps) {
-  const Field = multiline ? CustomTextarea : CustomInput;
+export function LocalizedTextPair({ label, value, onChange, multiline = false, rows = 2 }: LocalizedTextPairProps) {
+  if (multiline) {
+    return (
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <CustomTextarea
+          label={`${label} (English)`}
+          rows={rows}
+          value={value.en}
+          onChange={(event) => onChange({ ...value, en: event.target.value })}
+        />
+        <CustomTextarea
+          label={`${label} (Arabic)`}
+          dir="rtl"
+          rows={rows}
+          value={value.ar}
+          onChange={(event) => onChange({ ...value, ar: event.target.value })}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      <Field
+      <CustomInput
         label={`${label} (English)`}
         value={value.en}
         onChange={(event) => onChange({ ...value, en: event.target.value })}
       />
-      <Field
+      <CustomInput
         label={`${label} (Arabic)`}
         dir="rtl"
         value={value.ar}

@@ -107,7 +107,9 @@ export function PackageForm({ defaultValues, endpoint }: PackageFormProps) {
           createItem={() => ({ ...EMPTY_LOCALIZED })}
           addLabel="Add detail"
           emptyLabel="No details yet."
-          renderItem={(item, index, update) => <LocalizedTextPair label="Detail" value={item} onChange={update} />}
+          renderItem={(item, index, update) => (
+            <LocalizedTextPair label="Detail" multiline value={item} onChange={update} />
+          )}
         />
       ),
     },

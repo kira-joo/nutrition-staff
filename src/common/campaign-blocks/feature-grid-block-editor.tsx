@@ -48,6 +48,7 @@ export function FeatureGridBlockEditor({ defaultValues, endpoint, submitParams, 
               />
               <LocalizedTextPair
                 label="Description"
+                multiline
                 value={item.description ?? EMPTY_LOCALIZED}
                 onChange={(description) => update({ description })}
               />
