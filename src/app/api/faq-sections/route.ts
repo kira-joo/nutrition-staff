@@ -1,3 +1,4 @@
+import { createDtoRequirednessResolver } from "@kira-joo/backend-toolkit-core";
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
@@ -18,7 +19,7 @@ export const POST = createPostRoute({
   body: CreateFaqSectionDto,
   auth: { permissions: [AppPermission.FAQ_SECTION.CREATE] },
   handler: async ({ body }) => {
-    assertPublishReady(body, body.status);
+    assertPublishReady(body, body.status, createDtoRequirednessResolver(CreateFaqSectionDto, body));
     return faqSectionRepository.save(body);
   },
   revalidateTags: FAQ_TAGS,

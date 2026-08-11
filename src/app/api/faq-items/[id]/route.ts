@@ -1,7 +1,9 @@
+import { createDtoRequirednessResolver } from "@kira-joo/backend-toolkit-core";
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { FAQ_TAGS } from "src/server/core/revalidation/revalidate-entity";
+import { CreateFaqItemDto } from "src/server/faq-items/dto/create-faq-item.dto";
 import { FindFaqItemParamsDto } from "src/server/faq-items/dto/find-faq-item-params.dto";
 import { UpdateFaqItemDto } from "src/server/faq-items/dto/update-faq-item.dto";
 import { faqItemRepository } from "src/server/faq-items/faq-items.repository";
@@ -21,7 +23,8 @@ export const PUT = createPutRoute({
   handler: async ({ params, body }) => {
     const existing = await faqItemRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
-    assertPublishReady({ ...existing, ...body }, nextStatus);
+    const nextEntity = { ...existing, ...body };
+    assertPublishReady(nextEntity, nextStatus, createDtoRequirednessResolver(CreateFaqItemDto, nextEntity));
     return faqItemRepository.update({ where: { _id: params.id } }, body);
   },
   revalidateTags: FAQ_TAGS,

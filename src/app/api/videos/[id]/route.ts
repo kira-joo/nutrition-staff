@@ -1,4 +1,4 @@
-import { validateDto } from "@kira-joo/backend-toolkit-core";
+import { createDtoRequirednessResolver, validateDto } from "@kira-joo/backend-toolkit-core";
 import { parseMultipartFormData } from "@kira-joo/backend-toolkit-next";
 import {
   assetProvider,
@@ -10,6 +10,7 @@ import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { VIDEOS_TAGS } from "src/server/core/revalidation/revalidate-entity";
+import { CreateVideoDto } from "src/server/videos/dto/create-video.dto";
 import { FindVideoParamsDto } from "src/server/videos/dto/find-video-params.dto";
 import { UpdateVideoDto } from "src/server/videos/dto/update-video.dto";
 import { VIDEO_ASSET_FIELDS, VIDEO_ASSET_FOLDER } from "src/server/videos/video-asset-fields";
@@ -45,7 +46,8 @@ export const PUT = createPutRoute({
     try {
       const dto = await validateDto(UpdateVideoDto, payload);
       const nextStatus = dto.status ?? previousDocument.status;
-      assertPublishReady({ ...previousDocument, ...dto }, nextStatus);
+      const nextEntity = { ...previousDocument, ...dto };
+      assertPublishReady(nextEntity, nextStatus, createDtoRequirednessResolver(CreateVideoDto, nextEntity));
       saved = await videoRepository.update({ where: { _id: params.id } }, dto);
     } catch (error) {
       await destroyUploadedAssets(assetProvider, uploaded);

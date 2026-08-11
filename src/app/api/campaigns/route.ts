@@ -5,6 +5,7 @@ import { CAMPAIGNS_TAGS } from "src/server/core/revalidation/revalidate-entity";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { CreateCampaignDto } from "src/server/campaigns/dto/create-campaign.dto";
 import { ListCampaignsQueryDto } from "src/server/campaigns/dto/list-campaigns-query.dto";
+import { resolveCampaignRequiredness } from "src/server/campaigns/resolve-campaign-requiredness";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,8 @@ export const POST = createPostRoute({
   body: CreateCampaignDto,
   auth: { permissions: [AppPermission.CAMPAIGN.CREATE] },
   handler: async ({ body }) => {
-    assertPublishReady({ title: body.title, blocks: [] }, body.status);
+    const entity = { title: body.title, blocks: [] };
+    assertPublishReady(entity, body.status, resolveCampaignRequiredness(entity));
     return campaignRepository.save({ ...body, blocks: [] });
   },
   revalidateTags: CAMPAIGNS_TAGS,

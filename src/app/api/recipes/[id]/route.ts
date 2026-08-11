@@ -1,4 +1,4 @@
-import { validateDto } from "@kira-joo/backend-toolkit-core";
+import { createDtoRequirednessResolver, validateDto } from "@kira-joo/backend-toolkit-core";
 import { parseMultipartFormData } from "@kira-joo/backend-toolkit-next";
 import {
   assetProvider,
@@ -10,6 +10,7 @@ import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { recipeDetailTags } from "src/server/core/revalidation/revalidate-entity";
+import { CreateRecipeDto } from "src/server/recipes/dto/create-recipe.dto";
 import { FindRecipeParamsDto } from "src/server/recipes/dto/find-recipe-params.dto";
 import { UpdateRecipeDto } from "src/server/recipes/dto/update-recipe.dto";
 import { RECIPE_ASSET_FIELDS, RECIPE_ASSET_FOLDER } from "src/server/recipes/recipe-asset-fields";
@@ -46,7 +47,8 @@ export const PUT = createPutRoute({
     try {
       const dto = await validateDto(UpdateRecipeDto, payload);
       const nextStatus = dto.status ?? previousDocument.status;
-      assertPublishReady({ ...previousDocument, ...dto }, nextStatus);
+      const nextEntity = { ...previousDocument, ...dto };
+      assertPublishReady(nextEntity, nextStatus, createDtoRequirednessResolver(CreateRecipeDto, nextEntity));
       saved = await recipeRepository.update({ where: { _id: params.id } }, dto);
     } catch (error) {
       await destroyUploadedAssets(assetProvider, uploaded);

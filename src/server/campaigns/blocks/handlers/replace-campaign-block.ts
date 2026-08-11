@@ -13,6 +13,7 @@ import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/c
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
 import { validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
 import { assertBlockReferencesValid } from "src/server/campaigns/blocks/assert-block-references-valid";
+import { resolveCampaignRequiredness } from "src/server/campaigns/resolve-campaign-requiredness";
 
 /**
  * Replaces one block's content in place — never touches its position or
@@ -48,7 +49,8 @@ export async function replaceCampaignBlock(request: NextRequest, campaignId: str
     const updatedBlock = { ...dto, id: previousBlock.id, order: previousBlock.order } as CampaignBlock;
     const nextBlocks = campaign.blocks.map((block, index) => (index === blockIndex ? updatedBlock : block));
 
-    assertPublishReady({ title: campaign.title, blocks: nextBlocks }, campaign.status);
+    const entity = { title: campaign.title, blocks: nextBlocks };
+    assertPublishReady(entity, campaign.status, resolveCampaignRequiredness(entity));
 
     saved = await campaignRepository.update({ where: { _id: campaignId } }, { blocks: nextBlocks });
   } catch (error) {

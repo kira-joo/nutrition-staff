@@ -7,6 +7,7 @@ import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/c
 import { assertValidBlockType, validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
 import { assertBlockReferencesValid } from "src/server/campaigns/blocks/assert-block-references-valid";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
+import { resolveCampaignRequiredness } from "src/server/campaigns/resolve-campaign-requiredness";
 
 /** Adding a block always appends (order = current length) — reordering is its own dedicated route. */
 export async function addCampaignBlock(request: NextRequest, campaignId: string) {
@@ -38,7 +39,8 @@ export async function addCampaignBlock(request: NextRequest, campaignId: string)
     // an incomplete state — removing/replacing can't regress completeness,
     // but adding genuinely can, so this is the one block mutation that
     // must re-check the whole campaign, not just the header's own PUT.
-    assertPublishReady({ title: campaign.title, blocks: nextBlocks }, campaign.status);
+    const entity = { title: campaign.title, blocks: nextBlocks };
+    assertPublishReady(entity, campaign.status, resolveCampaignRequiredness(entity));
 
     return await campaignRepository.update({ where: { _id: campaignId } }, { blocks: nextBlocks });
   } catch (error) {

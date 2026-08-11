@@ -1,7 +1,9 @@
+import { createDtoRequirednessResolver } from "@kira-joo/backend-toolkit-core";
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { RECIPE_CATEGORIES_TAGS } from "src/server/core/revalidation/revalidate-entity";
+import { CreateRecipeCategoryDto } from "src/server/recipe-categories/dto/create-recipe-category.dto";
 import { FindRecipeCategoryParamsDto } from "src/server/recipe-categories/dto/find-recipe-category-params.dto";
 import { UpdateRecipeCategoryDto } from "src/server/recipe-categories/dto/update-recipe-category.dto";
 import { recipeCategoryRepository } from "src/server/recipe-categories/recipe-categories.repository";
@@ -21,7 +23,8 @@ export const PUT = createPutRoute({
   handler: async ({ params, body }) => {
     const existing = await recipeCategoryRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
-    assertPublishReady({ ...existing, ...body }, nextStatus);
+    const nextEntity = { ...existing, ...body };
+    assertPublishReady(nextEntity, nextStatus, createDtoRequirednessResolver(CreateRecipeCategoryDto, nextEntity));
     return recipeCategoryRepository.update({ where: { _id: params.id } }, body);
   },
   revalidateTags: RECIPE_CATEGORIES_TAGS,

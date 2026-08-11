@@ -1,4 +1,4 @@
-import { validateDto } from "@kira-joo/backend-toolkit-core";
+import { createDtoRequirednessResolver, validateDto } from "@kira-joo/backend-toolkit-core";
 import { parseMultipartFormData } from "@kira-joo/backend-toolkit-next";
 import { assertPublishReady } from "src/server/core/publishing";
 import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
@@ -35,7 +35,7 @@ export const POST = createPostRoute({
 
     try {
       const dto = await validateDto(CreateVideoDto, payload);
-      assertPublishReady(dto, dto.status);
+      assertPublishReady(dto, dto.status, createDtoRequirednessResolver(CreateVideoDto, dto));
       return await videoRepository.save(dto);
     } catch (error) {
       await destroyUploadedAssets(assetProvider, uploaded);

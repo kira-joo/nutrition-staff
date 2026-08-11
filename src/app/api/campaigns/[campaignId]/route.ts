@@ -6,6 +6,7 @@ import { campaignDetailTags, campaignSlugChangeTags } from "src/server/core/reva
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
 import { FindCampaignParamsDto } from "src/server/campaigns/dto/find-campaign-params.dto";
 import { UpdateCampaignDto } from "src/server/campaigns/dto/update-campaign.dto";
+import { resolveCampaignRequiredness } from "src/server/campaigns/resolve-campaign-requiredness";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,8 @@ export const PUT = createPutRoute({
     const campaign = await campaignRepository.findOne({ where: { _id: params.campaignId } });
     const nextStatus = body.status ?? campaign.status;
     const nextTitle = body.title ?? campaign.title;
-    assertPublishReady({ title: nextTitle, blocks: campaign.blocks }, nextStatus);
+    const entity = { title: nextTitle, blocks: campaign.blocks };
+    assertPublishReady(entity, nextStatus, resolveCampaignRequiredness(entity));
     const updated = await campaignRepository.update({ where: { _id: params.campaignId } }, body);
     return withRevalidationMeta(updated, { previousSlug: campaign.slug });
   },

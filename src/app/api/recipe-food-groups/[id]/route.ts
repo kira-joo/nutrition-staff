@@ -1,7 +1,9 @@
+import { createDtoRequirednessResolver } from "@kira-joo/backend-toolkit-core";
 import { assertPublishReady } from "src/server/core/publishing";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { RECIPE_FOOD_GROUPS_TAGS } from "src/server/core/revalidation/revalidate-entity";
+import { CreateRecipeFoodGroupDto } from "src/server/recipe-food-groups/dto/create-recipe-food-group.dto";
 import { FindRecipeFoodGroupParamsDto } from "src/server/recipe-food-groups/dto/find-recipe-food-group-params.dto";
 import { UpdateRecipeFoodGroupDto } from "src/server/recipe-food-groups/dto/update-recipe-food-group.dto";
 import { recipeFoodGroupRepository } from "src/server/recipe-food-groups/recipe-food-groups.repository";
@@ -21,7 +23,8 @@ export const PUT = createPutRoute({
   handler: async ({ params, body }) => {
     const existing = await recipeFoodGroupRepository.findOne({ where: { _id: params.id } });
     const nextStatus = body.status ?? existing.status;
-    assertPublishReady({ ...existing, ...body }, nextStatus);
+    const nextEntity = { ...existing, ...body };
+    assertPublishReady(nextEntity, nextStatus, createDtoRequirednessResolver(CreateRecipeFoodGroupDto, nextEntity));
     return recipeFoodGroupRepository.update({ where: { _id: params.id } }, body);
   },
   revalidateTags: RECIPE_FOOD_GROUPS_TAGS,

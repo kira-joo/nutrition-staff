@@ -21,7 +21,7 @@ import { RichTextBlockDto } from "./dto/rich-text-block.dto";
  * Add a new block type by adding one entry here (and to the frontend block
  * registry) — nothing else about this dispatch changes.
  */
-const BLOCK_DTO_BY_TYPE: Record<CampaignBlockType, ClassConstructor<object>> = {
+export const BLOCK_DTO_BY_TYPE: Record<CampaignBlockType, ClassConstructor<object>> = {
   [CampaignBlockType.HERO]: HeroBlockDto,
   [CampaignBlockType.RICH_TEXT]: RichTextBlockDto,
   [CampaignBlockType.FEATURE_GRID]: FeatureGridBlockDto,
