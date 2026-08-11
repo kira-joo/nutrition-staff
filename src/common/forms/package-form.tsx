@@ -59,6 +59,7 @@ export function PackageForm({ defaultValues, endpoint }: PackageFormProps) {
       type: FieldType.CUSTOM,
       name: "pricingTiers",
       label: "Pricing",
+      colSpan: "full",
       render: ({ field }) => {
         const tiers = (field.value as PricingTiers) ?? EMPTY_PRICING_TIERS;
         return (
@@ -98,6 +99,7 @@ export function PackageForm({ defaultValues, endpoint }: PackageFormProps) {
       type: FieldType.CUSTOM,
       name: "details",
       label: "Details",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<LocalizedString>
           items={(field.value as LocalizedString[]) ?? []}

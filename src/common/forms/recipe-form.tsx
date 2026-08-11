@@ -83,6 +83,7 @@ export function RecipeForm({ defaultValues, endpoint }: RecipeFormProps) {
       type: FieldType.CUSTOM,
       name: "ingredients",
       label: "Ingredients",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<LocalizedString>
           items={(field.value as LocalizedString[]) ?? []}
@@ -103,6 +104,7 @@ export function RecipeForm({ defaultValues, endpoint }: RecipeFormProps) {
       type: FieldType.CUSTOM,
       name: "instructions",
       label: "Instructions",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<LocalizedString>
           items={(field.value as LocalizedString[]) ?? []}

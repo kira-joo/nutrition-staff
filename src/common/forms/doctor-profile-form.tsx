@@ -28,6 +28,7 @@ export function DoctorProfileForm({ defaultValues, endpoint }: DoctorProfileForm
       type: FieldType.CUSTOM,
       name: "bioSections",
       label: "Bio sections",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<BioSection>
           items={(field.value as BioSection[]) ?? []}
@@ -56,6 +57,7 @@ export function DoctorProfileForm({ defaultValues, endpoint }: DoctorProfileForm
       type: FieldType.CUSTOM,
       name: "programHighlights",
       label: "Program highlights",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<LabeledOrderedItem>
           items={(field.value as LabeledOrderedItem[]) ?? []}
@@ -74,6 +76,7 @@ export function DoctorProfileForm({ defaultValues, endpoint }: DoctorProfileForm
       type: FieldType.CUSTOM,
       name: "whyChooseReasons",
       label: "Why choose us — reasons",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<LabeledOrderedItem>
           items={(field.value as LabeledOrderedItem[]) ?? []}

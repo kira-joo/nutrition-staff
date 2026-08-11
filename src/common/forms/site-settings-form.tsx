@@ -34,6 +34,7 @@ export function SiteSettingsForm({ defaultValues, endpoint }: SiteSettingsFormPr
       type: FieldType.CUSTOM,
       name: "socialLinks",
       label: "Social links",
+      colSpan: "full",
       render: ({ field }) => (
         <ArrayFieldEditor<SocialLink>
           items={(field.value as SocialLink[]) ?? []}
