@@ -55,13 +55,20 @@ export class BookSettingsSchema {
   // LocalizedString: Books are Arabic-only from the architecture up, and
   // this is a separate publishing profile from DoctorProfile/SiteSettings,
   // never auto-mirrored.
-  @MongoField({ type: String, required: true, default: "" })
+  // required:false, not true -- Mongoose's built-in required-checker for
+  // String rejects an empty string even when it comes from `default: ""`
+  // (confirmed empirically: `required:true` here made getOrCreateSingleton
+  // unable to ever create the very first singleton document). These
+  // fields are always PRESENT as a string at the application level thanks
+  // to the default; `required` here is purely "must the doctor have
+  // already typed something," which is not the invariant we want.
+  @MongoField({ type: String, required: false, default: "" })
   doctorName!: string;
 
-  @MongoField({ type: String, required: true, default: "" })
+  @MongoField({ type: String, required: false, default: "" })
   doctorTitle!: string;
 
-  @MongoField({ type: String, required: true, default: "" })
+  @MongoField({ type: String, required: false, default: "" })
   doctorBio!: string;
 
   @MongoField(imageAssetField())
@@ -79,16 +86,16 @@ export class BookSettingsSchema {
   @MongoField({ type: bookContactBlockSchema, default: () => ({}) })
   contact!: BookContactBlock;
 
-  @MongoField({ type: String, required: true, default: "" })
+  @MongoField({ type: String, required: false, default: "" })
   disclaimer!: string;
 
-  @MongoField({ type: String, required: true, default: "" })
+  @MongoField({ type: String, required: false, default: "" })
   copyrightText!: string;
 
-  @MongoField({ type: String, required: true, default: "" })
+  @MongoField({ type: String, required: false, default: "" })
   backCoverClosingText!: string;
 
-  @MongoField({ type: String, required: true, default: "" })
+  @MongoField({ type: String, required: false, default: "" })
   backCoverAudienceText!: string;
 
   @MongoField({ type: String, required: false })

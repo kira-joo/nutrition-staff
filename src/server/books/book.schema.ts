@@ -3,7 +3,7 @@ import type { ImageAsset } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { BookOverrideKey, BookStatus, BookVisibility } from "src/common/enums";
-import { asSchemaField, bookContactBlockSchema, bookPrintSettingsSchema, bookSocialLinkSchema } from "src/server/book-settings/book-settings.schema";
+import { asSchemaField, bookContactBlockSchema, bookSocialLinkSchema } from "src/server/book-settings/book-settings.schema";
 import type { BookOverrides } from "src/common/interfaces/book.interface";
 
 // Embedded, `_id:false` — mirrors BookSettings' overridable shape exactly,
@@ -23,7 +23,19 @@ const bookOverridesSchema = new mongoose.Schema(
     backCoverClosingText: { type: String, required: false },
     backCoverAudienceText: { type: String, required: false },
     qrDestination: { type: String, required: false },
-    print: { type: bookPrintSettingsSchema, required: false },
+    // Mixed, NOT bookPrintSettingsSchema -- print resolves as a PARTIAL
+    // MERGE (`{ ...settings.print, ...overrides.print }` in
+    // resolveBookIdentity), which requires that a field the doctor never
+    // touched stay genuinely absent in storage. Reusing the full
+    // sub-schema here was a real bug caught live: Mongoose casts ANY
+    // write through a nested schema's own field defaults, so sending
+    // `{ pageSize: "a4" }` silently stored
+    // `{ pageSize: "a4", marginPreset: "standard", gutterMm: 18, ... }` —
+    // clobbering the books default for every field the doctor left alone
+    // with the sub-schema's generic default instead. Mixed stores exactly
+    // what's given, with no casting/defaulting, which is what a genuine
+    // partial value requires.
+    print: { type: mongoose.Schema.Types.Mixed, required: false },
   },
   { _id: false }
 );

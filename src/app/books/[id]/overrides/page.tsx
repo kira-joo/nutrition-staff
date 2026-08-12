@@ -7,8 +7,8 @@ import { getBookSettingsEndpoint } from "../../../../../api/book-settings.endpoi
 import { getBookByIdEndpoint, updateBookEndpoint } from "../../../../../api/book.endpoints";
 import { ArrayFieldEditor } from "src/common/forms/array-field-editor";
 import { OverrideField } from "src/common/forms/books/override-field";
-import { BookOverrideKey } from "src/common/enums";
-import type { BookSettings } from "src/common/interfaces/book-settings.interface";
+import { BookMarginPreset, BookOverrideKey, BookPageSize } from "src/common/enums";
+import type { BookContactBlock, BookPrintSettings, BookSettings } from "src/common/interfaces/book-settings.interface";
 import type { BookOverrides } from "src/common/interfaces/book.interface";
 import { bookLogoPolicy, bookPortraitPolicy } from "src/common/upload-policies";
 
@@ -253,9 +253,110 @@ function OverridesEditor({
         />
       </PageSection>
 
+      <PageSection title="Contact">
+        <OverrideField
+          label="Contact"
+          isOverridden={isOverridden(BookOverrideKey.CONTACT)}
+          renderDefault={() => formatContact(settings.contact) || "—"}
+          renderOverride={() => (
+            <div className="grid grid-cols-2 gap-2">
+              {(["phone", "whatsapp", "email", "address"] as const).map((field) => (
+                <input
+                  key={field}
+                  className="rounded border px-2 py-1"
+                  placeholder={field}
+                  value={overrides.contact?.[field] ?? ""}
+                  onChange={(e) => setOverrides((prev) => ({ ...prev, contact: { ...prev.contact, [field]: e.target.value } }))}
+                />
+              ))}
+            </div>
+          )}
+          // Contact resolves as a WHOLE-VALUE replace, not a partial merge
+          // (see resolveBookIdentity: `overrides.contact ?? {}`, no spread
+          // of settings.contact) — so overriding seeds the complete
+          // inherited object as the starting point; there is no per-field
+          // "inherit this one, override that one" for contact.
+          onOverride={() => handleOverride(BookOverrideKey.CONTACT, { ...(settings.contact ?? {}) }, "contact")}
+          onReset={() => handleReset(BookOverrideKey.CONTACT, "contact")}
+        />
+      </PageSection>
+
+      <PageSection title="Print defaults">
+        <OverrideField
+          label="Print settings"
+          isOverridden={isOverridden(BookOverrideKey.PRINT)}
+          renderDefault={() => formatPrint(settings.print) || "—"}
+          renderOverride={() => (
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                className="rounded border px-2 py-1"
+                value={overrides.print?.pageSize ?? settings.print.pageSize}
+                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, pageSize: e.target.value as BookPageSize } }))}
+              >
+                {Object.values(BookPageSize).map((value) => (
+                  <option key={value} value={value}>
+                    {value.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="rounded border px-2 py-1"
+                value={overrides.print?.marginPreset ?? settings.print.marginPreset}
+                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, marginPreset: e.target.value as BookMarginPreset } }))}
+              >
+                {Object.values(BookMarginPreset).map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                className="rounded border px-2 py-1"
+                placeholder="Gutter (mm)"
+                value={overrides.print?.gutterMm ?? settings.print.gutterMm}
+                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, gutterMm: Number(e.target.value) } }))}
+              />
+              <input
+                type="number"
+                className="rounded border px-2 py-1"
+                placeholder="First page number"
+                value={overrides.print?.pageNumberStart ?? settings.print.pageNumberStart}
+                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, pageNumberStart: Number(e.target.value) } }))}
+              />
+              <label className="col-span-2 flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={overrides.print?.doublePageSpread ?? settings.print.doublePageSpread}
+                  onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, doublePageSpread: e.target.checked } }))}
+                />
+                Double-page spread preview
+              </label>
+            </div>
+          )}
+          // Print resolves as a PARTIAL MERGE (see resolveBookIdentity:
+          // `{ ...settings.print, ...overrides.print }`) — seeding with the
+          // full resolved object is still correct (a complete object is a
+          // valid partial input), and any field the doctor leaves alone
+          // here would fall back to the books default even if this seed
+          // weren't complete.
+          onOverride={() => handleOverride(BookOverrideKey.PRINT, { ...settings.print }, "print")}
+          onReset={() => handleReset(BookOverrideKey.PRINT, "print")}
+        />
+      </PageSection>
+
       <CustomButton type="button" loading={saveMutation.loading} onClick={handleSave}>
         Save overrides
       </CustomButton>
     </div>
   );
+}
+
+function formatContact(contact: BookContactBlock | undefined): string {
+  if (!contact) return "";
+  return [contact.phone, contact.whatsapp, contact.email, contact.address].filter(Boolean).join(" · ");
+}
+
+function formatPrint(print: BookPrintSettings): string {
+  return `${print.pageSize.toUpperCase()} · ${print.marginPreset} margins · ${print.gutterMm}mm gutter`;
 }
