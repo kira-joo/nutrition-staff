@@ -68,4 +68,10 @@ export const AppRoute = {
   calculators: "/calculators",
   consultationRequests: "/consultation-requests",
   consultationRequestDetails: "/consultation-requests/[id]",
+  books: "/books",
+  bookCreate: "/books/create",
+  bookDetails: "/books/[id]",
+  bookOverview: "/books/[id]/overview",
+  bookOverrides: "/books/[id]/overrides",
+  bookSettings: "/book-settings",
 } as const;
