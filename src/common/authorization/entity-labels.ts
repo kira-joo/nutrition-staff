@@ -25,4 +25,8 @@ export const ENTITY_PLURAL_LABELS: Record<EntityName, string> = {
   [EntityName.CLIENT_INTERACTION]: "Client Interactions",
   [EntityName.CONSULTATION_REQUEST]: "Consultation Requests",
   [EntityName.DASHBOARD]: "Dashboard",
+  [EntityName.BOOK_SETTINGS]: "Book Settings",
+  [EntityName.BOOK]: "Books",
+  [EntityName.BOOK_EDITION]: "Book Editions",
+  [EntityName.BOOK_ARTIFACT]: "Book Artifacts",
 };

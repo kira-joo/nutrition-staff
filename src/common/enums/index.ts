@@ -18,3 +18,8 @@ export * from "./calculation-type.enum";
 export * from "./bmr-formula.enum";
 export * from "./interaction-type.enum";
 export * from "./consultation-request-intent.enum";
+export * from "./book-status.enum";
+export * from "./book-visibility.enum";
+export * from "./book-override-key.enum";
+export * from "./book-page-size.enum";
+export * from "./book-margin-preset.enum";

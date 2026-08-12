@@ -92,3 +92,35 @@ export const videoPosterPolicy: UploadPolicy = {
   minWidth: 200,
   minHeight: 200,
 };
+
+/**
+ * Books are printed, not just displayed on a screen — minimums here are
+ * deliberately much higher than a website photo policy (roughly ~300dpi
+ * at the template's print dimensions), so a low-resolution source is
+ * rejected up front rather than silently upscaled onto a printed page.
+ */
+export const bookPortraitPolicy: UploadPolicy = {
+  allowedMimeTypes: IMAGE_MIME_TYPES,
+  allowedFormats: IMAGE_FORMATS,
+  maxBytes: 10 * 1024 * 1024,
+  minWidth: 800,
+  minHeight: 800,
+};
+
+/** The book's own logo mark — wide/small by nature, so a much lower minimum than a portrait photo. */
+export const bookLogoPolicy: UploadPolicy = {
+  allowedMimeTypes: IMAGE_MIME_TYPES,
+  allowedFormats: IMAGE_FORMATS,
+  maxBytes: 5 * 1024 * 1024,
+  minWidth: 300,
+  minHeight: 100,
+};
+
+/** Any image placed inside a book's content (chapter cover, image block, back cover) — print-grade minimum. */
+export const bookContentImagePolicy: UploadPolicy = {
+  allowedMimeTypes: IMAGE_MIME_TYPES,
+  allowedFormats: IMAGE_FORMATS,
+  maxBytes: 12 * 1024 * 1024,
+  minWidth: 600,
+  minHeight: 600,
+};

@@ -22,4 +22,8 @@ export enum EntityName {
   CLIENT_INTERACTION = "ClientInteraction",
   CONSULTATION_REQUEST = "ConsultationRequest",
   DASHBOARD = "Dashboard",
+  BOOK_SETTINGS = "BookSettings",
+  BOOK = "Book",
+  BOOK_EDITION = "BookEdition",
+  BOOK_ARTIFACT = "BookArtifact",
 }

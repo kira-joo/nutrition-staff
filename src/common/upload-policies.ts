@@ -6,6 +6,9 @@
 // `@kira-joo/toolkit-common`), so this re-export is a plain literal, not a
 // live/heavier module.
 export {
+  bookContentImagePolicy,
+  bookLogoPolicy,
+  bookPortraitPolicy,
   campaignHeroPolicy,
   doctorPhotoPolicy,
   faviconImagePolicy,
