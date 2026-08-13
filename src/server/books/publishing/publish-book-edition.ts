@@ -69,6 +69,8 @@ export async function publishBookEdition(bookId: string, publishedByUserId: stri
     publishedByUserId,
     slugAtPublish: book.slug,
     titleAtPublish: book.title,
+    subtitleAtPublish: book.subtitle,
+    coverImageAtPublish: book.coverImage ?? null,
     notes: dto.notes,
     content,
     resolvedSettings: identity,

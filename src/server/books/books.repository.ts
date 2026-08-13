@@ -58,15 +58,25 @@ export const BOOK_LIST_PROJECTION = {
  * to reach the response, and `currentEditionId` is an internal pointer,
  * not public-facing data.
  */
+/**
+ * `title`/`subtitle`/`coverImage` are deliberately ABSENT — the listing
+ * renders those from the book's current published Edition, never the
+ * live draft (see `find-public-book-list-items.ts`); this projection
+ * only needs `currentEditionId` to batch-fetch them. `shortDescription`/
+ * `category` stay live and ARE returned as-is: unlike title/subtitle/
+ * cover, neither ever appears on a rendered page inside the book itself
+ * — they're catalog/discovery metadata (what shelf is this on, what's
+ * the blurb on the browse page), not manuscript content, so editing a
+ * typo in either is intentionally visible immediately without a
+ * republish. This is a considered decision, not an oversight.
+ */
 export const PUBLIC_BOOK_LIST_PROJECTION = {
-  title: true,
-  subtitle: true,
   slug: true,
   shortDescription: true,
   category: true,
-  coverImage: true,
   editionCount: true,
   lastPublishedAt: true,
+  currentEditionId: true,
 } as const;
 
 /**

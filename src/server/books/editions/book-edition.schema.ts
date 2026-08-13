@@ -1,4 +1,4 @@
-import { createMongoModel, MongoField, MongoSchema } from "@kira-joo/backend-toolkit-mongoose";
+import { createMongoModel, imageAssetField, MongoField, MongoSchema } from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import type { ImageAsset, LocalizedString } from "@kira-joo/frontend-toolkit-core";
@@ -86,6 +86,23 @@ export class BookEditionSchema {
 
   @MongoField({ type: String, required: true })
   titleAtPublish!: string;
+
+  // `subtitleAtPublish`/`coverImageAtPublish` exist for exactly the same
+  // reason `titleAtPublish` does: the public LISTING needs these three
+  // presentation fields for every book on a page in ONE batched `$in`
+  // query (see `find-public-book-list-items.ts`), and `content` is
+  // `Mixed` — a dot-path projection like `"content.title": 1` works at
+  // the raw MongoDB level but isn't a shape this toolkit's `select`
+  // typing or `buildLevelProjection` (single-level, schema-aware) is
+  // designed around. Real top-level fields sidestep that entirely.
+  // `content.subtitle`/`content.coverImage` remain the source of truth
+  // for the detail/reader payload and for PDF rendering; these are a
+  // deliberate, populated-once duplicate for the listing's sake only.
+  @MongoField({ type: String, required: false })
+  subtitleAtPublish?: string;
+
+  @MongoField(imageAssetField())
+  coverImageAtPublish?: ImageAsset | null;
 
   // Captured once at publish time via `PublishBookDto.notes` — there is
   // no route to edit this afterward, matching the "no ordinary PUT" rule
