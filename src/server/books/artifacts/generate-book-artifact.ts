@@ -36,7 +36,7 @@ export async function generateBookArtifact(bookId: string, editionId: string, ge
 
   let rendered;
   try {
-    rendered = await renderBookPdf({ content: edition.content, resolvedSettings: edition.resolvedSettings, templateVersion: edition.templateVersion });
+    rendered = await renderBookPdf({ content: edition.content, resolvedSettings: edition.resolvedSettings, templateVersion: edition.templateVersion, recipeSnapshots: edition.recipeSnapshots });
   } catch (error) {
     await markFailed(row._id.toString(), error);
     throw error;

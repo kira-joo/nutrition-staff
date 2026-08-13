@@ -1,8 +1,9 @@
 import { ConflictError, NotFoundError, BadRequestError, validateDto } from "@kira-joo/backend-toolkit-core";
-import { parseMultipartFormData } from "@kira-joo/backend-toolkit-next";
+import { parseMultipartFormData, withRevalidationMeta } from "@kira-joo/backend-toolkit-next";
 import { assetProvider, destroyReplacedAssets, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
+import { bookSlugChangeTags } from "src/server/core/revalidation/revalidate-entity";
 import { BOOK_ASSET_FIELDS, BOOK_ASSET_FOLDER } from "src/server/books/book-asset-fields";
 import { assertBookStatusTransition } from "src/server/books/assert-book-status-transition";
 import { FindBookParamsDto } from "src/server/books/dto/find-book-params.dto";
@@ -70,8 +71,14 @@ export const PUT = createPutRoute({
       previousDocument: previousDocument as unknown as Record<string, unknown>,
     });
 
-    return saved;
+    return withRevalidationMeta(saved, { previousSlug: previousDocument.slug });
   },
+  // This one route can change slug, visibility, showOnWebsite,
+  // allowFlipbook, allowPdfDownload, or status in a single request —
+  // rather than special-casing which field actually flipped, always bust
+  // the public list plus both the old and new slug's detail cache (see
+  // `bookSlugChangeTags`).
+  revalidateTags: ({ result: { response, meta } }) => bookSlugChangeTags(meta.previousSlug, response.slug),
 });
 
 export const DELETE = createDeleteRoute({

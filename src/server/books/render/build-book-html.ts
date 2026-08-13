@@ -17,6 +17,7 @@ import {
 } from "./dr-omnia-book-v1/single-pages";
 import { paginateAndRenderBook } from "./paginate-book.browser";
 import type { StreamFragment } from "./page-model.interface";
+import type { RecipeSnapshot } from "src/server/books/editions/book-edition.schema";
 
 const TOC_ENTRIES_PER_PAGE = 16;
 
@@ -28,6 +29,8 @@ export interface BuildBookHtmlOptions {
   identity: ResolvedBookIdentity;
   /** Restricts rendering to one chapter (staff "Preview chapter" scope) — still runs the real paginator end to end, just over a shorter stream, per BOOK_PLAN §41. */
   chapterId?: string;
+  /** Only ever passed for a frozen Edition (PDF generation, the public reader) — see `render-block.ts`'s `renderBlockToFragment` for why a live draft never has one. */
+  recipeSnapshots?: Record<string, RecipeSnapshot>;
 }
 
 /**
@@ -39,7 +42,7 @@ export interface BuildBookHtmlOptions {
  * feed to Chromium — one builder, one paginator, per the approved
  * architecture. No PDF is generated here; Phase D stops at this HTML.
  */
-export async function buildBookHtml({ book, identity, chapterId }: BuildBookHtmlOptions): Promise<string> {
+export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots }: BuildBookHtmlOptions): Promise<string> {
   const geometry = resolveGeometry(identity.print.pageSize, identity.print.marginPreset, identity.print.gutterMm);
   const css = buildTemplateCss(geometry);
 
@@ -54,21 +57,21 @@ export async function buildBookHtml({ book, identity, chapterId }: BuildBookHtml
     const aboutDoctor = renderAboutDoctorPage(identity);
     if (aboutDoctor) stream.push(aboutDoctor);
 
-    for (const block of book.frontMatter.aboutBook.blocks) stream.push(await renderBlockToFragment(block, book.references));
+    for (const block of book.frontMatter.aboutBook.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
     stream.push(renderTocReservationFragment());
-    for (const block of book.frontMatter.introduction.blocks) stream.push(await renderBlockToFragment(block, book.references));
+    for (const block of book.frontMatter.introduction.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
   }
 
   for (const chapter of chapters) {
     stream.push(renderChapterOpenerFragment(chapter));
     for (const block of chapter.blocks) {
-      const fragment = await renderBlockToFragment(block, book.references);
+      const fragment = await renderBlockToFragment(block, book.references, recipeSnapshots);
       stream.push({ ...fragment, chapterId: chapter.id });
     }
   }
 
   if (isFullBook) {
-    for (const block of book.backMatter.conclusion.blocks) stream.push(await renderBlockToFragment(block, book.references));
+    for (const block of book.backMatter.conclusion.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
     for (const fragment of renderReferencesPage(book.references)) stream.push(fragment);
     stream.push(await renderBackCoverPage(book, identity));
   }

@@ -1,8 +1,11 @@
+import { withRevalidationMeta } from "@kira-joo/backend-toolkit-next";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
+import { bookDetailTags } from "src/server/core/revalidation/revalidate-entity";
 import { bookArtifactRepository } from "src/server/books/artifacts/book-artifacts.repository";
 import { BookArtifactType } from "src/server/books/artifacts/book-artifact.schema";
 import { generateBookArtifact } from "src/server/books/artifacts/generate-book-artifact";
+import { bookRepository } from "src/server/books/books.repository";
 import { FindEditionParamsDto } from "src/server/books/editions/dto/find-edition-params.dto";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +20,16 @@ export const dynamic = "force-dynamic";
 export const POST = createPostRoute({
   params: FindEditionParamsDto,
   auth: { permissions: [AppPermission.BOOK_ARTIFACT.CREATE] },
-  handler: async ({ params, user }) => generateBookArtifact(params.id, params.editionId, String(user._id)),
+  handler: async ({ params, user }) => {
+    const artifact = await generateBookArtifact(params.id, params.editionId, String(user._id));
+    // A newly READY (or newly FAILED) artifact changes the public
+    // reader's `pdf.ready` flag — the artifact row itself has no slug,
+    // so it's fetched here purely for cache-tag purposes; `select`
+    // keeps this a cheap, single-field lookup.
+    const book = await bookRepository.findOne({ where: { _id: params.id }, select: { slug: true } });
+    return withRevalidationMeta(artifact, { bookSlug: book.slug });
+  },
+  revalidateTags: ({ result: { meta } }) => bookDetailTags(meta.bookSlug),
 });
 
 // At most one row per (editionId, type) — see the compound unique index

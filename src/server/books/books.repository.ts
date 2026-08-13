@@ -45,3 +45,45 @@ export const BOOK_LIST_PROJECTION = {
   createdAt: true,
   updatedAt: true,
 } as const;
+
+/**
+ * The public listing's own, deliberately narrower, allow-list — same
+ * inclusion-only shape and the same "an all-`false` object is silently
+ * treated as no restriction" trap `BOOK_LIST_PROJECTION`'s own comment
+ * warns about. Excludes every staff/internal field `BOOK_LIST_PROJECTION`
+ * carries (status, visibility, allowFlipbook, allowPdfDownload,
+ * showOnWebsite, revision, contentRevision, currentEditionId,
+ * editionLabelTemplate) — the public route's `where` clause already
+ * guarantees every returned row is public, so none of those flags need
+ * to reach the response, and `currentEditionId` is an internal pointer,
+ * not public-facing data.
+ */
+export const PUBLIC_BOOK_LIST_PROJECTION = {
+  title: true,
+  subtitle: true,
+  slug: true,
+  shortDescription: true,
+  category: true,
+  coverImage: true,
+  editionCount: true,
+  lastPublishedAt: true,
+} as const;
+
+/**
+ * The public DETAIL route's own minimal projection — only what
+ * `buildPublicBookReaderPayload` actually reads off the live `Book`
+ * (everything else the reader payload needs comes from the frozen
+ * Edition). Excludes `chapters`/`frontMatter`/`backMatter`/`references`/
+ * `overrides` entirely, so the live draft manuscript is never even
+ * fetched into memory on this path, let alone returned.
+ */
+export const PUBLIC_BOOK_DETAIL_PROJECTION = {
+  slug: true,
+  shortDescription: true,
+  category: true,
+  allowFlipbook: true,
+  allowPdfDownload: true,
+  currentEditionId: true,
+  status: true,
+  showOnWebsite: true,
+} as const;

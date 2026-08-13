@@ -1,8 +1,9 @@
 import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import { BookBlockType } from "src/common/enums";
-import type { BookBlock } from "src/common/interfaces/book-block.interface";
+import type { BookBlock, RecipeRefBlock } from "src/common/interfaces/book-block.interface";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
 import { escapeHtml, renderRichTextToHtml, richTextToParagraphRuns } from "src/common/books/rich-text/render-rich-text";
+import type { RecipeSnapshot } from "src/server/books/editions/book-edition.schema";
 import { generateQrSvg } from "../qr/generate-qr-svg";
 import type { StreamFragment } from "../page-model.interface";
 
@@ -17,8 +18,15 @@ import type { StreamFragment } from "../page-model.interface";
  * paginator splits from that mark-preserving structure, never from
  * flattened plain text, so a continuation that crosses a page boundary
  * keeps its bold/italic/highlight/link/citation marks intact.
+ *
+ * `recipeSnapshots` is only ever populated from a frozen `BookEdition`
+ * (PDF generation, and eventually the public reader's own render path)
+ * — Staff Preview of a live draft passes nothing, since a draft has no
+ * snapshot to read yet and must never call the live Recipe module from
+ * inside a renderer (see BOOK_PLAN §15). A `RECIPE_REF` with no matching
+ * snapshot falls back to the same generic placeholder it always has.
  */
-export async function renderBlockToFragment(block: BookBlock, references: BookReference[]): Promise<StreamFragment> {
+export async function renderBlockToFragment(block: BookBlock, references: BookReference[], recipeSnapshots?: Record<string, RecipeSnapshot>): Promise<StreamFragment> {
   const base = {
     id: block.id,
     chapterId: null,
@@ -137,7 +145,7 @@ export async function renderBlockToFragment(block: BookBlock, references: BookRe
       return {
         ...base,
         kind: "content",
-        html: `<div class="book-recipe-ref">${escapeHtml(block.displayTitle ?? "وصفة")}</div>`,
+        html: renderRecipeRefBlock(block, recipeSnapshots?.[block.recipeId]),
         atomic: true,
         splittable: false,
       };
@@ -173,4 +181,22 @@ function renderImageBlock(image: ImageAsset | null | undefined, caption: string 
   const captionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : "";
   const dimensionAttrs = image.width && image.height ? ` width="${image.width}" height="${image.height}"` : "";
   return `<figure class="book-image"><img src="${escapeHtml(image.secureUrl)}" alt="${caption ? escapeHtml(caption) : ""}"${dimensionAttrs} />${captionHtml}</figure>`;
+}
+
+/**
+ * Renders the actual recipe (title/description/image, Arabic only — the
+ * template is Arabic-only) from its frozen snapshot. Falls back to the
+ * old generic placeholder when no snapshot is available at all (a live
+ * draft preview, or a snapshot that failed to resolve at publish time
+ * because the recipe was deleted between authoring and publishing).
+ */
+function renderRecipeRefBlock(block: RecipeRefBlock, snapshot: RecipeSnapshot | undefined): string {
+  if (!snapshot) {
+    return `<div class="book-recipe-ref">${escapeHtml(block.displayTitle ?? "وصفة")}</div>`;
+  }
+  const image = snapshot.image;
+  const dimensionAttrs = image?.width && image?.height ? ` width="${image.width}" height="${image.height}"` : "";
+  const imageHtml = image ? `<img class="book-recipe-ref-image" src="${escapeHtml(image.secureUrl)}" alt=""${dimensionAttrs} />` : "";
+  const descriptionHtml = snapshot.description?.ar ? `<div class="book-recipe-ref-description">${escapeHtml(snapshot.description.ar)}</div>` : "";
+  return `<div class="book-recipe-ref">${imageHtml}<div class="book-recipe-ref-body"><div class="book-recipe-ref-title">${escapeHtml(snapshot.title.ar)}</div>${descriptionHtml}</div></div>`;
 }

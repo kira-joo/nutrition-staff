@@ -1,6 +1,7 @@
 import { SortOrder } from "@kira-joo/toolkit-common";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPostRoute } from "src/server/core/route-factories";
+import { bookDetailTags } from "src/server/core/revalidation/revalidate-entity";
 import { publishBookEdition } from "src/server/books/publishing/publish-book-edition";
 import { PublishBookDto } from "src/server/books/publishing/dto/publish-book.dto";
 import { bookEditionRepository } from "src/server/books/editions/book-editions.repository";
@@ -22,4 +23,7 @@ export const POST = createPostRoute({
   body: PublishBookDto,
   auth: { permissions: [AppPermission.BOOK_EDITION.CREATE] },
   handler: async ({ params, body, user }) => publishBookEdition(params.id, String(user._id), body),
+  // A new current Edition (`currentEditionId`/`status`/`editionCount`)
+  // directly changes the public reader payload — slug never changes here.
+  revalidateTags: ({ result }) => bookDetailTags(result.book.slug),
 });

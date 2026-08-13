@@ -159,7 +159,10 @@ hr.book-divider { border: none; border-top: 0.3mm solid ${BRAND_COLORS.hairline}
 .book-qr-link svg { width: 28mm; height: 28mm; display: block; margin: 0 auto; }
 .book-qr-link .book-qr-label { font-size: 9pt; color: ${BRAND_COLORS.muted}; margin-top: 1mm; }
 
-.book-recipe-ref { border: 0.3mm solid ${BRAND_COLORS.hairline}; border-radius: 2mm; padding: 3mm; margin: 3mm 0; }
+.book-recipe-ref { display: flex; align-items: center; gap: 3mm; border: 0.3mm solid ${BRAND_COLORS.hairline}; border-radius: 2mm; padding: 3mm; margin: 3mm 0; }
+.book-recipe-ref-image { width: 20mm; height: 20mm; object-fit: cover; border-radius: 1.5mm; flex-shrink: 0; }
+.book-recipe-ref-title { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-weight: 700; color: ${BRAND_COLORS.primaryDark}; }
+.book-recipe-ref-description { font-size: 9pt; color: ${BRAND_COLORS.muted}; margin-top: 1mm; }
 
 /* ---- Single-page compositions ---- */
 .book-cover, .book-back-cover {

@@ -3,7 +3,7 @@ import type { BookContentForRender } from "./build-book-html";
 import { resolveGeometry } from "./dr-omnia-book-v1/geometry";
 import { launchBookRenderBrowser } from "./launch-browser";
 import type { PaginationWarning } from "./page-model.interface";
-import type { FrozenBookContent } from "src/server/books/editions/book-edition.schema";
+import type { FrozenBookContent, RecipeSnapshot } from "src/server/books/editions/book-edition.schema";
 import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identity";
 
 export interface RenderedBookPdf {
@@ -30,7 +30,12 @@ interface BookPageModel {
  * implementation — the only difference is which object supplies
  * `{book, identity}`.
  */
-export async function renderBookPdf(edition: { content: FrozenBookContent; resolvedSettings: ResolvedBookIdentity; templateVersion: string }): Promise<RenderedBookPdf> {
+export async function renderBookPdf(edition: {
+  content: FrozenBookContent;
+  resolvedSettings: ResolvedBookIdentity;
+  templateVersion: string;
+  recipeSnapshots?: Record<string, RecipeSnapshot>;
+}): Promise<RenderedBookPdf> {
   const bookForRender: BookContentForRender = {
     title: edition.content.title,
     subtitle: edition.content.subtitle,
@@ -43,7 +48,7 @@ export async function renderBookPdf(edition: { content: FrozenBookContent; resol
   };
   const identity = edition.resolvedSettings;
   const template = getBookTemplate(edition.templateVersion);
-  const html = await template.buildHtml({ book: bookForRender, identity });
+  const html = await template.buildHtml({ book: bookForRender, identity, recipeSnapshots: edition.recipeSnapshots });
   const geometry = resolveGeometry(identity.print.pageSize, identity.print.marginPreset, identity.print.gutterMm);
 
   const { browser, close } = await launchBookRenderBrowser();

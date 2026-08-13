@@ -1,7 +1,7 @@
 import { createMongoModel, MongoField, MongoSchema } from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
-import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
+import type { ImageAsset, LocalizedString } from "@kira-joo/frontend-toolkit-core";
 import type { BookBackMatter, BookFrontMatter, BookReference, Chapter } from "src/common/interfaces/book-chapter.interface";
 import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identity";
 
@@ -25,16 +25,23 @@ export interface FrozenBookContent {
   references: BookReference[];
 }
 
-/** Everything a `RECIPE_REF` block needs to render independently of the live Recipe module, keyed by recipe id. */
+/**
+ * Everything a `RECIPE_REF` block needs to render independently of the
+ * live Recipe module, keyed by recipe id — mirrors the real `Recipe`
+ * interface's field types exactly (see `snapshot-recipe-references.ts`)
+ * so the shared renderer (`render-block.ts`, reused by Staff Preview,
+ * PDF generation, and the public reader) can read `.ar` off these
+ * without a cast.
+ */
 export interface RecipeSnapshot {
-  title: unknown;
-  description: unknown;
-  image: unknown;
-  ingredients: unknown;
-  instructions: unknown;
-  prepTime?: unknown;
-  cookTime?: unknown;
-  servings?: unknown;
+  title: LocalizedString;
+  description: LocalizedString;
+  image: ImageAsset | null;
+  ingredients: LocalizedString[];
+  instructions: LocalizedString[];
+  prepTime?: LocalizedString;
+  cookTime?: LocalizedString;
+  servings?: LocalizedString;
 }
 
 /**
