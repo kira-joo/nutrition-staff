@@ -73,5 +73,9 @@ export const AppRoute = {
   bookDetails: "/books/[id]",
   bookOverview: "/books/[id]/overview",
   bookOverrides: "/books/[id]/overrides",
+  bookContent: "/books/[id]/content",
+  bookFrontMatter: "/books/[id]/front-matter",
+  bookBackMatter: "/books/[id]/back-matter",
+  bookReferences: "/books/[id]/references",
   bookSettings: "/book-settings",
 } as const;

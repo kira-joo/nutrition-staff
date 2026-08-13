@@ -5,6 +5,7 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { BookOverrideKey, BookStatus, BookVisibility } from "src/common/enums";
 import { asSchemaField, bookContactBlockSchema, bookSocialLinkSchema } from "src/server/book-settings/book-settings.schema";
 import type { BookOverrides } from "src/common/interfaces/book.interface";
+import { emptyBackMatter, emptyFrontMatter, type BookBackMatter, type BookFrontMatter, type BookReference, type Chapter } from "src/common/interfaces/book-chapter.interface";
 
 // Embedded, `_id:false` — mirrors BookSettings' overridable shape exactly,
 // reusing the same sub-schemas rather than redefining them.
@@ -118,22 +119,26 @@ export class BookSchema {
   @MongoField({ type: [String], enum: Object.values(BookOverrideKey), default: () => [] })
   overriddenFields!: BookOverrideKey[];
 
-  // Content placeholders — real shape (chapter/block registry, front/back
-  // matter slots, structured references) is Phase C/D territory. Present
-  // here with safe empty defaults so a Draft created in Phase B already
-  // has the exact keys Phase C will populate, rather than needing a later
-  // migration to add them.
-  @MongoField({ type: mongoose.Schema.Types.Mixed, default: () => ({}) })
-  frontMatter!: Record<string, unknown>;
+  // Content — Phase C gives these their real shape. Still stored as
+  // `Mixed` (same reasoning as `Campaign.blocks`: a chapter's `blocks[]`
+  // is a heterogeneous union that Mongoose `strict` mode would silently
+  // strip), typed on the TS side only. Mongoose therefore validates
+  // NOTHING on this path — the per-type block/chapter DTOs
+  // (`validate-book-block.ts`, chapter DTOs) plus `assertBookSizeBudget`
+  // are the only real defence, exactly like Campaign's own doc comment
+  // on `blocks` says. Never written through this entity's own header
+  // PUT — only through the chapter/block sub-resource routes.
+  @MongoField({ type: mongoose.Schema.Types.Mixed, default: () => emptyFrontMatter() })
+  frontMatter!: BookFrontMatter;
 
   @MongoField({ type: [mongoose.Schema.Types.Mixed], default: () => [] })
-  chapters!: unknown[];
+  chapters!: Chapter[];
 
-  @MongoField({ type: mongoose.Schema.Types.Mixed, default: () => ({}) })
-  backMatter!: Record<string, unknown>;
+  @MongoField({ type: mongoose.Schema.Types.Mixed, default: () => emptyBackMatter() })
+  backMatter!: BookBackMatter;
 
   @MongoField({ type: [mongoose.Schema.Types.Mixed], default: () => [] })
-  references!: unknown[];
+  references!: BookReference[];
 }
 
 export const BookModel = createMongoModel(EntityName.BOOK, BookSchema);

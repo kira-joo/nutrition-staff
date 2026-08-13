@@ -1,6 +1,7 @@
 import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import type { BookOverrideKey, BookStatus, BookVisibility } from "../enums";
 import type { BookContactBlock, BookPrintSettings, BookSocialLink } from "./book-settings.interface";
+import type { Chapter, BookFrontMatter, BookBackMatter, BookReference } from "./book-chapter.interface";
 
 /** Mirrors the overridable subset of BookSettings. Every field is optional — only keys present in `Book.overriddenFields` are actually resolved from here. */
 export interface BookOverrides {
@@ -45,6 +46,15 @@ export interface Book {
 
   overrides: BookOverrides;
   overriddenFields: BookOverrideKey[];
+
+  // Present on the detail GET (`/books/:id`) only — the list route
+  // (`BOOK_LIST_PROJECTION`) deliberately excludes all four to keep the
+  // books table cheap. A row fetched from the list endpoint will not have
+  // these keys; the Content tab always re-fetches by id.
+  frontMatter: BookFrontMatter;
+  chapters: Chapter[];
+  backMatter: BookBackMatter;
+  references: BookReference[];
 
   createdAt: string;
   updatedAt: string;

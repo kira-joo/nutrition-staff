@@ -3,5 +3,6 @@ export * from "./asset-kind.enum";
 export * from "./cloudinary-provider";
 export * from "./destroy-replaced-assets";
 export * from "./destroy-uploaded-assets";
+export * from "./duplicate-image-asset";
 export * from "./process-asset-upload-fields";
 export * from "./upload-policies";

@@ -18,13 +18,17 @@ const BOOK_STATUS_BADGE_VARIANT: Record<BookStatus, "success" | "secondary" | "w
 };
 
 /**
- * Only Overview + Overrides exist yet — Content/Front Matter/Back Matter/
- * References/Publishing/Preview/Editions are Phase C+ and deliberately
- * absent rather than linking to routes that don't exist.
+ * Content/Front Matter/Back Matter/References are Phase C. Publishing/
+ * Preview/Editions stay Phase D+ and deliberately absent rather than
+ * linking to routes that don't exist.
  */
 const BOOK_EDITOR_TABS: RouteTabItem<string>[] = [
   { id: "overview", label: "Overview", path: AppRoute.bookOverview, permission: AppPermission.BOOK.READ },
   { id: "overrides", label: "Overrides", path: AppRoute.bookOverrides, permission: AppPermission.BOOK.READ },
+  { id: "content", label: "Content", path: AppRoute.bookContent, permission: AppPermission.BOOK.READ },
+  { id: "front-matter", label: "Front Matter", path: AppRoute.bookFrontMatter, permission: AppPermission.BOOK.READ },
+  { id: "back-matter", label: "Back Matter", path: AppRoute.bookBackMatter, permission: AppPermission.BOOK.READ },
+  { id: "references", label: "References", path: AppRoute.bookReferences, permission: AppPermission.BOOK.READ },
 ];
 
 export default function BookEditorLayout({ children, params }: { children: ReactNode; params: { id: string } }) {
