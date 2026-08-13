@@ -30,6 +30,7 @@ const BOOK_EDITOR_TABS: RouteTabItem<string>[] = [
   { id: "back-matter", label: "Back Matter", path: AppRoute.bookBackMatter, permission: AppPermission.BOOK.READ },
   { id: "references", label: "References", path: AppRoute.bookReferences, permission: AppPermission.BOOK.READ },
   { id: "preview", label: "Preview", path: AppRoute.bookPreview, permission: AppPermission.BOOK.READ },
+  { id: "editions", label: "Editions", path: AppRoute.bookEditions, permission: AppPermission.BOOK_EDITION.READ },
 ];
 
 export default function BookEditorLayout({ children, params }: { children: ReactNode; params: { id: string } }) {
