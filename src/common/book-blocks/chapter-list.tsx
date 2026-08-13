@@ -15,6 +15,7 @@ import type { Book } from "src/common/interfaces/book.interface";
 import { useDebouncedAutosave } from "src/common/books/use-debounced-autosave";
 import { SortableList } from "src/common/books/sortable-list";
 import { BookBlockList } from "./book-block-list";
+import { ChapterSettingsForm } from "./chapter-settings-form";
 
 export interface ChapterListProps {
   bookId: string;
@@ -168,8 +169,11 @@ function ChapterRow({
         </CustomButton>
       </div>
       {expanded && chapter ? (
-        <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-          <BookBlockList bookId={bookId} book={book} container={{ kind: "chapter", chapterId }} blocks={chapter.blocks} enqueue={enqueue} />
+        <div className="flex flex-col gap-3">
+          <ChapterSettingsForm bookId={bookId} chapter={chapter} enqueue={enqueue} />
+          <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
+            <BookBlockList bookId={bookId} book={book} container={{ kind: "chapter", chapterId }} blocks={chapter.blocks} enqueue={enqueue} />
+          </div>
         </div>
       ) : null}
     </div>
