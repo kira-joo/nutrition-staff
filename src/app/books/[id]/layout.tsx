@@ -18,9 +18,9 @@ const BOOK_STATUS_BADGE_VARIANT: Record<BookStatus, "success" | "secondary" | "w
 };
 
 /**
- * Content/Front Matter/Back Matter/References are Phase C. Publishing/
- * Preview/Editions stay Phase D+ and deliberately absent rather than
- * linking to routes that don't exist.
+ * Content/Front Matter/Back Matter/References are Phase C; Preview is
+ * Phase D. Publishing/Editions stay Phase E+ and deliberately absent
+ * rather than linking to routes that don't exist.
  */
 const BOOK_EDITOR_TABS: RouteTabItem<string>[] = [
   { id: "overview", label: "Overview", path: AppRoute.bookOverview, permission: AppPermission.BOOK.READ },
@@ -29,6 +29,7 @@ const BOOK_EDITOR_TABS: RouteTabItem<string>[] = [
   { id: "front-matter", label: "Front Matter", path: AppRoute.bookFrontMatter, permission: AppPermission.BOOK.READ },
   { id: "back-matter", label: "Back Matter", path: AppRoute.bookBackMatter, permission: AppPermission.BOOK.READ },
   { id: "references", label: "References", path: AppRoute.bookReferences, permission: AppPermission.BOOK.READ },
+  { id: "preview", label: "Preview", path: AppRoute.bookPreview, permission: AppPermission.BOOK.READ },
 ];
 
 export default function BookEditorLayout({ children, params }: { children: ReactNode; params: { id: string } }) {

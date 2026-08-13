@@ -7,7 +7,7 @@ import type { RichTextDoc, RichTextMark, RichTextNode } from "./rich-text-doc.in
  * content on output; only `href`s already restricted to safe protocols by
  * `assert-valid-rich-text-doc.ts` are ever emitted as an attribute.
  */
-function escapeHtml(text: string): string {
+export function escapeHtml(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
