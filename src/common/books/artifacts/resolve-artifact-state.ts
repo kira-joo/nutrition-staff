@@ -1,4 +1,4 @@
-import { BookArtifactStatus } from "./book-artifact.schema";
+import { BookArtifactStatus } from "src/common/enums";
 
 export type ArtifactUiState = "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED" | "OUTDATED";
 
@@ -14,10 +14,11 @@ export interface ArtifactStateInput {
 /**
  * Derives the 5 UI-facing states from the 3 persisted ones — `NOT_GENERATED`
  * (no row) and `OUTDATED` (a `READY` row whose `templateVersion` no longer
- * matches the live template) are never written to the database, only
- * computed at read time. No generation route exists yet (Phase F), so this
- * function is exercised today only by "no row → NOT_GENERATED"; the other
- * branches are foundation for when one does.
+ * matches the edition's own frozen `templateVersion`) are never written to
+ * the database, only computed at read time. Lives in `src/common` (not
+ * `src/server`) so both the server (the generation route) and the staff
+ * Editions UI derive the exact same state from the exact same row —
+ * mirroring `resolveBookIdentity`'s reasoning.
  */
 export function resolveArtifactState(row: ArtifactStateInput | null, currentTemplateVersion: string, now: Date = new Date()): ArtifactUiState {
   if (!row) return "NOT_GENERATED";

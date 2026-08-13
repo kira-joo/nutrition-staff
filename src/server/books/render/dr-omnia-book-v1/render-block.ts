@@ -2,7 +2,8 @@ import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import { BookBlockType } from "src/common/enums";
 import type { BookBlock } from "src/common/interfaces/book-block.interface";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
-import { escapeHtml, renderRichTextToHtml, richTextToPlainText } from "src/common/books/rich-text/render-rich-text";
+import { escapeHtml, renderRichTextToHtml, richTextToParagraphRuns } from "src/common/books/rich-text/render-rich-text";
+import { generateQrSvg } from "../qr/generate-qr-svg";
 import type { StreamFragment } from "../page-model.interface";
 
 /**
@@ -11,16 +12,13 @@ import type { StreamFragment } from "../page-model.interface";
  * unrelated to the staff editor's own block previews, which exist only
  * to help the doctor recognize a block while editing.
  *
- * Known limitation, stated plainly rather than hidden: if a PARAGRAPH
- * block's content is long enough to be split across a page boundary,
- * the paginator rebuilds the split continuation from plain text (see
- * `paginate-book.browser.ts`'s `splitParagraphToFit`), which does not
- * preserve inline bold/highlight/link/citation marks in that specific
- * continuation fragment. A paragraph that fits entirely on one page —
- * the common case for a single content block — keeps its full
- * formatting untouched.
+ * A PARAGRAPH block also carries `richTextParagraphs` (see
+ * `richTextToParagraphRuns`) alongside its pre-rendered `html` — the
+ * paginator splits from that mark-preserving structure, never from
+ * flattened plain text, so a continuation that crosses a page boundary
+ * keeps its bold/italic/highlight/link/citation marks intact.
  */
-export function renderBlockToFragment(block: BookBlock, references: BookReference[]): StreamFragment {
+export async function renderBlockToFragment(block: BookBlock, references: BookReference[]): Promise<StreamFragment> {
   const base = {
     id: block.id,
     chapterId: null,
@@ -40,7 +38,7 @@ export function renderBlockToFragment(block: BookBlock, references: BookReferenc
         html: renderRichTextToHtml(block.richText),
         atomic: false,
         splittable: "paragraph",
-        plainText: richTextToPlainText(block.richText),
+        richTextParagraphs: richTextToParagraphRuns(block.richText),
       };
     case BookBlockType.IMAGE:
       return {
@@ -125,14 +123,16 @@ export function renderBlockToFragment(block: BookBlock, references: BookReferenc
       return { ...base, kind: "content", html: `<hr class="book-divider" />`, atomic: true, splittable: false };
     case BookBlockType.PAGE_BREAK:
       return { ...base, kind: "pageBreakMarker", html: "", atomic: true, splittable: false };
-    case BookBlockType.QR_LINK:
+    case BookBlockType.QR_LINK: {
+      const qrSvg = await generateQrSvg(block.destination);
       return {
         ...base,
         kind: "content",
-        html: `<div class="book-qr-link">${renderQrPlaceholder(block.destination)}${block.label ? `<div class="book-qr-label">${escapeHtml(block.label)}</div>` : ""}</div>`,
+        html: `<div class="book-qr-link">${qrSvg}${block.label ? `<div class="book-qr-label">${escapeHtml(block.label)}</div>` : ""}</div>`,
         atomic: true,
         splittable: false,
       };
+    }
     case BookBlockType.RECIPE_REF:
       return {
         ...base,
@@ -173,14 +173,4 @@ function renderImageBlock(image: ImageAsset | null | undefined, caption: string 
   const captionHtml = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : "";
   const dimensionAttrs = image.width && image.height ? ` width="${image.width}" height="${image.height}"` : "";
   return `<figure class="book-image"><img src="${escapeHtml(image.secureUrl)}" alt="${caption ? escapeHtml(caption) : ""}"${dimensionAttrs} />${captionHtml}</figure>`;
-}
-
-/**
- * A visual QR placeholder, not a real generated code — server-side QR
- * generation is real PDF/download infrastructure (Phase F territory,
- * explicitly out of scope here). Shows the destination as text so the
- * doctor can still verify it in the preview.
- */
-function renderQrPlaceholder(destination: string): string {
-  return `<div class="book-qr-placeholder" style="width:28mm;height:28mm;margin:0 auto;border:0.3mm dashed #999;display:flex;align-items:center;justify-content:center;font-size:7pt;color:#999;">QR</div><div dir="ltr" style="font-size:7pt;color:#999;word-break:break-all;">${escapeHtml(destination)}</div>`;
 }

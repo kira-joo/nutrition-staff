@@ -4,7 +4,20 @@
  * level for `Function.prototype.toString()` inlining to be faithful).
  */
 
+import type { RichTextMark } from "src/common/books/rich-text/rich-text-doc.interface";
+
 export type FragmentKind = "content" | "chapterOpener" | "singlePage" | "tocReservation" | "pageBreakMarker";
+
+/** One contiguous run of identically-marked text — the same granularity a ProseMirror "text" node already has. */
+export interface StreamFragmentRun {
+  text: string;
+  marks: RichTextMark[];
+}
+
+/** One `<p>` worth of runs. A PARAGRAPH block's `richText` doc can hold more than one of these (the user can press Enter inside one block); `richTextParagraphs` preserves that structure so a mid-block page split never collapses multiple paragraphs into one or drops the marks on either side of the cut. */
+export interface StreamFragmentParagraph {
+  runs: StreamFragmentRun[];
+}
 
 export interface StreamFragment {
   id: string;
@@ -16,7 +29,8 @@ export interface StreamFragment {
   forceNewPage: boolean;
   splittable: "paragraph" | "list" | "table" | false;
   degrade?: "scaleImage";
-  plainText?: string;
+  /** Only set when `splittable === "paragraph"` — the mark-preserving source the paginator splits from. See `richTextToParagraphRuns`. */
+  richTextParagraphs?: StreamFragmentParagraph[];
   tableHeaderHtml?: string;
   tableRowsHtml?: string[];
   listItemsHtml?: string[];

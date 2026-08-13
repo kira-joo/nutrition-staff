@@ -83,3 +83,25 @@ export function richTextToPlainText(doc: RichTextDoc | null | undefined): string
   }
   return doc.content.map(collect).join("\n");
 }
+
+/**
+ * Projects a doc into `{runs: {text, marks}[]}[]` — one entry per
+ * top-level "paragraph" node, each holding its "text" nodes verbatim
+ * (text + marks, no rendering). This is the mark-preserving counterpart
+ * to `richTextToPlainText`: the paginator (`paginate-book.browser.ts`)
+ * splits from this shape instead of flattened plain text specifically so
+ * a paragraph continuation that crosses a page boundary keeps its bold/
+ * italic/highlight/link/citation marks instead of losing them.
+ */
+export function richTextToParagraphRuns(doc: RichTextDoc | null | undefined): { runs: { text: string; marks: RichTextMark[] }[] }[] {
+  if (!doc || !Array.isArray(doc.content)) return [];
+  return doc.content.reduce<{ runs: { text: string; marks: RichTextMark[] }[] }[]>((paragraphs, node) => {
+    if (node.type !== "paragraph") return paragraphs;
+    const runs = (node.content ?? []).reduce<{ text: string; marks: RichTextMark[] }[]>((acc, child) => {
+      if (child.type === "text" && (child.text ?? "").length > 0) acc.push({ text: child.text ?? "", marks: child.marks ?? [] });
+      return acc;
+    }, []);
+    paragraphs.push({ runs });
+    return paragraphs;
+  }, []);
+}

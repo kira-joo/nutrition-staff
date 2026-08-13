@@ -1,3 +1,4 @@
+import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import type { BookBackMatter, BookFrontMatter, BookReference, Chapter } from "./book-chapter.interface";
 import type { ResolvedBookIdentity } from "../books/resolve-book-identity";
 
@@ -25,6 +26,10 @@ export interface BookEdition {
   titleAtPublish: string;
   notes?: string;
   content: {
+    title: string;
+    subtitle?: string;
+    coverImage?: ImageAsset | null;
+    backCoverImage?: ImageAsset | null;
     frontMatter: BookFrontMatter;
     chapters: Chapter[];
     backMatter: BookBackMatter;

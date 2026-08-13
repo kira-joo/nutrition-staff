@@ -2,6 +2,7 @@ import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identit
 import { escapeHtml } from "src/common/books/rich-text/render-rich-text";
 import type { Chapter, BookReference } from "src/common/interfaces/book-chapter.interface";
 import type { Book } from "src/common/interfaces/book.interface";
+import { generateQrSvg } from "../qr/generate-qr-svg";
 import type { StreamFragment } from "../page-model.interface";
 
 /** Cover — no folio/running head, fixed identity (logo/brand) + variable data (title/subtitle/cover image). */
@@ -92,7 +93,7 @@ export function renderReferencesPage(references: BookReference[]): StreamFragmen
   ];
 }
 
-export function renderBackCoverPage(book: Pick<Book, "backCoverImage">, identity: ResolvedBookIdentity): StreamFragment {
+export async function renderBackCoverPage(book: Pick<Book, "backCoverImage">, identity: ResolvedBookIdentity): Promise<StreamFragment> {
   // `dir="ltr"` on phone/whatsapp/email/website only — never on `address`,
   // which is free-text and plausibly itself Arabic. Without this, a
   // leading "+" (a bidi-neutral character) on a phone number gets
@@ -100,6 +101,13 @@ export function renderBackCoverPage(book: Pick<Book, "backCoverImage">, identity
   // bidi algorithm — a real rendering defect caught in Phase D
   // verification, not a hypothetical one.
   const ltrContactLines = [identity.contact.phone, identity.contact.whatsapp, identity.contact.email].filter(Boolean);
+  // The book/template-level QR — encodes `identity.qrDestination`, which
+  // is always the RESOLVED value the caller passed in (live for staff
+  // preview, frozen `resolvedSettings.qrDestination` for a published
+  // Edition's PDF) — this function never re-resolves BookSettings
+  // itself, so a published Edition's QR can never silently change
+  // because BookSettings changed afterward.
+  const qrSvg = identity.qrDestination ? await generateQrSvg(identity.qrDestination) : null;
   const html = `
     <div class="book-back-cover">
       ${identity.backCoverAudienceText ? `<div class="book-back-cover-audience">${escapeHtml(identity.backCoverAudienceText)}</div>` : ""}
@@ -109,6 +117,7 @@ export function renderBackCoverPage(book: Pick<Book, "backCoverImage">, identity
         ${ltrContactLines.map((line) => `<div dir="ltr">${escapeHtml(line as string)}</div>`).join("")}
         ${identity.contact.address ? `<div>${escapeHtml(identity.contact.address)}</div>` : ""}
       </div>
+      ${qrSvg ? `<div class="book-back-cover-qr">${qrSvg}</div>` : ""}
       ${identity.bookLogo ? `<img class="book-back-cover-logo" src="${escapeHtml(identity.bookLogo.secureUrl)}" alt="" />` : ""}
     </div>`;
   return { id: "back-cover", kind: "singlePage", pageKind: "backCover", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: true, numbered: false };

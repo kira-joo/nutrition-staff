@@ -9,9 +9,15 @@ import type { BookSchema } from "src/server/books/book.schema";
  * numbers, booleans, ImageAsset objects, ProseMirror JSON) with no
  * Date/ObjectId/class instances nested inside.
  */
-export function freezeBookContent(book: Pick<BookSchema, "frontMatter" | "chapters" | "backMatter" | "references">): FrozenBookContent {
+export function freezeBookContent(
+  book: Pick<BookSchema, "title" | "subtitle" | "coverImage" | "backCoverImage" | "frontMatter" | "chapters" | "backMatter" | "references">
+): FrozenBookContent {
   return JSON.parse(
     JSON.stringify({
+      title: book.title,
+      subtitle: book.subtitle,
+      coverImage: book.coverImage,
+      backCoverImage: book.backCoverImage,
       frontMatter: book.frontMatter,
       chapters: book.chapters,
       backMatter: book.backMatter,

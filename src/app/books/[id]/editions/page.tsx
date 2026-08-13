@@ -1,13 +1,15 @@
 "use client";
 
-import { useRequesterMutation, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
+import { downloadRequester, useRequesterMutation, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, CustomButton, Modal, QueryState, toast } from "@kira-joo/frontend-toolkit-tailwind";
 import { useState } from "react";
 import { getBookByIdEndpoint } from "../../../../../api/book.endpoints";
 import { getBookEditionsEndpoint, getBookPublishCheckEndpoint, publishBookEditionEndpoint, type PublishValidationIssue } from "../../../../../api/book-edition.endpoints";
+import { downloadBookArtifactPdfEndpoint, generateBookArtifactEndpoint, getBookArtifactEndpoint, type BookArtifact } from "../../../../../api/book-artifact.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookEdition } from "src/common/interfaces/book-edition.interface";
 import { BookStatus } from "src/common/enums";
+import { resolveArtifactState, type ArtifactUiState } from "src/common/books/artifacts/resolve-artifact-state";
 
 const PUBLISHABLE_STATUSES: BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW];
 
@@ -196,9 +198,96 @@ function EditionHistory({ bookId, editions, loading }: { bookId: string; edition
               </p>
             ) : null}
             <p className="text-xs text-slate-400">This is a read-only historical snapshot — it can never be edited.</p>
+
+            <ArtifactPanel bookId={bookId} edition={viewing} />
           </div>
         </Modal>
       ) : null}
+    </div>
+  );
+}
+
+const ARTIFACT_STATE_BADGE_VARIANT: Record<ArtifactUiState, "success" | "secondary" | "warning" | "destructive"> = {
+  NOT_GENERATED: "secondary",
+  GENERATING: "warning",
+  READY: "success",
+  FAILED: "destructive",
+  OUTDATED: "warning",
+};
+
+const ARTIFACT_STATE_LABEL: Record<ArtifactUiState, string> = {
+  NOT_GENERATED: "Not generated",
+  GENERATING: "Generating…",
+  READY: "Ready",
+  FAILED: "Failed",
+  OUTDATED: "Outdated",
+};
+
+/**
+ * PDF generation runs SYNCHRONOUSLY server-side (see the Phase F
+ * report's S8/Vercel note) — `generateMutation` resolving IS the final
+ * READY/FAILED outcome, not a "started" acknowledgement, so no polling
+ * is needed here.
+ */
+function ArtifactPanel({ bookId, edition }: { bookId: string; edition: BookEdition }) {
+  const artifactQuery = useRequesterQuery({ endpoint: getBookArtifactEndpoint, options: { params: { id: bookId, editionId: edition._id } } });
+  const generateMutation = useRequesterMutation({
+    endpoint: generateBookArtifactEndpoint,
+    onSuccess: () => {
+      toast.success("PDF generated");
+      artifactQuery.refetch();
+    },
+    onError: (error: { message: string }) => {
+      toast.error(error.message);
+      artifactQuery.refetch();
+    },
+  });
+
+  const artifact: BookArtifact | null | undefined = artifactQuery.data;
+  const state = resolveArtifactState(artifact ?? null, edition.templateVersion);
+  const canDownload = state === "READY" || state === "OUTDATED";
+
+  async function handleDownload(): Promise<void> {
+    try {
+      await downloadRequester({
+        endpoint: downloadBookArtifactPdfEndpoint,
+        options: { params: { id: bookId, editionId: edition._id } },
+        fileName: `${edition.titleAtPublish || "book"}.pdf`,
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to download the PDF.");
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2 rounded-md border border-slate-200 p-3">
+      <div className="flex items-center justify-between">
+        <span className="font-medium">PDF</span>
+        <Badge variant={ARTIFACT_STATE_BADGE_VARIANT[state]}>{ARTIFACT_STATE_LABEL[state]}</Badge>
+      </div>
+
+      {artifact?.pageCount ? (
+        <p className="text-xs text-slate-500">
+          {artifact.pageCount} pages · {artifact.fileSize ? `${Math.round(artifact.fileSize / 1024)}KB` : "—"}
+        </p>
+      ) : null}
+
+      {state === "FAILED" && artifact?.errorMessage ? <p className="text-xs text-red-600">Generation failed — you can try again.</p> : null}
+
+      <div className="flex gap-2">
+        <CustomButton
+          type="button"
+          size="sm"
+          loading={generateMutation.loading}
+          disabled={state === "GENERATING"}
+          onClick={() => generateMutation.mutate({ params: { id: bookId, editionId: edition._id } })}
+        >
+          {state === "NOT_GENERATED" ? "Generate PDF" : "Regenerate PDF"}
+        </CustomButton>
+        <CustomButton type="button" size="sm" variant="secondary" disabled={!canDownload} onClick={handleDownload}>
+          Download
+        </CustomButton>
+      </div>
     </div>
   );
 }

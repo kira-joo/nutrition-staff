@@ -39,7 +39,7 @@ export interface BuildBookHtmlOptions {
  * feed to Chromium — one builder, one paginator, per the approved
  * architecture. No PDF is generated here; Phase D stops at this HTML.
  */
-export function buildBookHtml({ book, identity, chapterId }: BuildBookHtmlOptions): string {
+export async function buildBookHtml({ book, identity, chapterId }: BuildBookHtmlOptions): Promise<string> {
   const geometry = resolveGeometry(identity.print.pageSize, identity.print.marginPreset, identity.print.gutterMm);
   const css = buildTemplateCss(geometry);
 
@@ -54,23 +54,23 @@ export function buildBookHtml({ book, identity, chapterId }: BuildBookHtmlOption
     const aboutDoctor = renderAboutDoctorPage(identity);
     if (aboutDoctor) stream.push(aboutDoctor);
 
-    for (const block of book.frontMatter.aboutBook.blocks) stream.push(renderBlockToFragment(block, book.references));
+    for (const block of book.frontMatter.aboutBook.blocks) stream.push(await renderBlockToFragment(block, book.references));
     stream.push(renderTocReservationFragment());
-    for (const block of book.frontMatter.introduction.blocks) stream.push(renderBlockToFragment(block, book.references));
+    for (const block of book.frontMatter.introduction.blocks) stream.push(await renderBlockToFragment(block, book.references));
   }
 
   for (const chapter of chapters) {
     stream.push(renderChapterOpenerFragment(chapter));
     for (const block of chapter.blocks) {
-      const fragment = renderBlockToFragment(block, book.references);
+      const fragment = await renderBlockToFragment(block, book.references);
       stream.push({ ...fragment, chapterId: chapter.id });
     }
   }
 
   if (isFullBook) {
-    for (const block of book.backMatter.conclusion.blocks) stream.push(renderBlockToFragment(block, book.references));
+    for (const block of book.backMatter.conclusion.blocks) stream.push(await renderBlockToFragment(block, book.references));
     for (const fragment of renderReferencesPage(book.references)) stream.push(fragment);
-    stream.push(renderBackCoverPage(book, identity));
+    stream.push(await renderBackCoverPage(book, identity));
   }
 
   const tocChapters = isFullBook
@@ -102,6 +102,14 @@ export function buildBookHtml({ book, identity, chapterId }: BuildBookHtmlOption
   var GEOMETRY_MM = ${JSON.stringify({ widthMm: geometry.widthMm, heightMm: geometry.heightMm, contentWidthMm: geometry.contentWidthMm, contentHeightMm: geometry.contentHeightMm })};
   var INPUT_BASE = ${JSON.stringify(paginationInputWithoutGeometry)};
 
+  // Defensive no-op: some transpilers (e.g. esbuild, used by this repo's
+  // own tsx-run QA scripts — never Next's own SWC/webpack build) inject
+  // calls to a "__name" helper into a function's compiled body, which
+  // Function.prototype.toString() then captures verbatim. Nothing here
+  // reads a function's .name, so a no-op stub keeps this inlined script
+  // correct regardless of which compiler produced the running process's
+  // copy of paginateAndRenderBook.
+  function __name(fn) { return fn; }
   var paginateAndRenderBook = ${paginatorSource};
 
   function escapeHtmlInline(text) {

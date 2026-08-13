@@ -20,7 +20,7 @@
  * render — one builder, one algorithm, no possible divergence.
  */
 
-import type { PaginationInput, PaginationResult } from "./page-model.interface";
+import type { PaginationInput, PaginationResult, StreamFragmentParagraph, StreamFragmentRun } from "./page-model.interface";
 
 export async function paginateAndRenderBook(input: PaginationInput): Promise<PaginationResult> {
   const warnings: { code: string; message: string }[] = [];
@@ -51,24 +51,170 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     return height;
   }
 
-  // ---- 3. Word/line-boundary-correct paragraph splitting ----
-  // Binary-searches how much of a text-bearing HTML fragment fits in
-  // `remainingHeightPx`, snapping the cut to a whitespace boundary and
-  // then backwards to a full rendered LINE boundary (never mid-word,
-  // never mid-line, which would be wrong for Arabic ligatures/diacritic
-  // clusters even when the raw character index looks "safe").
-  function splitParagraphToFit(paragraphHtml: string, plainText: string, remainingHeightPx: number): { fitHtml: string; fitText: string; remainderText: string } | null {
-    const words = plainText.split(/(\s+)/).filter((piece) => piece.length > 0);
-    if (words.length <= 1) return null;
+  // ---- 3. Word/line-boundary-correct, MARK-PRESERVING paragraph splitting ----
+  // Same binary-search-to-a-line-boundary algorithm as before, but
+  // operating on `richTextParagraphs` (runs of {text, marks}) instead of
+  // flattened plain text, so a continuation fragment keeps its bold/
+  // italic/highlight/link/citation marks and its original multi-paragraph
+  // structure (a PARAGRAPH block's rich text doc can hold more than one
+  // top-level "paragraph" node — pressing Enter inside the editor — which
+  // the old plain-text version silently collapsed into one <p>).
+  interface FlatPiece {
+    text: string;
+    marks: StreamFragmentRun["marks"];
+    paragraphIndex: number;
+  }
+
+  function escapeHtmlLocal(text: string): string {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  const SAFE_HREF_PATTERN_LOCAL = /^(https?:\/\/|\/)/;
+
+  // Mirrors `render-rich-text.ts`'s mark→tag mapping exactly. Duplicated
+  // rather than imported: this whole file is inlined via
+  // `Function.prototype.toString()` into the generated document's own
+  // <script> tag and must stay import-free at the value level (see the
+  // file header). Keep both in sync by hand if a mark type is ever added.
+  function renderMarksOpenLocal(marks: FlatPiece["marks"]): string {
+    return marks
+      .map((mark) => {
+        switch (mark.type) {
+          case "bold":
+            return "<strong>";
+          case "italic":
+            return "<em>";
+          case "highlight":
+            return '<mark class="book-highlight">';
+          case "link": {
+            const href = mark.attrs?.href && SAFE_HREF_PATTERN_LOCAL.test(mark.attrs.href) ? mark.attrs.href : "";
+            return href ? `<a href="${escapeHtmlLocal(href)}">` : "<span>";
+          }
+          case "citation":
+            return '<sup class="book-citation">';
+          default:
+            return "";
+        }
+      })
+      .join("");
+  }
+
+  function renderMarksCloseLocal(marks: FlatPiece["marks"]): string {
+    return marks
+      .slice()
+      .reverse()
+      .map((mark) => {
+        switch (mark.type) {
+          case "bold":
+            return "</strong>";
+          case "italic":
+            return "</em>";
+          case "highlight":
+            return "</mark>";
+          case "link":
+            return mark.attrs?.href && SAFE_HREF_PATTERN_LOCAL.test(mark.attrs.href) ? "</a>" : "</span>";
+          case "citation":
+            return "</sup>";
+          default:
+            return "";
+        }
+      })
+      .join("");
+  }
+
+  function marksEqual(a: FlatPiece["marks"], b: FlatPiece["marks"]): boolean {
+    if (a.length !== b.length) return false;
+    return a.every((mark, index) => mark.type === b[index].type && JSON.stringify(mark.attrs ?? null) === JSON.stringify(b[index].attrs ?? null));
+  }
+
+  function flattenParagraphsToPieces(paragraphs: StreamFragmentParagraph[]): FlatPiece[] {
+    const pieces: FlatPiece[] = [];
+    paragraphs.forEach((paragraph, paragraphIndex) => {
+      paragraph.runs.forEach((run) => {
+        run.text
+          .split(/(\s+)/)
+          .filter((part) => part.length > 0)
+          .forEach((part) => pieces.push({ text: part, marks: run.marks, paragraphIndex }));
+      });
+    });
+    return pieces;
+  }
+
+  /** Groups consecutive pieces sharing the same `paragraphIndex` — does NOT reintroduce an interior paragraph that contributed zero pieces (a fully empty `<p></p>`); an acceptable, pre-existing-severity edge case, not what this fix targets. */
+  function groupByParagraphIndex(pieces: FlatPiece[]): FlatPiece[][] {
+    const groups: FlatPiece[][] = [];
+    let current: FlatPiece[] = [];
+    let currentIndex: number | null = null;
+    pieces.forEach((piece) => {
+      if (piece.paragraphIndex !== currentIndex) {
+        if (current.length > 0) groups.push(current);
+        current = [];
+        currentIndex = piece.paragraphIndex;
+      }
+      current.push(piece);
+    });
+    if (current.length > 0) groups.push(current);
+    return groups;
+  }
+
+  /** Renders a run of pieces, merging adjacent pieces with identical marks into one tag pair — tidier output only, never affects layout/measurement. */
+  function renderPiecesAsRuns(pieces: FlatPiece[]): string {
+    let html = "";
+    let index = 0;
+    while (index < pieces.length) {
+      let text = pieces[index].text;
+      const marks = pieces[index].marks;
+      let next = index + 1;
+      while (next < pieces.length && marksEqual(pieces[next].marks, marks)) {
+        text += pieces[next].text;
+        next += 1;
+      }
+      html += renderMarksOpenLocal(marks) + escapeHtmlLocal(text) + renderMarksCloseLocal(marks);
+      index = next;
+    }
+    return html;
+  }
+
+  function renderParagraphPrefixHtml(pieces: FlatPiece[], cutIndex: number): string {
+    return groupByParagraphIndex(pieces.slice(0, cutIndex))
+      .map((group) => `<p>${renderPiecesAsRuns(group)}</p>`)
+      .join("");
+  }
+
+  function mergeAdjacentMarksToRuns(pieces: FlatPiece[]): StreamFragmentRun[] {
+    const runs: StreamFragmentRun[] = [];
+    pieces.forEach((piece) => {
+      const last = runs[runs.length - 1];
+      if (last && marksEqual(last.marks, piece.marks)) {
+        last.text += piece.text;
+      } else {
+        runs.push({ text: piece.text, marks: piece.marks });
+      }
+    });
+    return runs;
+  }
+
+  function piecesToParagraphs(pieces: FlatPiece[]): StreamFragmentParagraph[] {
+    return groupByParagraphIndex(pieces).map((group) => ({ runs: mergeAdjacentMarksToRuns(group) }));
+  }
+
+  /** Full (uncut) render of paragraphs straight from runs — no piece-level tokenizing needed since nothing is being measured/cut here. Used for a continuation fragment's `html` field. */
+  function renderParagraphsHtml(paragraphs: StreamFragmentParagraph[]): string {
+    return paragraphs
+      .map((paragraph) => `<p>${paragraph.runs.map((run) => renderMarksOpenLocal(run.marks) + escapeHtmlLocal(run.text) + renderMarksCloseLocal(run.marks)).join("")}</p>`)
+      .join("");
+  }
+
+  function splitRichParagraphsToFit(paragraphs: StreamFragmentParagraph[], remainingHeightPx: number): { fitHtml: string; remainderParagraphs: StreamFragmentParagraph[] } | null {
+    const pieces = flattenParagraphsToPieces(paragraphs);
+    if (pieces.length <= 1) return null;
 
     let low = 0;
-    let high = words.length;
+    let high = pieces.length;
     let bestCount = 0;
     while (low <= high) {
       const mid = Math.floor((low + high) / 2);
-      const candidateText = words.slice(0, mid).join("");
-      const candidateHtml = wrapAsParagraph(candidateText);
-      const height = measureHtmlHeight(candidateHtml);
+      const height = measureHtmlHeight(renderParagraphPrefixHtml(pieces, mid));
       if (height <= remainingHeightPx) {
         bestCount = mid;
         low = mid + 1;
@@ -78,44 +224,53 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     }
     if (bestCount === 0) return null;
 
-    // Snap backwards to a real rendered line boundary via Range.getClientRects()
-    // — a raw word-count cut can still land mid-line, which is not itself wrong
-    // but makes the orphan/widow check below operate on a false line count.
-    sandbox.innerHTML = wrapAsParagraph(words.slice(0, bestCount).join(""));
-    const paragraphEl = sandbox.firstElementChild as HTMLElement;
-    const textNode = paragraphEl?.firstChild;
-    let lineCount = 1;
-    if (textNode) {
-      const range = document.createRange();
-      range.selectNodeContents(textNode);
-      lineCount = new Set(Array.from(range.getClientRects()).map((rect) => Math.round(rect.top))).size || 1;
+    // A cut landing exactly ON a paragraph boundary (not inside one) is
+    // always fine — same as a break between any two blocks — so the
+    // line-boundary snap and widow policy below only apply when the cut
+    // falls strictly inside one paragraph.
+    const splitsMidParagraph = bestCount < pieces.length && pieces[bestCount - 1].paragraphIndex === pieces[bestCount].paragraphIndex;
+
+    if (splitsMidParagraph) {
+      // Snap backwards to a real rendered line boundary via
+      // Range.getClientRects() over the WHOLE last <p> (not just its
+      // first child — marks mean the paragraph can have several child
+      // nodes now) — a raw piece-count cut can still land mid-line.
+      sandbox.innerHTML = renderParagraphPrefixHtml(pieces, bestCount);
+      const paragraphEls = sandbox.querySelectorAll("p");
+      const lastParagraphEl = paragraphEls[paragraphEls.length - 1] as HTMLElement | undefined;
+      let lineCount = 1;
+      if (lastParagraphEl) {
+        const range = document.createRange();
+        range.selectNodeContents(lastParagraphEl);
+        lineCount = new Set(Array.from(range.getClientRects()).map((rect) => Math.round(rect.top))).size || 1;
+      }
+      sandbox.innerHTML = "";
+
+      // Orphan policy: fewer than 2 lines placed of a paragraph that
+      // continues retracts the whole thing to the next page instead.
+      if (lineCount < 2) return null;
+
+      // Widow policy: fewer than ~3 words left as a remainder WITHIN THE
+      // SAME paragraph reads as a bad widow — pull a little more back
+      // rather than leave a tiny orphan line. A full next paragraph
+      // sitting in the remainder is never a "widow" of this one.
+      const splitParagraphIndex = pieces[bestCount - 1].paragraphIndex;
+      let scanIndex = bestCount;
+      let remainderWordCount = 0;
+      while (scanIndex < pieces.length && pieces[scanIndex].paragraphIndex === splitParagraphIndex) {
+        if (pieces[scanIndex].text.trim().length > 0) remainderWordCount += 1;
+        scanIndex += 1;
+      }
+      if (remainderWordCount > 0 && remainderWordCount < 3 && bestCount > 3) {
+        bestCount = Math.max(0, bestCount - 6);
+        if (bestCount === 0) return null;
+      }
     }
-    sandbox.innerHTML = "";
 
-    // Orphan/widow policy: fewer than 2 lines left behind retracts the
-    // whole paragraph to the next page instead (handled by the caller
-    // returning null-like "doesn't fit at all" when bestCount stays 0);
-    // fewer than 2 lines carried forward pulls one more line's worth of
-    // words back into the first part.
-    if (lineCount < 2 && bestCount < words.length) {
-      return null;
-    }
+    const remainderPieces = pieces.slice(bestCount);
+    if (remainderPieces.length === 0) return null;
 
-    const fitText = words.slice(0, bestCount).join("");
-    const remainderText = words.slice(bestCount).join("");
-    const remainderWordCount = remainderText.split(/\s+/).filter(Boolean).length;
-    if (remainderWordCount > 0 && remainderWordCount < 3 && bestCount > 3) {
-      // Fewer than ~3 words left as a remainder reads as a bad widow —
-      // pull a little more back rather than leave a tiny orphan line.
-      const pulledBack = words.slice(0, Math.max(0, bestCount - 6)).join("");
-      return { fitHtml: wrapAsParagraph(pulledBack), fitText: pulledBack, remainderText: plainText.slice(pulledBack.length) };
-    }
-
-    return { fitHtml: wrapAsParagraph(fitText), fitText, remainderText };
-  }
-
-  function wrapAsParagraph(text: string): string {
-    return `<p>${text}</p>`;
+    return { fitHtml: renderParagraphPrefixHtml(pieces, bestCount), remainderParagraphs: piecesToParagraphs(remainderPieces) };
   }
 
   // ---- 4. Table splitting with repeated headers ----
@@ -273,7 +428,7 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           usedHeight = measureHtmlHeight(currentPageHtml);
           continue;
         }
-        const split = splitParagraphToFit(html, fragment.plainText ?? "", remaining);
+        const split = splitRichParagraphsToFit(fragment.richTextParagraphs ?? [], remaining);
         if (!split) {
           closePage(true);
           openPage("content", currentChapterId);
@@ -282,7 +437,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         }
         currentPageHtml += split.fitHtml;
         usedHeight = measureHtmlHeight(currentPageHtml);
-        queue.unshift({ fragment: { ...fragment, html: wrapAsParagraph(split.remainderText), plainText: split.remainderText }, isContinuation: true });
+        queue.unshift({
+          fragment: { ...fragment, html: renderParagraphsHtml(split.remainderParagraphs), richTextParagraphs: split.remainderParagraphs },
+          isContinuation: true,
+        });
         continue;
       }
 

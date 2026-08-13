@@ -156,7 +156,7 @@ table.book-table th { background: ${BRAND_COLORS.calloutTip}; font-family: "${BO
 hr.book-divider { border: none; border-top: 0.3mm solid ${BRAND_COLORS.hairline}; margin: 5mm 0; }
 
 .book-qr-link { text-align: center; margin: 4mm 0; }
-.book-qr-link img { width: 28mm; height: 28mm; }
+.book-qr-link svg { width: 28mm; height: 28mm; display: block; margin: 0 auto; }
 .book-qr-link .book-qr-label { font-size: 9pt; color: ${BRAND_COLORS.muted}; margin-top: 1mm; }
 
 .book-recipe-ref { border: 0.3mm solid ${BRAND_COLORS.hairline}; border-radius: 2mm; padding: 3mm; margin: 3mm 0; }
@@ -214,6 +214,8 @@ hr.book-divider { border: none; border-top: 0.3mm solid ${BRAND_COLORS.hairline}
 .book-back-cover .book-back-cover-summary { font-size: 11pt; margin-bottom: 6mm; max-width: 90%; }
 .book-back-cover .book-back-cover-audience { font-size: 10pt; opacity: 0.9; margin-bottom: 6mm; }
 .book-back-cover .book-back-cover-contact { font-size: 9pt; opacity: 0.85; margin-top: auto; display: flex; flex-direction: column; gap: 1mm; }
+.book-back-cover .book-back-cover-qr { margin-top: 4mm; }
+.book-back-cover .book-back-cover-qr svg { width: 22mm; height: 22mm; display: block; margin: 0 auto; background: #fff; border-radius: 1mm; padding: 1mm; }
 .book-back-cover .book-back-cover-logo { width: 16mm; height: 16mm; border-radius: 50%; margin-top: 4mm; object-fit: cover; }
 
 /* Pagination-hint markers — never rendered visibly, kept only so the staff editor's PAGE_BREAK block never leaves stray content. */

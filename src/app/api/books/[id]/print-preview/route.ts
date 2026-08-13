@@ -58,7 +58,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
     const identity = resolveBookIdentity(settings as unknown as Parameters<typeof resolveBookIdentity>[0], book);
 
     const template = getBookTemplate(identity.templateVersion);
-    const html = template.buildHtml({ book, identity, chapterId: query.chapterId });
+    const html = await template.buildHtml({ book, identity, chapterId: query.chapterId });
 
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
   } catch (error) {

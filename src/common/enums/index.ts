@@ -24,3 +24,5 @@ export * from "./book-override-key.enum";
 export * from "./book-page-size.enum";
 export * from "./book-margin-preset.enum";
 export * from "./book-block-type.enum";
+export * from "./book-artifact-type.enum";
+export * from "./book-artifact-status.enum";

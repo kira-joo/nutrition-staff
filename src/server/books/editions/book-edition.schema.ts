@@ -1,11 +1,24 @@
 import { createMongoModel, MongoField, MongoSchema } from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
+import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import type { BookBackMatter, BookFrontMatter, BookReference, Chapter } from "src/common/interfaces/book-chapter.interface";
 import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identity";
 
-/** The frozen content shape — deep-copied at publish time, never a live reference back to `Book`. */
+/**
+ * The frozen content shape — deep-copied at publish time, never a live
+ * reference back to `Book`. Includes everything the renderer's
+ * `BookContentForRender` input needs (title/subtitle/cover/back-cover
+ * images) so a PDF can be generated from `{content, resolvedSettings}`
+ * alone — `titleAtPublish`/`slugAtPublish` stay as separate top-level
+ * fields too (used by the edition list/detail UI without reaching into
+ * `content`), so `title` is deliberately captured in both places.
+ */
 export interface FrozenBookContent {
+  title: string;
+  subtitle?: string;
+  coverImage?: ImageAsset | null;
+  backCoverImage?: ImageAsset | null;
   frontMatter: BookFrontMatter;
   chapters: Chapter[];
   backMatter: BookBackMatter;
@@ -91,3 +104,18 @@ export class BookEditionSchema {
 }
 
 export const BookEditionModel = createMongoModel(EntityName.BOOK_EDITION, BookEditionSchema);
+
+// `content`/`resolvedSettings`/`recipeSnapshots` are all `Mixed` — plain
+// JS object trees, not typed sub-schemas. Mongoose's default `minimize`
+// behavior silently DROPS any empty-object (`{}`) key anywhere in a
+// document before persisting, which is exactly wrong for an Edition:
+// caught live when a book with no contact info ever set resolved to
+// `identity.contact = {}`, and a fresh re-fetch of the persisted
+// Edition came back with the `contact` key missing entirely, crashing
+// the PDF renderer's `identity.contact.phone` access. `@MongoSchema()`
+// has no `minimize` passthrough (no toolkit change possible), but
+// `schema.set()` is a normal, documented Mongoose API on the already-
+// compiled model — not a toolkit edit. Disabled schema-wide (not just
+// per-field) because "exact Edition snapshot" is a mandatory acceptance
+// criterion here, unlike most other schemas in this app.
+BookEditionModel.schema.set("minimize", false);
