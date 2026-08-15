@@ -21,6 +21,21 @@ export interface BookOverrides {
   print?: Partial<BookPrintSettings>;
 }
 
+/**
+ * `"generated"` (default): the reusable template renders the dynamic
+ * title/subtitle/doctor identity over the template's own artwork —
+ * `coverImage`/`backCoverImage` are ignored entirely in this mode, even
+ * if set. `"uploaded"`: the doctor's own finished A5 image (`coverImage`/
+ * `backCoverImage`) becomes the ENTIRE page, full-bleed — nothing else is
+ * rendered over it (no title, no frame, no doctor identity). Explicit
+ * rather than inferred from image presence, so switching back to
+ * "generated" needs no separate "clear the image" step: the uploaded
+ * asset stays stored either way, and flipping back to "uploaded" later
+ * restores it immediately without a re-upload. Front and back cover modes
+ * are fully independent of each other.
+ */
+export type BookCoverMode = "generated" | "uploaded";
+
 export interface Book {
   _id: string;
   title: string;
@@ -29,7 +44,9 @@ export interface Book {
   shortDescription?: string;
   category?: string;
   editionLabelTemplate?: string;
+  coverMode: BookCoverMode;
   coverImage?: ImageAsset | null;
+  backCoverMode: BookCoverMode;
   backCoverImage?: ImageAsset | null;
 
   status: BookStatus;
@@ -69,7 +86,9 @@ export type BookFormValues = Pick<
   | "shortDescription"
   | "category"
   | "editionLabelTemplate"
+  | "coverMode"
   | "coverImage"
+  | "backCoverMode"
   | "backCoverImage"
   | "visibility"
   | "allowFlipbook"

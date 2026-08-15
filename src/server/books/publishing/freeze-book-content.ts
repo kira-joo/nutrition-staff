@@ -10,13 +10,18 @@ import type { BookSchema } from "src/server/books/book.schema";
  * Date/ObjectId/class instances nested inside.
  */
 export function freezeBookContent(
-  book: Pick<BookSchema, "title" | "subtitle" | "coverImage" | "backCoverImage" | "frontMatter" | "chapters" | "backMatter" | "references">
+  book: Pick<
+    BookSchema,
+    "title" | "subtitle" | "coverMode" | "coverImage" | "backCoverMode" | "backCoverImage" | "frontMatter" | "chapters" | "backMatter" | "references"
+  >
 ): FrozenBookContent {
   return JSON.parse(
     JSON.stringify({
       title: book.title,
       subtitle: book.subtitle,
+      coverMode: book.coverMode,
       coverImage: book.coverImage,
+      backCoverMode: book.backCoverMode,
       backCoverImage: book.backCoverImage,
       frontMatter: book.frontMatter,
       chapters: book.chapters,

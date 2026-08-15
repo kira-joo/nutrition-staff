@@ -39,7 +39,9 @@ export async function renderBookPdf(edition: {
   const bookForRender: BookContentForRender = {
     title: edition.content.title,
     subtitle: edition.content.subtitle,
+    coverMode: edition.content.coverMode,
     coverImage: edition.content.coverImage ?? null,
+    backCoverMode: edition.content.backCoverMode,
     backCoverImage: edition.content.backCoverImage ?? null,
     chapters: edition.content.chapters,
     frontMatter: edition.content.frontMatter,

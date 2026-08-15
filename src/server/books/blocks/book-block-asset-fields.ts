@@ -28,6 +28,7 @@ const BLOCK_ASSET_FIELDS_BY_TYPE: Record<BookBlockType, readonly AssetFieldConfi
   [BookBlockType.QR_LINK]: [],
   [BookBlockType.RECIPE_REF]: [],
   [BookBlockType.CITATION]: [],
+  [BookBlockType.PAGE_FOOTER_NOTE]: [],
 };
 
 export function getBookBlockAssetFields(type: BookBlockType): readonly AssetFieldConfig[] {

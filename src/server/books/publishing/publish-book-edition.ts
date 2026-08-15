@@ -12,7 +12,20 @@ import { freezeBookContent } from "./freeze-book-content";
 import { snapshotRecipeReferences } from "./snapshot-recipe-references";
 import { validateBookForPublish } from "./validate-book-for-publish";
 
-const PUBLISHABLE_STATUSES: readonly BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW];
+// PUBLISHED is a legitimate SOURCE state, not just a destination — a
+// book's mutable Book/chapter/block/settings data is a separate, ongoing
+// draft from whichever Edition `currentEditionId` currently points the
+// public site at (see `[slug]/route.ts`), so publishing again while
+// already PUBLISHED must freeze that draft into a NEW Edition and simply
+// move `currentEditionId` forward — it must never be blocked, and must
+// never touch the Edition it's replacing. Caught live: excluding
+// PUBLISHED here made a book's first publish permanent — there was no
+// way back into this action at all afterward, since nothing in the Staff
+// UI could move status back to Draft either (a real dead end, not a
+// deliberate one). ARCHIVED stays excluded on purpose: un-archiving is
+// its own explicit, separate action (ARCHIVED -> DRAFT), not something a
+// publish attempt should silently do on a book's behalf.
+const PUBLISHABLE_STATUSES: readonly BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW, BookStatus.PUBLISHED];
 
 /**
  * Publish, in order (matches the approved architecture):
@@ -26,7 +39,7 @@ export async function publishBookEdition(bookId: string, publishedByUserId: stri
   const book = await bookRepository.findOne({ where: { _id: bookId } });
 
   if (!PUBLISHABLE_STATUSES.includes(book.status)) {
-    throw new BadRequestError(`Cannot publish a book with status "${book.status}" — it must be a Draft or Ready for Review.`);
+    throw new BadRequestError(`Cannot publish a book with status "${book.status}" — archive it back to Draft first.`);
   }
 
   const settings = await getOrCreateSingleton(bookSettingsRepository, {});

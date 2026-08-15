@@ -6,7 +6,7 @@
 
 import type { RichTextMark } from "src/common/books/rich-text/rich-text-doc.interface";
 
-export type FragmentKind = "content" | "chapterOpener" | "singlePage" | "tocReservation" | "pageBreakMarker";
+export type FragmentKind = "content" | "chapterOpener" | "singlePage" | "tocReservation" | "pageBreakMarker" | "pageFooterNote";
 
 /** One contiguous run of identically-marked text — the same granularity a ProseMirror "text" node already has. */
 export interface StreamFragmentRun {
@@ -47,7 +47,8 @@ export interface PaginationInput {
   pageNumberStart: number;
   tocEligibleCount: number;
   tocEntriesPerPage: number;
-  tocChapters: { chapterId: string; title: string; tocTitle?: string }[];
+  /** `label` is the chapter's dynamic ordinal ("الفصل الأول", ...) — computed by the caller from the chapter's position in the FULL (unfiltered) chapter list; see `chapter-label.ts`. */
+  tocChapters: { chapterId: string; title: string; tocTitle?: string; label: string }[];
   fontProbes: { family: string; weight: string; sampleText: string }[];
 }
 
@@ -67,6 +68,7 @@ export interface PaginationWarning {
 export interface TocResultEntry {
   chapterId: string;
   title: string;
+  label: string;
   pageNumber: number | null;
 }
 

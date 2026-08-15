@@ -299,19 +299,38 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   function layoutPass(tocPageCount: number): { pages: { kind: string; chapterId: string | null; html: string; numbered: boolean }[]; chapterPageIndex: Map<string, number> } {
     const pages: { kind: string; chapterId: string | null; html: string; numbered: boolean }[] = [];
     const chapterPageIndex = new Map<string, number>();
-    let currentPageHtml = "";
+    // Placed pieces for the page currently being packed — kept as parts
+    // (not one flat string) specifically so a PAGE_FOOTER_NOTE fragment
+    // can retract already-placed fragments back onto the queue when they
+    // don't leave enough room for it (see the "pageFooterNote" branch
+    // below). `item` is null for a piece that can't be individually
+    // un-placed (a singlePage's one-shot HTML, or the fit-half of a
+    // mid-fragment paragraph/table/list split) — retraction only ever
+    // pops parts with a real `item`, and stops rather than corrupting a
+    // split fragment's own bookkeeping.
+    let currentPageParts: { item: WorkItem | null; html: string }[] = [];
     let usedHeight = 0;
     let currentKind = "content";
     let currentChapterId: string | null = null;
 
+    function currentPageHtml(): string {
+      return currentPageParts.map((part) => part.html).join("");
+    }
     function openPage(kind: string, chapterId: string | null): void {
-      currentPageHtml = "";
+      currentPageParts = [];
       usedHeight = 0;
       currentKind = kind;
       currentChapterId = chapterId;
     }
-    function closePage(numbered: boolean): void {
-      pages.push({ kind: currentKind, chapterId: currentChapterId, html: currentPageHtml, numbered });
+    // `footerNoteHtml`, when given, wraps everything placed so far in
+    // `.book-page-content-body` (a flex:1 box) followed by the footer —
+    // the same "flex:1 above absorbs the space, non-growing sibling below
+    // sits flush at the bottom" trick `renderTitlePage`'s legal footer
+    // uses, reserving the footer's real height instead of overlaying it.
+    function closePage(numbered: boolean, footerNoteHtml?: string): void {
+      const bodyHtml = currentPageHtml();
+      const html = footerNoteHtml !== undefined ? `<div class="book-page-content-body">${bodyHtml}</div>${footerNoteHtml}` : bodyHtml;
+      pages.push({ kind: currentKind, chapterId: currentChapterId, html, numbered });
     }
 
     openPage("content", null);
@@ -333,41 +352,96 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
       const html = item.htmlOverride ?? fragment.html;
 
       if (fragment.kind === "pageBreakMarker") {
-        if (currentPageHtml !== "") {
+        if (currentPageParts.length > 0) {
           closePage(true);
           openPage("content", currentChapterId);
         }
         continue;
       }
 
-      const forceNewPage = fragment.forceNewPage && currentPageHtml !== "" && !item.isContinuation;
+      const forceNewPage = fragment.forceNewPage && currentPageParts.length > 0 && !item.isContinuation;
       if (forceNewPage) {
         closePage(true);
-        openPage(fragment.kind === "chapterOpener" ? "chapterOpener" : "content", fragment.chapterId ?? currentChapterId);
+        openPage("content", fragment.chapterId ?? currentChapterId);
       }
 
       if (fragment.kind === "singlePage") {
-        if (currentPageHtml !== "") closePage(fragment.numbered !== false);
+        if (currentPageParts.length > 0) closePage(fragment.numbered !== false);
         openPage(fragment.pageKind ?? "content", fragment.chapterId ?? null);
-        currentPageHtml = html;
+        currentPageParts = [{ item: null, html }];
         closePage(fragment.numbered !== false);
+        // Chapter openers are now singlePage fragments (a dedicated
+        // full-bleed page), not their own FragmentKind — recorded here,
+        // right after the page housing them was actually pushed, so
+        // `pages.length - 1` is exactly that page's index regardless of
+        // whether a prior close just happened above.
+        if (fragment.pageKind === "chapterOpener" && fragment.chapterId) {
+          chapterPageIndex.set(fragment.chapterId, pages.length - 1);
+        }
         openPage("content", currentChapterId);
         continue;
       }
 
       if (fragment.kind === "tocReservation") {
         for (let i = 0; i < tocPageCount; i++) {
-          if (currentPageHtml !== "") closePage(true);
+          if (currentPageParts.length > 0) closePage(true);
           openPage("toc", null);
-          currentPageHtml = "";
           closePage(true);
           openPage("content", currentChapterId);
         }
         continue;
       }
 
-      if (fragment.chapterId && fragment.kind === "chapterOpener") {
-        chapterPageIndex.set(fragment.chapterId, pages.length);
+      if (fragment.kind === "pageFooterNote") {
+        // Degenerate case: the note itself doesn't fit even alone on an
+        // empty page (a safety valve, not the common path — a real
+        // footer note is a sentence or two). Only then does it get a
+        // dedicated page, per spec: never silently create one otherwise.
+        const aloneHeight = measureHtmlHeight(`<div class="book-page-content-body"></div>${html}`);
+        if (aloneHeight > input.contentBoxHeightPx) {
+          if (currentPageParts.length > 0) {
+            closePage(true);
+            openPage("content", currentChapterId);
+          }
+          closePage(true, html);
+          warnings.push({ code: "FOOTER_NOTE_OVERFLOW", message: `Fragment ${fragment.id} does not fit within a single page even alone — it will overflow visually.` });
+          openPage("content", currentChapterId);
+          continue;
+        }
+
+        // Retract already-placed, individually-requeueable fragments from
+        // THIS page, one at a time from the end, until what remains plus
+        // the footer note fits together — moving preceding content to the
+        // next page rather than letting it overlap the footer.
+        const popped: { item: WorkItem | null; html: string }[] = [];
+        let fits = measureHtmlHeight(`<div class="book-page-content-body">${currentPageHtml()}</div>${html}`) <= input.contentBoxHeightPx;
+        while (!fits && currentPageParts.length > 0 && currentPageParts[currentPageParts.length - 1].item) {
+          popped.push(currentPageParts.pop()!);
+          fits = measureHtmlHeight(`<div class="book-page-content-body">${currentPageHtml()}</div>${html}`) <= input.contentBoxHeightPx;
+        }
+
+        if (!fits) {
+          // Retraction couldn't make room (blocked by a non-retractable
+          // part, e.g. a mid-fragment split's fit-half) — restore what we
+          // popped and move the footer itself to a fresh page instead of
+          // forcing an overlap; `aloneHeight` above guarantees it fits
+          // there.
+          while (popped.length > 0) currentPageParts.push(popped.pop()!);
+          closePage(true);
+          openPage("content", currentChapterId);
+          queue.unshift(item);
+          continue;
+        }
+
+        // Requeue the popped fragments in their original relative order
+        // so they're the first things placed on the fresh page that
+        // follows this one.
+        queue.unshift(...popped.map((part) => part.item!).reverse());
+
+        if (fragment.chapterId) currentChapterId = fragment.chapterId;
+        closePage(true, html);
+        openPage("content", currentChapterId);
+        continue;
       }
 
       const remaining = input.contentBoxHeightPx - usedHeight;
@@ -386,14 +460,14 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           if (height + nextHeight > remaining && usedHeight > 0) {
             closePage(true);
             openPage("content", currentChapterId);
-            currentPageHtml += html;
-            usedHeight = measureHtmlHeight(currentPageHtml);
+            currentPageParts.push({ item, html });
+            usedHeight = measureHtmlHeight(currentPageHtml());
             if (fragment.chapterId) currentChapterId = fragment.chapterId;
             continue;
           }
         }
-        currentPageHtml += html;
-        usedHeight = measureHtmlHeight(currentPageHtml);
+        currentPageParts.push({ item, html });
+        usedHeight = measureHtmlHeight(currentPageHtml());
         if (fragment.chapterId) currentChapterId = fragment.chapterId;
         continue;
       }
@@ -409,14 +483,14 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         // Doesn't fit even on a fresh empty page.
         if (fragment.degrade === "scaleImage") {
           const scaled = scaleImageFragmentToFit(html, input.contentBoxHeightPx);
-          currentPageHtml += scaled;
-          usedHeight = measureHtmlHeight(currentPageHtml);
+          currentPageParts.push({ item, html: scaled });
+          usedHeight = measureHtmlHeight(currentPageHtml());
           warnings.push({ code: "IMAGE_SCALED_DOWN", message: `An oversized image/caption was scaled down to fit the page (fragment ${fragment.id}).` });
           continue;
         }
         warnings.push({ code: "ATOMIC_OVERFLOW", message: `Fragment ${fragment.id} does not fit on an empty page and could not be split or scaled — it will overflow visually.` });
-        currentPageHtml += html;
-        usedHeight = measureHtmlHeight(currentPageHtml);
+        currentPageParts.push({ item, html });
+        usedHeight = measureHtmlHeight(currentPageHtml());
         continue;
       }
 
@@ -424,8 +498,8 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         if (usedHeight === 0) {
           // Doesn't even fit alone on an empty page — let it overflow rather than loop forever.
           warnings.push({ code: "PARAGRAPH_OVERFLOW", message: `Fragment ${fragment.id} could not be split to fit an empty page.` });
-          currentPageHtml += html;
-          usedHeight = measureHtmlHeight(currentPageHtml);
+          currentPageParts.push({ item, html });
+          usedHeight = measureHtmlHeight(currentPageHtml());
           continue;
         }
         const split = splitRichParagraphsToFit(fragment.richTextParagraphs ?? [], remaining);
@@ -435,8 +509,8 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           queue.unshift(item);
           continue;
         }
-        currentPageHtml += split.fitHtml;
-        usedHeight = measureHtmlHeight(currentPageHtml);
+        currentPageParts.push({ item: null, html: split.fitHtml });
+        usedHeight = measureHtmlHeight(currentPageHtml());
         queue.unshift({
           fragment: { ...fragment, html: renderParagraphsHtml(split.remainderParagraphs), richTextParagraphs: split.remainderParagraphs },
           isContinuation: true,
@@ -447,8 +521,8 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
       if (fragment.splittable === "table" && fragment.tableHeaderHtml && fragment.tableRowsHtml) {
         if (usedHeight === 0 && measureHtmlHeight(`<table class="book-table">${fragment.tableHeaderHtml}<tbody>${fragment.tableRowsHtml[0] ?? ""}</tbody></table>`) > input.contentBoxHeightPx) {
           warnings.push({ code: "TABLE_ROW_OVERFLOW", message: `A single row of table ${fragment.id} is taller than one page.` });
-          currentPageHtml += html;
-          usedHeight = measureHtmlHeight(currentPageHtml);
+          currentPageParts.push({ item, html });
+          usedHeight = measureHtmlHeight(currentPageHtml());
           continue;
         }
         const split = splitTableToFit(fragment.tableHeaderHtml, fragment.tableRowsHtml, remaining);
@@ -458,8 +532,8 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           queue.unshift(item);
           continue;
         }
-        currentPageHtml += `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.fitRows.join("")}</tbody></table>`;
-        usedHeight = measureHtmlHeight(currentPageHtml);
+        currentPageParts.push({ item: null, html: `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.fitRows.join("")}</tbody></table>` });
+        usedHeight = measureHtmlHeight(currentPageHtml());
         if (split.remainderRows.length > 0) {
           queue.unshift({
             fragment: { ...fragment, tableRowsHtml: split.remainderRows, html: `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.remainderRows.join("")}</tbody></table>` },
@@ -483,8 +557,8 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           queue.unshift(item);
           continue;
         }
-        currentPageHtml += wrapListItems(fragment.listTag ?? "ul", items.slice(0, fitCount));
-        usedHeight = measureHtmlHeight(currentPageHtml);
+        currentPageParts.push({ item: null, html: wrapListItems(fragment.listTag ?? "ul", items.slice(0, fitCount)) });
+        usedHeight = measureHtmlHeight(currentPageHtml());
         if (fitCount < items.length) {
           queue.unshift({
             fragment: { ...fragment, listItemsHtml: items.slice(fitCount), html: wrapListItems(fragment.listTag ?? "ul", items.slice(fitCount)) },
@@ -502,11 +576,11 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         continue;
       }
       warnings.push({ code: "UNSPLITTABLE_OVERFLOW", message: `Fragment ${fragment.id} does not fit and has no split/degrade strategy.` });
-      currentPageHtml += html;
-      usedHeight = measureHtmlHeight(currentPageHtml);
+      currentPageParts.push({ item: null, html });
+      usedHeight = measureHtmlHeight(currentPageHtml());
     }
 
-    if (currentPageHtml !== "" || pages.length === 0) closePage(true);
+    if (currentPageParts.length > 0 || pages.length === 0) closePage(true);
     return { pages, chapterPageIndex };
   }
 
@@ -580,7 +654,7 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   const toc = input.tocChapters.map((chapter) => {
     const pageIndex = lastResult.chapterPageIndex.get(chapter.chapterId);
     const pageNumber = pageIndex !== undefined ? numberedPages[pageIndex]?.pageNumber ?? null : null;
-    return { chapterId: chapter.chapterId, title: chapter.tocTitle || chapter.title, pageNumber };
+    return { chapterId: chapter.chapterId, title: chapter.tocTitle || chapter.title, label: chapter.label, pageNumber };
   });
 
   return {

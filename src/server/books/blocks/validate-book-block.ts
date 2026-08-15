@@ -7,6 +7,7 @@ import { ChecklistBlockDto } from "./dto/checklist-block.dto";
 import { CitationBlockDto } from "./dto/citation-block.dto";
 import { ImageBlockDto } from "./dto/image-block.dto";
 import { ListBlockDto } from "./dto/list-block.dto";
+import { PageFooterNoteBlockDto } from "./dto/page-footer-note-block.dto";
 import { ParagraphBlockDto } from "./dto/paragraph-block.dto";
 import { QrLinkBlockDto } from "./dto/qr-link-block.dto";
 import { QuoteBlockDto } from "./dto/quote-block.dto";
@@ -40,6 +41,7 @@ export const BOOK_BLOCK_DTO_BY_TYPE: Record<BookBlockType, ClassConstructor<obje
   [BookBlockType.QR_LINK]: QrLinkBlockDto,
   [BookBlockType.RECIPE_REF]: RecipeRefBlockDto,
   [BookBlockType.CITATION]: CitationBlockDto,
+  [BookBlockType.PAGE_FOOTER_NOTE]: PageFooterNoteBlockDto,
 };
 
 /** Block types whose DTO carries a `richText` field requiring the separate allow-list walk. */
@@ -49,6 +51,7 @@ const RICH_TEXT_FIELD_BY_TYPE: Partial<Record<BookBlockType, "richText">> = {
   [BookBlockType.TIP]: "richText",
   [BookBlockType.NOTE]: "richText",
   [BookBlockType.WARNING]: "richText",
+  [BookBlockType.PAGE_FOOTER_NOTE]: "richText",
 };
 
 export function assertValidBlockType(type: unknown): BookBlockType {

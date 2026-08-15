@@ -2,6 +2,8 @@ import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identit
 import { BINDING_EDGE } from "src/common/books/book-physical-order";
 import type { Book } from "src/common/interfaces/book.interface";
 import { buildTemplateCss } from "./dr-omnia-book-v1/template.css";
+import { CHAPTER_BACKGROUND_DATA_URI } from "./dr-omnia-book-v1/art/chapter-background";
+import { chapterLabel } from "src/common/books/chapter-label";
 import { resolveGeometry } from "./dr-omnia-book-v1/geometry";
 import { BOOK_FONT_READINESS_PROBES, BOOK_TEMPLATE_FONT_FINGERPRINT } from "./dr-omnia-book-v1/fonts/fonts";
 import { renderBlockToFragment } from "./dr-omnia-book-v1/render-block";
@@ -9,7 +11,6 @@ import {
   renderAboutDoctorPage,
   renderBackCoverPage,
   renderChapterOpenerFragment,
-  renderCopyrightPage,
   renderCoverPage,
   renderReferencesPage,
   renderTitlePage,
@@ -22,7 +23,10 @@ import type { RecipeSnapshot } from "src/server/books/editions/book-edition.sche
 const TOC_ENTRIES_PER_PAGE = 16;
 
 /** Structural, not the full `Book` — this file (and the `BookSchema` Mongoose document callers actually hold) never needs `_id`/`createdAt`/`updatedAt`. */
-export type BookContentForRender = Pick<Book, "title" | "subtitle" | "coverImage" | "backCoverImage" | "chapters" | "frontMatter" | "backMatter" | "references">;
+export type BookContentForRender = Pick<
+  Book,
+  "title" | "subtitle" | "coverMode" | "coverImage" | "backCoverMode" | "backCoverImage" | "chapters" | "frontMatter" | "backMatter" | "references"
+>;
 
 export interface BuildBookHtmlOptions {
   book: BookContentForRender;
@@ -44,26 +48,43 @@ export interface BuildBookHtmlOptions {
  */
 export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots }: BuildBookHtmlOptions): Promise<string> {
   const geometry = resolveGeometry(identity.print.pageSize, identity.print.marginPreset, identity.print.gutterMm);
-  const css = buildTemplateCss(geometry);
+  const css = buildTemplateCss(geometry, { chapterBackgroundUrl: CHAPTER_BACKGROUND_DATA_URI });
 
   const stream: StreamFragment[] = [];
   const chapters = chapterId ? book.chapters.filter((chapter) => chapter.id === chapterId) : book.chapters;
   const isFullBook = !chapterId;
 
+  // Front matter order: cover, title (the copyright/disclaimer legal footer
+  // is baked into the title page itself, pinned to its bottom — see
+  // `renderTitlePage`), "About the Book" (frontMatter.aboutBook — a real,
+  // published-content section, not a hardcoded page), "About the Doctor"
+  // (the template's own fixed identity page), "Introduction"
+  // (frontMatter.introduction), THEN the reserved TOC pages, then chapters.
+  // About-the-book reads as scene-setting for the book itself and belongs
+  // before the doctor's own bio; introduction belongs immediately before
+  // the TOC/chapters it's introducing.
   if (isFullBook) {
     stream.push(renderCoverPage(book, identity));
     stream.push(renderTitlePage(book, identity));
-    stream.push(renderCopyrightPage(identity));
+
+    for (const block of book.frontMatter.aboutBook.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
+
     const aboutDoctor = renderAboutDoctorPage(identity);
     if (aboutDoctor) stream.push(aboutDoctor);
 
-    for (const block of book.frontMatter.aboutBook.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
-    stream.push(renderTocReservationFragment());
     for (const block of book.frontMatter.introduction.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
+
+    stream.push(renderTocReservationFragment());
   }
 
   for (const chapter of chapters) {
-    stream.push(renderChapterOpenerFragment(chapter));
+    // The chapter's ordinal is its position in the FULL book, never in
+    // `chapters` (which is filtered down to one chapter for a staff
+    // "Preview chapter" request) — a single-chapter preview must still
+    // print "الفصل الثالث" for chapter 3, not "الفصل الأول" because it
+    // happens to be first in a filtered array of one.
+    const chapterNumber = book.chapters.findIndex((candidate) => candidate.id === chapter.id) + 1;
+    stream.push(renderChapterOpenerFragment(chapter, chapterNumber, identity));
     for (const block of chapter.blocks) {
       const fragment = await renderBlockToFragment(block, book.references, recipeSnapshots);
       stream.push({ ...fragment, chapterId: chapter.id });
@@ -76,8 +97,15 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
     stream.push(await renderBackCoverPage(book, identity));
   }
 
+  // `chapterNumber` (and therefore `label`) is computed BEFORE filtering
+  // to `includeInToc` — a chapter excluded from the TOC still occupies
+  // its place in the book, so filtering first would shift every later
+  // chapter's printed ordinal off by however many were skipped.
   const tocChapters = isFullBook
-    ? book.chapters.filter((chapter) => chapter.includeInToc).map((chapter) => ({ chapterId: chapter.id, title: chapter.title, tocTitle: chapter.tocTitle }))
+    ? book.chapters
+        .map((chapter, index) => ({ chapter, chapterNumber: index + 1 }))
+        .filter(({ chapter }) => chapter.includeInToc)
+        .map(({ chapter, chapterNumber }) => ({ chapterId: chapter.id, title: chapter.title, tocTitle: chapter.tocTitle, label: chapterLabel(chapterNumber) }))
     : [];
 
   const paginationInputWithoutGeometry = {
@@ -190,7 +218,7 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
     for (var i = 0; i < result.pages.length; i++) {
       var page = result.pages[i];
       var side = page.numbered && page.pageNumber ? sideOfPage(page.pageNumber) : (i % 2 === 0 ? "right" : "left");
-      var isSpecial = ["cover", "titlePage", "copyrightPage", "backCover"].indexOf(page.kind) !== -1;
+      var isSpecial = ["cover", "titlePage", "backCover", "chapterOpener"].indexOf(page.kind) !== -1;
       var runningHeadHtml = "";
       var folioHtml = "";
       if (!isSpecial) {

@@ -159,6 +159,14 @@ export async function renderBlockToFragment(block: BookBlock, references: BookRe
         splittable: false,
       };
     }
+    case BookBlockType.PAGE_FOOTER_NOTE:
+      return {
+        ...base,
+        kind: "pageFooterNote",
+        html: `<div class="book-page-footer-note">${renderRichTextToHtml(block.richText)}</div>`,
+        atomic: true,
+        splittable: false,
+      };
     default:
       return { ...base, kind: "content", html: "", atomic: true, splittable: false };
   }

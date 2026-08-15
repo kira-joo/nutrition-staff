@@ -19,4 +19,5 @@ export enum BookBlockType {
   QR_LINK = "qrLink",
   RECIPE_REF = "recipeRef",
   CITATION = "citation",
+  PAGE_FOOTER_NOTE = "pageFooterNote",
 }

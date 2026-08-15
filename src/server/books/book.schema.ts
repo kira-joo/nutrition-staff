@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { BookOverrideKey, BookStatus, BookVisibility } from "src/common/enums";
 import { asSchemaField, bookContactBlockSchema, bookSocialLinkSchema } from "src/server/book-settings/book-settings.schema";
-import type { BookOverrides } from "src/common/interfaces/book.interface";
+import type { BookCoverMode, BookOverrides } from "src/common/interfaces/book.interface";
 import { emptyBackMatter, emptyFrontMatter, type BookBackMatter, type BookFrontMatter, type BookReference, type Chapter } from "src/common/interfaces/book-chapter.interface";
 
 // Embedded, `_id:false` — mirrors BookSettings' overridable shape exactly,
@@ -69,8 +69,20 @@ export class BookSchema {
   @MongoField({ type: String, required: false })
   editionLabelTemplate?: string;
 
+  // "generated" (the reusable template renders title/subtitle/doctor over
+  // its own artwork) vs "uploaded" (coverImage/backCoverImage becomes the
+  // WHOLE page, full-bleed, nothing else rendered over it) — see
+  // `BookCoverMode`'s doc comment in book.interface.ts. Independent per
+  // side; the image field itself stays populated regardless of mode so
+  // toggling back to "uploaded" never needs a re-upload.
+  @MongoField({ type: String, enum: ["generated", "uploaded"], required: true, default: "generated" })
+  coverMode!: BookCoverMode;
+
   @MongoField(imageAssetField())
   coverImage?: ImageAsset | null;
+
+  @MongoField({ type: String, enum: ["generated", "uploaded"], required: true, default: "generated" })
+  backCoverMode!: BookCoverMode;
 
   @MongoField(imageAssetField())
   backCoverImage?: ImageAsset | null;

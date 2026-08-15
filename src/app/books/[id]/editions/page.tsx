@@ -11,7 +11,13 @@ import type { BookEdition } from "src/common/interfaces/book-edition.interface";
 import { BookStatus } from "src/common/enums";
 import { resolveArtifactState, type ArtifactUiState } from "src/common/books/artifacts/resolve-artifact-state";
 
-const PUBLISHABLE_STATUSES: BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW];
+// Mirrors publish-book-edition.ts's own PUBLISHABLE_STATUSES exactly —
+// PUBLISHED is a legitimate source state (publishing again freezes the
+// current draft into a new Edition and moves currentEditionId forward,
+// it never touches the Edition being replaced), so a book already
+// showing a current Edition is NOT "locked out" of publishing; only
+// ARCHIVED is genuinely blocked (un-archive to Draft first).
+const PUBLISHABLE_STATUSES: BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW, BookStatus.PUBLISHED];
 
 export default function BookEditionsPage({ params }: { params: { id: string } }) {
   const bookQuery = useRequesterQuery({ endpoint: getBookByIdEndpoint, options: { params: { id: params.id } } });
@@ -85,10 +91,10 @@ function PublishPanel({ book, onPublished }: { book: Book; onPublished: () => vo
         </div>
         {canPublish ? (
           <CustomButton type="button" loading={checking} onClick={handleRunCheck}>
-            Check &amp; Publish
+            {book.editionCount > 0 ? "Publish New Edition" : "Check & Publish"}
           </CustomButton>
         ) : (
-          <p className="text-sm text-slate-500">This book cannot be published from its current status.</p>
+          <p className="text-sm text-slate-500">This book is archived — restore it to Draft before publishing.</p>
         )}
       </div>
 
@@ -139,7 +145,7 @@ function PublishPanel({ book, onPublished }: { book: Book; onPublished: () => vo
               loading={publishMutation.loading}
               onClick={handleConfirmPublish}
             >
-              Confirm publish
+              {book.editionCount > 0 ? "Confirm new edition" : "Confirm publish"}
             </CustomButton>
           </div>
         </Modal>

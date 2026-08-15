@@ -19,15 +19,32 @@ export const BRAND_COLORS = {
   calloutTip: "#eef7ee",
   calloutNote: "#eef3fb",
   calloutWarning: "#fbeeee",
+  /** The ordinary-page inner frame's accent — a warm gold-bronze, distinct from the cool green everything else uses, so the frame itself reads as a deliberate design element rather than another green rule among many. */
+  frameGold: "rgba(176, 141, 79, 0.45)",
 };
+
+export interface BuildTemplateCssOptions {
+  /**
+   * The template's botanical/leaf artwork (a data URI here — Puppeteer's
+   * `setContent` has no base URL to resolve a relative path against; see
+   * `art/chapter-background.ts`). Reused across covers, the back cover,
+   * and every chapter opener — one asset, one visual language, per §3 of
+   * the plan. Optional so any caller that hasn't been updated still
+   * produces valid (plain-color) CSS rather than a broken `url()`.
+   */
+  chapterBackgroundUrl?: string;
+}
 
 /**
  * One reusable template, content and styling fully separated per the
  * approved architecture — this function takes ONLY geometry (derived
- * from resolved BookSettings/Book print settings) and never anything
- * per-book beyond that; the visual language itself never varies by Book.
+ * from resolved BookSettings/Book print settings) plus the template's own
+ * artwork, and never anything per-book beyond that; the visual language
+ * itself never varies by Book.
  */
-export function buildTemplateCss(geometry: ResolvedGeometry): string {
+export function buildTemplateCss(geometry: ResolvedGeometry, options: BuildTemplateCssOptions = {}): string {
+  const botanical = options.chapterBackgroundUrl ? `, url("${options.chapterBackgroundUrl}")` : "";
+  const botanicalSize = options.chapterBackgroundUrl ? ", cover" : "";
   return `
 ${BOOK_TEMPLATE_FONT_FACES}
 
@@ -81,6 +98,37 @@ body { direction: rtl; }
   overflow: visible;
 }
 
+/* PAGE_FOOTER_NOTE — a generic, reusable "pin to the bottom of whatever
+   page this lands on" block (see paginate-book.browser.ts's
+   "pageFooterNote" FragmentKind branch), reusing the title page's
+   legal-footer visual language (divider above, muted smaller type). The
+   paginator only ever emits the .book-page-content-body wrapper when a
+   footer note actually landed on this page, so :has() keeps every other
+   page a plain flow-root box, completely unaffected.
+   .book-page-content-body's flex:1 absorbs all the space ABOVE the
+   footer note — the same technique .book-title-page-main uses — which is
+   what reserves the footer's own height automatically instead of
+   position:absolute. Hand-synced with nutrition-client's identical
+   rules. */
+.book-page-content:has(> .book-page-content-body) {
+  display: flex;
+  flex-direction: column;
+}
+.book-page-content-body {
+  flex: 1;
+  min-height: 0;
+  display: flow-root;
+}
+.book-page-footer-note {
+  flex-shrink: 0;
+  margin-top: 6mm;
+  padding-top: 3mm;
+  border-top: 0.3mm solid ${BRAND_COLORS.hairline};
+  text-align: center;
+}
+.book-page-footer-note p { font-size: 7.5pt; line-height: 1.5; color: ${BRAND_COLORS.muted}; margin-bottom: 1mm; }
+.book-page-footer-note p:last-child { margin-bottom: 0; }
+
 /* ---- Page chrome: folio at the outer edge, running head at the inner edge ---- */
 .book-running-head {
   position: absolute;
@@ -101,6 +149,24 @@ body { direction: rtl; }
 }
 .book-page[data-side="left"] .book-folio { left: ${geometry.outerMm}mm; text-align: left; }
 .book-page[data-side="right"] .book-folio { right: ${geometry.outerMm}mm; text-align: right; }
+
+/* An ordinary printed page's inner frame — a thin decorative rule set
+   IN the margin, between the trim edge and the text block, not around
+   the text block itself (that would collide with real content). Only
+   ordinary content pages get it; the cover, chapter openers, and the
+   back cover already carry their own full-bleed artwork (generated OR
+   uploaded — both still carry the same .book-cover/.book-back-cover base
+   class) and would look wrong with a frame drawn over it, so the :has()
+   selector excludes any page containing one of those three. This is what
+   turns a plain paper fill into something that reads as a designed page
+   rather than a raw HTML box. */
+.book-page:not(:has(.book-cover)):not(:has(.book-chapter-opener)):not(:has(.book-back-cover))::before {
+  content: "";
+  position: absolute;
+  inset: 4mm;
+  border: 0.3mm solid ${BRAND_COLORS.frameGold};
+  pointer-events: none;
+}
 
 /* ---- Typography ---- */
 .book-heading, .book-subheading, h1, h2 {
@@ -165,27 +231,56 @@ hr.book-divider { border: none; border-top: 0.3mm solid ${BRAND_COLORS.hairline}
 .book-recipe-ref-description { font-size: 9pt; color: ${BRAND_COLORS.muted}; margin-top: 1mm; }
 
 /* ---- Single-page compositions ---- */
+/* position:absolute + inset:0 fills the WHOLE .book-page box edge to
+   edge (.book-page is already position:relative) — the same technique
+   .book-chapter-opener uses, and for the same reason: the previous
+   negative-margin trick here only cancelled outerMm on both left AND
+   right, but a real page's actual padding is gutterMm on the gutter
+   side and outerMm on the outer side (see the .book-page[data-side]
+   rules above) — two DIFFERENT values. Cancelling both with one
+   -outerMm margin left a real, visible gap on whichever side carries
+   gutterMm instead — the bug behind the cover rendering with a visible
+   white margin around the artwork instead of true full-bleed. */
 .book-cover, .book-back-cover {
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: linear-gradient(180deg, ${BRAND_COLORS.primary}, ${BRAND_COLORS.primaryDark});
+  /* The botanical layer paints OVER the gradient (first-listed background
+     layer wins); the gradient underneath is what actually shows if the
+     artwork is ever omitted (chapterBackgroundUrl unset) — a real
+     fallback, not decoration hidden behind decoration. */
+  background-image: ${options.chapterBackgroundUrl ? `url("${options.chapterBackgroundUrl}"), ` : ""}linear-gradient(180deg, ${BRAND_COLORS.primary}, ${BRAND_COLORS.primaryDark});
+  background-size: cover;
+  background-position: center;
   color: #fff;
-  margin: -${geometry.topMm}mm -${geometry.outerMm}mm;
-  padding: ${geometry.topMm}mm ${geometry.outerMm}mm;
-  width: ${geometry.widthMm}mm;
-  height: ${geometry.heightMm}mm;
 }
-.book-cover img.book-cover-image { max-width: 70%; max-height: 45%; border-radius: 2mm; margin-bottom: 8mm; object-fit: cover; }
+/* "uploaded" mode (see BookCoverMode) — the doctor's own finished A5
+   cover/back-cover becomes the WHOLE page, full-bleed. Deliberately no
+   flex centering, no color, no text-shadow rules: nothing is ever
+   rendered inside this element at all (see renderCoverPage/
+   renderBackCoverPage's "uploaded" branch) — the image itself already
+   contains whatever design/text it needs, so this is pure background
+   positioning and nothing else. */
+.book-cover.book-cover--uploaded {
+  background-image: var(--book-cover-image-url);
+  background-size: cover;
+  background-position: center;
+}
+.book-back-cover.book-back-cover--uploaded {
+  background-image: var(--book-back-cover-image-url);
+  background-size: cover;
+  background-position: center;
+}
 .book-cover .book-cover-title { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-size: 26pt; font-weight: 700; margin-bottom: 4mm; }
 .book-cover .book-cover-subtitle { font-size: 13pt; opacity: 0.9; margin-bottom: 8mm; }
 .book-cover .book-cover-logo { width: 20mm; height: 20mm; border-radius: 50%; margin-top: 8mm; object-fit: cover; }
 .book-cover .book-cover-doctor { font-size: 10pt; opacity: 0.85; margin-top: 4mm; }
 
-.book-title-page, .book-copyright-page, .book-about-doctor-page {
+.book-about-doctor-page {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -193,17 +288,115 @@ hr.book-divider { border: none; border-top: 0.3mm solid ${BRAND_COLORS.hairline}
   text-align: center;
   gap: 3mm;
 }
+/* The title page is the page immediately after the front cover, and the
+   legal footer (copyright + disclaimer) is pinned to ITS bottom — not
+   given its own page, not left to flow before the TOC (both tried and
+   both rejected on review). A plain "height:100%; justify-content:center"
+   on the whole page (like the about-doctor page rule above) would centre
+   the footer INTO the middle of that centered group instead of pinning it
+   to the true bottom edge, so the title/subtitle/doctor content is
+   wrapped in its own flex:1 block instead: that block absorbs all the
+   space ABOVE the footer and centers its own content within it, while the
+   footer — a normal, non-growing flex child — is guaranteed to sit right
+   after it, flush with the page's bottom inset. This also reserves the
+   footer's own space automatically (its border/padding/line-height), so
+   the centered content above can never overlap it. */
+.book-title-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding-bottom: 6mm;
+}
+.book-title-page-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3mm;
+}
 .book-title-page .book-title-page-title { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-size: 20pt; font-weight: 700; color: ${BRAND_COLORS.primaryDark}; }
-.book-copyright-page { font-size: 9pt; color: ${BRAND_COLORS.muted}; text-align: center; padding: 0 8mm; }
+/* Publishing/legal footer (copyright + disclaimer) — deliberately NOT a
+   full-page centering treatment; a small, restrained block pinned to the
+   bottom of the title page (see renderTitlePage). */
+.book-legal-footer {
+  flex-shrink: 0;
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 0.3mm solid ${BRAND_COLORS.hairline};
+  text-align: center;
+}
+.book-legal-footer p { font-size: 7.5pt; line-height: 1.5; color: ${BRAND_COLORS.muted}; margin-bottom: 1mm; }
+.book-legal-footer p:last-child { margin-bottom: 0; }
 .book-about-doctor-page img.book-doctor-image { width: 30mm; height: 30mm; border-radius: 50%; object-fit: cover; margin: 0 auto 4mm; }
 .book-about-doctor-page .book-doctor-name { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-size: 15pt; font-weight: 700; color: ${BRAND_COLORS.primaryDark}; }
 .book-about-doctor-page .book-doctor-title { font-size: 10pt; color: ${BRAND_COLORS.muted}; margin-bottom: 3mm; }
 
-.book-chapter-opener { margin-bottom: 6mm; }
-.book-chapter-opener img.book-chapter-cover { width: 100%; max-height: 45mm; object-fit: cover; border-radius: 2mm; margin-bottom: 4mm; }
-.book-chapter-opener .book-chapter-title { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-size: 22pt; font-weight: 700; color: ${BRAND_COLORS.primaryDark}; }
-.book-chapter-opener .book-chapter-subtitle { font-size: 12pt; color: ${BRAND_COLORS.primary}; margin-top: 1mm; }
-.book-chapter-opener .book-chapter-intro { margin-top: 4mm; font-style: italic; color: ${BRAND_COLORS.muted}; }
+/* A full-bleed page, not a content block sharing a page with what follows
+   (see build-book-html.ts / paginate-book.browser.ts — chapter openers
+   are now emitted as "singlePage" fragments). position:absolute + inset:0
+   fills the whole .book-page box — including its padding — because
+   .book-page is already position:relative; this is simpler than
+   .book-cover's negative-margin trick and doesn't depend on outerMm
+   being symmetric on both sides. If a chapter has its own coverImage,
+   THAT takes over the entire background instead of the template artwork
+   (template-with-content-override, matching §3's "template owns the
+   visual language, content fills it in"); a scrim keeps the always-white
+   text legible over an arbitrary uploaded photo the same way it already
+   is over the template's own dark artwork. */
+.book-chapter-opener {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  background-color: ${BRAND_COLORS.primaryDark};
+  background-image: linear-gradient(180deg, rgba(20,45,35,0.15), rgba(15,35,27,0.55))${botanical};
+  background-size: cover${botanicalSize};
+  background-position: center${botanicalSize ? ", center" : ""};
+}
+.book-chapter-opener.book-chapter-opener--custom-cover {
+  background-image: linear-gradient(180deg, rgba(20,45,35,0.15), rgba(15,35,27,0.55)), var(--book-chapter-cover-url);
+  background-size: cover;
+  background-position: center;
+}
+/* Percentages anchor to the CONTAINER's height, not the artwork's — since
+   background-size:cover scales the (slightly wider-than-A5) artwork to
+   match the container's height exactly and only crops width, these line
+   up with the template art's own baked-in ornament bands (a dotted rule
+   near ~23% height, a small leaf mark near ~60%) regardless of page size
+   or margin preset. */
+.book-chapter-opener .book-chapter-band {
+  position: absolute;
+  top: 27%;
+  bottom: 42%;
+  left: ${geometry.outerMm}mm;
+  right: ${geometry.outerMm}mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+}
+.book-chapter-opener .book-chapter-label {
+  font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: ${BRAND_COLORS.highlight};
+}
+.book-chapter-opener .book-chapter-title { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-size: 24pt; font-weight: 700; line-height: 1.35; }
+.book-chapter-opener .book-chapter-subtitle { font-size: 12pt; opacity: 0.9; }
+.book-chapter-opener .book-chapter-intro { margin-top: 1mm; font-style: italic; opacity: 0.85; max-width: 80%; }
+.book-chapter-opener .book-chapter-doctor {
+  position: absolute;
+  top: 65%;
+  left: ${geometry.outerMm}mm;
+  right: ${geometry.outerMm}mm;
+  font-size: 10pt;
+  opacity: 0.85;
+}
 
 .book-toc-page .book-toc-title { font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif; font-size: 18pt; font-weight: 700; margin-bottom: 6mm; color: ${BRAND_COLORS.primaryDark}; }
 .book-toc-entry { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3mm; gap: 2mm; }

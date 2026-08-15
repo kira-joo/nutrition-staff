@@ -117,6 +117,20 @@ export interface CitationBlock extends BookBlockBase {
   referenceId: string;
 }
 
+/**
+ * Pins its content to the bottom of whatever physical page it lands on
+ * (above the folio), reserving that space from the paginator's normal
+ * packing rather than overlaying it — see `paginate-book.browser.ts`'s
+ * `"pageFooterNote"` FragmentKind branch. Generic and reusable (not
+ * specific to the Copyright/Disclaimer footer, which stays baked into
+ * `renderTitlePage` since the title page is a `singlePage` fragment this
+ * block never competes with).
+ */
+export interface PageFooterNoteBlock extends BookBlockBase {
+  type: BookBlockType.PAGE_FOOTER_NOTE;
+  richText: RichTextDoc;
+}
+
 /** Union of every block type — a new block type adds a member here (and to the registry/DTO/asset-field dispatch tables). */
 export type BookBlock =
   | HeadingBlock
@@ -135,7 +149,8 @@ export type BookBlock =
   | PageBreakBlock
   | QrLinkBlock
   | RecipeRefBlock
-  | CitationBlock;
+  | CitationBlock
+  | PageFooterNoteBlock;
 
 /** Block types that add instantly with no editor modal — both are contentless, so there is nothing to fill in. */
 export const IMMEDIATE_BLOCK_TYPES: readonly BookBlockType[] = [BookBlockType.PAGE_BREAK, BookBlockType.DIVIDER];

@@ -164,19 +164,39 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
             Add block
           </CustomButton>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          {groups.map(([groupKey, groupLabel]) => (
-            <div key={groupKey}>
-              <p className="px-2 pt-2 text-xs font-semibold uppercase text-slate-400">{groupLabel}</p>
-              {(Object.entries(bookBlockRegistry) as [BookBlockType, (typeof bookBlockRegistry)[BookBlockType]][])
-                .filter(([, entry]) => entry.group === groupKey)
-                .map(([type, entry]) => (
-                  <DropdownMenuItem key={type} onSelect={() => (entry.immediate ? handleAddImmediate(type) : setAdding(type))}>
-                    {entry.label}
-                  </DropdownMenuItem>
-                ))}
-            </div>
-          ))}
+        <DropdownMenuContent align="start" className="p-0">
+          {/* min(70dvh, Radix's own measured available height) — a plain
+              70dvh cap is wrong whenever the trigger sits close to a
+              viewport edge: Radix flips this menu to whichever side (top/
+              bottom) has more room, but a FIXED 70dvh can still exceed
+              that side's actual available space (e.g. a short viewport
+              with the trigger near the bottom), which left the menu
+              positioned partly off-screen — verified live, the "TEXT"
+              group header rendered above y=0 and was unreachable even
+              with the scroll container itself working correctly.
+              `--radix-dropdown-menu-content-available-height` is the CSS
+              variable Radix sets to the real, current available space on
+              whichever side it picked, so min() always yields whichever
+              is smaller. dvh (not vh) still matches this repo's
+              mobile-safe-overlay convention (see Modal's max-h-[90dvh]) —
+              vh is pinned to the *largest* possible mobile viewport. The
+              max-height + scroll live on this options list only, not on
+              DropdownMenuContent itself, so the popover frame stays sized
+              to its content and the "Add block" trigger never moves. */}
+          <div className="max-h-[min(70dvh,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto overflow-x-hidden p-1">
+            {groups.map(([groupKey, groupLabel]) => (
+              <div key={groupKey}>
+                <p className="sticky top-0 z-10 bg-white px-2 pt-2 text-xs font-semibold uppercase text-slate-400">{groupLabel}</p>
+                {(Object.entries(bookBlockRegistry) as [BookBlockType, (typeof bookBlockRegistry)[BookBlockType]][])
+                  .filter(([, entry]) => entry.group === groupKey)
+                  .map(([type, entry]) => (
+                    <DropdownMenuItem key={type} onSelect={() => (entry.immediate ? handleAddImmediate(type) : setAdding(type))}>
+                      {entry.label}
+                    </DropdownMenuItem>
+                  ))}
+              </div>
+            ))}
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
 

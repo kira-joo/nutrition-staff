@@ -1,21 +1,16 @@
 import { FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import type { ComponentType } from "react";
-import { BookBlockType } from "src/common/enums";
 import { EMPTY_RICH_TEXT_DOC } from "src/common/books/rich-text/rich-text-doc.interface";
-import { bookContentImagePolicy } from "src/common/upload-policies";
+import { BookBlockType } from "src/common/enums";
+import { arabicInput } from "src/common/forms/books/arabic-fields";
 import type { BookBlock } from "src/common/interfaces/book-block.interface";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
-import { arabicInput } from "src/common/forms/books/arabic-fields";
-import { checklistItemsField } from "./fields/checklist-items-field";
-import { citationPickerField } from "./fields/citation-picker-field";
-import { fromListItems, listItemsField, toListItems } from "./fields/list-items-field";
-import { recipePickerField } from "./fields/recipe-picker-field";
-import { richTextField } from "./fields/rich-text-field";
-import { tableGridField, type TableGridValue } from "./fields/table-grid-field";
+import { bookContentImagePolicy } from "src/common/upload-policies";
 import {
   CitationBlockPreview,
   ImageBlockPreview,
   ListBlockPreview,
+  PageFooterNoteBlockPreview,
   QrLinkBlockPreview,
   RecipeRefBlockPreview,
   RichTextBlockPreview,
@@ -23,6 +18,12 @@ import {
   TableBlockPreview,
   TextBlockPreview,
 } from "./block-previews";
+import { checklistItemsField } from "./fields/checklist-items-field";
+import { citationPickerField } from "./fields/citation-picker-field";
+import { fromListItems, listItemsField, toListItems } from "./fields/list-items-field";
+import { recipePickerField } from "./fields/recipe-picker-field";
+import { richTextField } from "./fields/rich-text-field";
+import { tableGridField, type TableGridValue } from "./fields/table-grid-field";
 
 export interface BookBlockRegistryCtx {
   references: BookReference[];
@@ -71,7 +72,13 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
   [BookBlockType.PARAGRAPH]: {
     label: "Paragraph",
     group: "text",
-    fields: (ctx) => [richTextField("richText", "Text", ctx.references.map((reference) => ({ id: reference.id, label: reference.label })))],
+    fields: (ctx) => [
+      richTextField(
+        "richText",
+        "Text",
+        ctx.references.map((reference) => ({ id: reference.id, label: reference.label })),
+      ),
+    ],
     defaultValues: (block) => ({ richText: block?.type === BookBlockType.PARAGRAPH ? block.richText : emptyDoc() }),
     transformSubmit: (values) => values,
     Preview: RichTextBlockPreview,
@@ -85,7 +92,7 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     ],
     defaultValues: (block) => ({
       image: block?.type === BookBlockType.IMAGE ? block.image : null,
-      caption: block?.type === BookBlockType.IMAGE ? block.caption ?? "" : "",
+      caption: block?.type === BookBlockType.IMAGE ? (block.caption ?? "") : "",
     }),
     transformSubmit: (values) => values,
     Preview: ImageBlockPreview,
@@ -94,7 +101,9 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     label: "Bullet list",
     group: "structure",
     fields: () => [listItemsField("items", "Items")],
-    defaultValues: (block) => ({ items: toListItems(block?.type === BookBlockType.BULLET_LIST ? block.items : undefined) }),
+    defaultValues: (block) => ({
+      items: toListItems(block?.type === BookBlockType.BULLET_LIST ? block.items : undefined),
+    }),
     transformSubmit: (values) => ({ ...values, items: fromListItems(values.items as { value: string }[]) }),
     Preview: ListBlockPreview,
   },
@@ -102,7 +111,9 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     label: "Numbered list",
     group: "structure",
     fields: () => [listItemsField("items", "Items")],
-    defaultValues: (block) => ({ items: toListItems(block?.type === BookBlockType.NUMBERED_LIST ? block.items : undefined) }),
+    defaultValues: (block) => ({
+      items: toListItems(block?.type === BookBlockType.NUMBERED_LIST ? block.items : undefined),
+    }),
     transformSubmit: (values) => ({ ...values, items: fromListItems(values.items as { value: string }[]) }),
     Preview: ListBlockPreview,
   },
@@ -111,7 +122,8 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     group: "structure",
     fields: () => [checklistItemsField("items", "Items")],
     defaultValues: (block) => ({
-      items: block?.type === BookBlockType.CHECKLIST ? block.items : [{ id: crypto.randomUUID(), text: "", checked: false }],
+      items:
+        block?.type === BookBlockType.CHECKLIST ? block.items : [{ id: crypto.randomUUID(), text: "", checked: false }],
     }),
     transformSubmit: (values) => values,
     Preview: ListBlockPreview,
@@ -120,12 +132,16 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     label: "Quote",
     group: "text",
     fields: (ctx) => [
-      richTextField("richText", "Quote", ctx.references.map((reference) => ({ id: reference.id, label: reference.label }))),
+      richTextField(
+        "richText",
+        "Quote",
+        ctx.references.map((reference) => ({ id: reference.id, label: reference.label })),
+      ),
       arabicInput("attribution", "Attribution (optional)"),
     ],
     defaultValues: (block) => ({
       richText: block?.type === BookBlockType.QUOTE ? block.richText : emptyDoc(),
-      attribution: block?.type === BookBlockType.QUOTE ? block.attribution ?? "" : "",
+      attribution: block?.type === BookBlockType.QUOTE ? (block.attribution ?? "") : "",
     }),
     transformSubmit: (values) => values,
     Preview: RichTextBlockPreview,
@@ -171,9 +187,12 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
   [BookBlockType.QR_LINK]: {
     label: "QR link",
     group: "reference",
-    fields: () => [arabicInput("label", "Label (optional)"), { type: FieldType.INPUT, name: "destination", label: "Destination URL", inputType: "url" }],
+    fields: () => [
+      arabicInput("label", "Label (optional)"),
+      { type: FieldType.INPUT, name: "destination", label: "Destination URL", inputType: "url" },
+    ],
     defaultValues: (block) => ({
-      label: block?.type === BookBlockType.QR_LINK ? block.label ?? "" : "",
+      label: block?.type === BookBlockType.QR_LINK ? (block.label ?? "") : "",
       destination: block?.type === BookBlockType.QR_LINK ? block.destination : "",
     }),
     transformSubmit: (values) => values,
@@ -185,7 +204,7 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     fields: () => [recipePickerField("recipeId", "Recipe"), arabicInput("displayTitle", "Display title (optional)")],
     defaultValues: (block) => ({
       recipeId: block?.type === BookBlockType.RECIPE_REF ? block.recipeId : "",
-      displayTitle: block?.type === BookBlockType.RECIPE_REF ? block.displayTitle ?? "" : "",
+      displayTitle: block?.type === BookBlockType.RECIPE_REF ? (block.displayTitle ?? "") : "",
     }),
     transformSubmit: (values) => values,
     Preview: RecipeRefBlockPreview,
@@ -198,18 +217,45 @@ export const bookBlockRegistry: Record<BookBlockType, BookBlockRegistryEntry> = 
     transformSubmit: (values) => values,
     Preview: CitationBlockPreview,
   },
+  // Arabic label deliberately, unlike every other type's English label —
+  // the doctor needs to understand THIS ONE pins to the page's bottom
+  // instead of flowing normally, which "Footer note" ("bottom-of-page
+  // text") conveys and an English name like "Footer note" would not.
+  [BookBlockType.PAGE_FOOTER_NOTE]: {
+    label: "Footer note",
+    group: "structure",
+    fields: (ctx) => [
+      richTextField(
+        "richText",
+        "Footer note text",
+        ctx.references.map((reference) => ({ id: reference.id, label: reference.label })),
+      ),
+    ],
+    defaultValues: (block) => ({
+      richText: block?.type === BookBlockType.PAGE_FOOTER_NOTE ? block.richText : emptyDoc(),
+    }),
+    transformSubmit: (values) => values,
+    Preview: PageFooterNoteBlockPreview,
+  },
 };
 
-function calloutEntry(type: BookBlockType.TIP | BookBlockType.NOTE | BookBlockType.WARNING, label: string): BookBlockRegistryEntry {
+function calloutEntry(
+  type: BookBlockType.TIP | BookBlockType.NOTE | BookBlockType.WARNING,
+  label: string,
+): BookBlockRegistryEntry {
   return {
     label,
     group: "text",
     fields: (ctx) => [
       arabicInput("title", "Title (optional)"),
-      richTextField("richText", "Body", ctx.references.map((reference) => ({ id: reference.id, label: reference.label }))),
+      richTextField(
+        "richText",
+        "Body",
+        ctx.references.map((reference) => ({ id: reference.id, label: reference.label })),
+      ),
     ],
     defaultValues: (block) => ({
-      title: block?.type === type ? block.title ?? "" : "",
+      title: block?.type === type ? (block.title ?? "") : "",
       richText: block?.type === type ? block.richText : emptyDoc(),
     }),
     transformSubmit: (values) => values,

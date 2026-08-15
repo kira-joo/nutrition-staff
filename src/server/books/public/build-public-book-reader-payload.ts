@@ -2,6 +2,7 @@ import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import { resolveArtifactState } from "src/common/books/artifacts/resolve-artifact-state";
 import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identity";
 import type { BookBackMatter, BookFrontMatter, BookReference, Chapter } from "src/common/interfaces/book-chapter.interface";
+import type { BookCoverMode } from "src/common/interfaces/book.interface";
 import type { BookArtifactSchema } from "src/server/books/artifacts/book-artifact.schema";
 import type { BookSchema } from "src/server/books/book.schema";
 import type { BookEditionSchema, RecipeSnapshot } from "src/server/books/editions/book-edition.schema";
@@ -21,7 +22,9 @@ export interface PublicBookReaderPayload {
   // BOOK_PLAN's "public reading resolves from the immutable Edition."
   title: string;
   subtitle?: string;
+  coverMode: BookCoverMode;
   coverImage: ImageAsset | null;
+  backCoverMode: BookCoverMode;
   backCoverImage: ImageAsset | null;
   resolvedSettings: PublicResolvedIdentity;
   content: {
@@ -67,7 +70,9 @@ export function buildPublicBookReaderPayload(book: BookSchema, edition: BookEdit
 
     title: edition.content.title,
     subtitle: edition.content.subtitle,
+    coverMode: edition.content.coverMode,
     coverImage: edition.content.coverImage ?? null,
+    backCoverMode: edition.content.backCoverMode,
     backCoverImage: edition.content.backCoverImage ?? null,
     resolvedSettings: publicResolvedSettings,
     content: {

@@ -1,6 +1,6 @@
 import { ImageAssetDto } from "@kira-joo/backend-toolkit-core";
 import { Type } from "class-transformer";
-import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, Matches, ValidateNested } from "class-validator";
+import { IsArray, IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, Matches, ValidateNested } from "class-validator";
 import "reflect-metadata";
 import { BookOverrideKey, BookStatus, BookVisibility } from "src/common/enums";
 import { BookOverridesDto } from "src/server/books/dto/book-overrides.dto";
@@ -38,10 +38,21 @@ export class UpdateBookDto {
   @IsString()
   editionLabelTemplate?: string;
 
+  // "generated" vs "uploaded" — see BookCoverMode's doc comment. Not
+  // required: a header PATCH that only changes e.g. `title` doesn't need
+  // to restate the cover mode every time.
+  @IsOptional()
+  @IsIn(["generated", "uploaded"])
+  coverMode?: "generated" | "uploaded";
+
   @IsOptional()
   @ValidateNested()
   @Type(() => ImageAssetDto)
   coverImage?: ImageAssetDto | null;
+
+  @IsOptional()
+  @IsIn(["generated", "uploaded"])
+  backCoverMode?: "generated" | "uploaded";
 
   @IsOptional()
   @ValidateNested()

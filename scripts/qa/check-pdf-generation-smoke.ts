@@ -27,7 +27,9 @@ const QR_DESTINATION = "https://example.com/books/smoke-test";
 const content: FrozenBookContent = {
   title: "كتاب اختبار الطبعة",
   subtitle: "اختبار دخان",
+  coverMode: "generated",
   coverImage: null,
+  backCoverMode: "generated",
   backCoverImage: null,
   frontMatter: { aboutBook: { blocks: [] }, introduction: { blocks: [] } },
   chapters: [
