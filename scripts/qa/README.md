@@ -51,3 +51,18 @@ When you're done, clean up with `find-users-by-pattern.ts` +
   npm run build && npm run start -- -p 4123 &
   ACCESS_TOKEN=<token> node scripts/qa/check-mobile-overflow.js [clientId]
   ```
+
+- **`check-paragraph-mark-split.ts`** — the regression check for "a Book
+  PARAGRAPH block split across a page boundary loses its inline marks"
+  (bold/italic/highlight/link/citation). Runs the real
+  `paginateAndRenderBook` — inlined via `.toString()` exactly like
+  `build-book-html.ts` does in production — inside real headless
+  Chromium, no DB/server/build needed. Sweeps a range of page heights
+  and requires at least one to produce a genuine mid-phrase split (a
+  bold run appearing as two separate `<strong>` tags on two different
+  pages whose concatenation reconstructs the source exactly), plus a
+  lossless-reconstruction check at every height tried.
+
+  ```
+  node --import tsx scripts/qa/check-paragraph-mark-split.ts
+  ```

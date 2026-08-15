@@ -21,6 +21,7 @@ export const VIDEOS_TAGS = [CacheTag.VIDEOS];
 /** Shared by both faq-sections and faq-items mutating routes — nutrition-client's composed GET /api/public/faq reads from both collections under this one tag. */
 export const FAQ_TAGS = [CacheTag.FAQ];
 export const CAMPAIGNS_TAGS = [CacheTag.CAMPAIGNS];
+export const BOOKS_TAGS = [CacheTag.BOOKS];
 
 /** A recipe update/delete busts both the list and that one recipe's detail page. */
 export const recipeDetailTags = (id: string): string[] => [CacheTag.RECIPES, CacheTag.recipe(id)];
@@ -39,3 +40,10 @@ export const campaignSlugChangeTags = (previousSlug: string, newSlug: string): s
   previousSlug === newSlug
     ? [CacheTag.CAMPAIGNS, CacheTag.campaign(newSlug)]
     : [CacheTag.CAMPAIGNS, CacheTag.campaign(previousSlug), CacheTag.campaign(newSlug)];
+
+/** A book header update (`PUT /api/books/:id`) can change slug, visibility, showOnWebsite, allowFlipbook, allowPdfDownload, or status in one request — rather than special-casing which field actually flipped, this always busts the list plus both the old and new slug's detail cache, exactly like `campaignSlugChangeTags`. Over-invalidating a low-frequency staff action is cheap; under-invalidating is a real bug (a book that just went private/unlisted staying visible). */
+export const bookSlugChangeTags = (previousSlug: string, newSlug: string): string[] =>
+  previousSlug === newSlug ? [CacheTag.BOOKS, CacheTag.book(newSlug)] : [CacheTag.BOOKS, CacheTag.book(previousSlug), CacheTag.book(newSlug)];
+
+/** Publishing a new Edition changes `currentEditionId`/`status`/`editionCount` — always busts the list and this book's detail page. */
+export const bookDetailTags = (slug: string): string[] => [CacheTag.BOOKS, CacheTag.book(slug)];

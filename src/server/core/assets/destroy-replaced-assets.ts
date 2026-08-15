@@ -1,6 +1,7 @@
 import type { AssetProvider, AssetResourceType } from "@kira-joo/backend-toolkit-core";
 import type { ParsedMultipartFile } from "@kira-joo/backend-toolkit-next";
 import type { AssetFieldConfig } from "./asset-field-config.interface";
+import { getAtPath } from "./process-asset-upload-fields";
 
 /**
  * Post-save cleanup for a successful *update*: for every asset field that
@@ -31,10 +32,10 @@ export async function destroyReplacedAssets({
 }): Promise<void> {
   for (const field of fields) {
     const hadNewFile = Boolean(files[field.name]);
-    const wasExplicitlyCleared = payload[field.name] === null;
+    const wasExplicitlyCleared = getAtPath(payload, field.name) === null;
     if (!hadNewFile && !wasExplicitlyCleared) continue;
 
-    const previousAsset = previousDocument[field.name] as { publicId: string } | undefined;
+    const previousAsset = getAtPath(previousDocument, field.name) as { publicId: string } | undefined;
     if (!previousAsset) continue;
 
     try {

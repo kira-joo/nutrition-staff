@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   ChefHat,
   FlaskConical,
   Globe,
@@ -116,6 +117,26 @@ export const sideNavSections: SideNavSectionConfig[] = [
         href: AppRoute.recipeFoodGroups,
         icon: Salad,
         permission: AppPermission.RECIPE_FOOD_GROUP.READ,
+      },
+    ],
+  },
+  {
+    key: "books",
+    label: "Books",
+    items: [
+      {
+        key: "books",
+        label: "Books",
+        href: AppRoute.books,
+        icon: BookOpen,
+        permission: AppPermission.BOOK.READ,
+      },
+      {
+        key: "book-settings",
+        label: "Book Settings",
+        href: AppRoute.bookSettings,
+        icon: Settings,
+        permission: AppPermission.BOOK_SETTINGS.READ_ONE,
       },
     ],
   },
