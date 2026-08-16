@@ -7,7 +7,15 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { Bold, Italic, Highlighter, Link as LinkIcon, Quote } from "lucide-react";
 import { useEffect } from "react";
 import { EMPTY_RICH_TEXT_DOC, type RichTextDoc } from "./rich-text-doc.interface";
-import { BoldMark, CitationMark, HighlightMark, ItalicMark, LinkMark } from "./tiptap-extensions";
+import { BoldMark, CitationMark, FontSizeMark, HighlightMark, ItalicMark, LinkMark, TextColorMark } from "./tiptap-extensions";
+import {
+  DEFAULT_HIGHLIGHT_COLOR,
+  FONT_SIZE_VALUES,
+  HIGHLIGHT_COLOR_TOKENS,
+  TEXT_COLOR_TOKENS,
+  type FontSizeToken,
+  buildRichTextMarkCss,
+} from "./rich-text-tokens";
 
 const SAFE_HREF_PATTERN = /^(https?:\/\/|\/)/;
 
@@ -30,7 +38,7 @@ export interface RichTextEditorProps {
  */
 export function RichTextEditor({ value, onChange, referenceOptions = [], error }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [Document, Paragraph, Text, BoldMark, ItalicMark, HighlightMark, LinkMark, CitationMark],
+    extensions: [Document, Paragraph, Text, BoldMark, ItalicMark, HighlightMark, LinkMark, CitationMark, FontSizeMark, TextColorMark],
     content: value ?? EMPTY_RICH_TEXT_DOC,
     onUpdate: ({ editor }) => onChange(editor.getJSON() as RichTextDoc),
     editorProps: {
@@ -84,6 +92,62 @@ export function RichTextEditor({ value, onChange, referenceOptions = [], error }
         <ToolbarButton active={editor.isActive("highlight")} onClick={() => editor.chain().focus().toggleMark("highlight").run()} label="Highlight">
           <Highlighter className="h-4 w-4" />
         </ToolbarButton>
+
+        {/* Compact selection-level controls. Each writes a TOKEN, never CSS,
+            and each applies only to the current selection because
+            setMark/unsetMark operate on the selection range. `value` is read
+            back from `editor.getAttributes(...)`, so the controls reflect
+            the caret/selection where a single value applies. */}
+        <select
+          aria-label="Highlight color"
+          className="h-8 rounded border border-slate-300 bg-white px-1 text-xs"
+          value={(editor.getAttributes("highlight").color as string) ?? DEFAULT_HIGHLIGHT_COLOR}
+          onChange={(event) =>
+            editor.chain().focus().setMark("highlight", { color: event.target.value }).run()
+          }
+        >
+          {HIGHLIGHT_COLOR_TOKENS.map((token) => (
+            <option key={token} value={token}>
+              {token}
+            </option>
+          ))}
+        </select>
+
+        <select
+          aria-label="Text color"
+          className="h-8 rounded border border-slate-300 bg-white px-1 text-xs"
+          value={(editor.getAttributes("textColor").color as string) ?? ""}
+          onChange={(event) => {
+            const value = event.target.value;
+            if (!value) editor.chain().focus().unsetMark("textColor").run();
+            else editor.chain().focus().setMark("textColor", { color: value }).run();
+          }}
+        >
+          <option value="">color</option>
+          {TEXT_COLOR_TOKENS.map((token) => (
+            <option key={token} value={token}>
+              {token}
+            </option>
+          ))}
+        </select>
+
+        <select
+          aria-label="Font size"
+          className="h-8 rounded border border-slate-300 bg-white px-1 text-xs"
+          value={(editor.getAttributes("fontSize").size as string) ?? ""}
+          onChange={(event) => {
+            const value = event.target.value;
+            if (!value) editor.chain().focus().unsetMark("fontSize").run();
+            else editor.chain().focus().setMark("fontSize", { size: value as FontSizeToken }).run();
+          }}
+        >
+          <option value="">size</option>
+          {FONT_SIZE_VALUES.map((value) => (
+            <option key={value} value={`size-${value}`}>
+              {value}
+            </option>
+          ))}
+        </select>
         <ToolbarButton active={editor.isActive("link")} onClick={toggleLink} label="Link">
           <LinkIcon className="h-4 w-4" />
         </ToolbarButton>
@@ -96,6 +160,15 @@ export function RichTextEditor({ value, onChange, referenceOptions = [], error }
           <Quote className="h-4 w-4" />
         </ToolbarButton>
       </div>
+      {/* The SAME rules the Book template emits, scoped to the editor so
+          formatting is visible while typing instead of only in Preview/PDF.
+          Generated from `rich-text-tokens.ts`, never hand-copied, so the
+          editor and the printed page cannot drift. Previously these nine
+          classes existed only in the template stylesheet, which is why the
+          marks applied correctly but looked completely inert in the editor
+          — and why plain Highlight still appeared yellow: that was the
+          browser's default <mark> styling, not ours. */}
+      <style dangerouslySetInnerHTML={{ __html: buildRichTextMarkCss(".book-rich-text-editor ") }} />
       <EditorContent editor={editor} />
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
     </div>

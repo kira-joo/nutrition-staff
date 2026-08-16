@@ -1,4 +1,5 @@
 import type { RichTextDoc, RichTextMark, RichTextNode } from "./rich-text-doc.interface";
+import { DEFAULT_HIGHLIGHT_COLOR, isFontSizeToken, isHighlightColorToken, isTextColorToken } from "./rich-text-tokens";
 
 /**
  * The one shared JSON→HTML renderer for Book rich text — used by the staff
@@ -21,8 +22,20 @@ function renderMarksOpen(marks: RichTextMark[]): string {
           return "<strong>";
         case "italic":
           return "<em>";
-        case "highlight":
-          return '<mark class="book-highlight">';
+        case "highlight": {
+          // An absent/unknown colour falls back to the historical yellow, so
+          // marks from Editions published before colours existed render
+          // exactly as they always did.
+          const color = isHighlightColorToken(mark.attrs?.color) ? mark.attrs?.color : DEFAULT_HIGHLIGHT_COLOR;
+          return `<mark class="book-highlight book-highlight--${color}">`;
+        }
+        case "fontSize":
+          // Unknown tokens render unstyled rather than emitting a class the
+          // template does not define — the validator already rejects them on
+          // the way in, so this only guards hand-edited legacy data.
+          return isFontSizeToken(mark.attrs?.size) ? `<span class="book-text-${mark.attrs?.size}">` : "<span>";
+        case "textColor":
+          return isTextColorToken(mark.attrs?.color) ? `<span class="book-text-color-${mark.attrs?.color}">` : "<span>";
         case "link": {
           const href = mark.attrs?.href && SAFE_HREF_PATTERN.test(mark.attrs.href) ? mark.attrs.href : "";
           return href ? `<a href="${escapeHtml(href)}">` : "<span>";
@@ -48,6 +61,9 @@ function renderMarksClose(marks: RichTextMark[]): string {
           return "</em>";
         case "highlight":
           return "</mark>";
+        case "fontSize":
+        case "textColor":
+          return "</span>";
         case "link":
           return mark.attrs?.href && SAFE_HREF_PATTERN.test(mark.attrs.href) ? "</a>" : "</span>";
         case "citation":

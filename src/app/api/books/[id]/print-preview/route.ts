@@ -60,7 +60,16 @@ export async function GET(request: NextRequest, context: { params: { id: string 
     const template = getBookTemplate(identity.templateVersion);
     const html = await template.buildHtml({ book, identity, chapterId: query.chapterId });
 
-    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    // `no-store` is required, not defensive. This renders the MUTABLE draft,
+    // and the page fetches it with a plain GET whose URL never changes, so
+    // without it the browser's own HTTP cache can satisfy a Refresh from a
+    // previous response — the preview then shows an older contentRevision
+    // than the block the author just saved. `dynamic = "force-dynamic"`
+    // above does not cover this: it governs Next's server-side cache, not
+    // the browser's.
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store, must-revalidate" },
+    });
   } catch (error) {
     return createErrorResponse(error);
   }

@@ -76,6 +76,18 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   // `Function.prototype.toString()` into the generated document's own
   // <script> tag and must stay import-free at the value level (see the
   // file header). Keep both in sync by hand if a mark type is ever added.
+  // MUST stay in lockstep with `render-rich-text.ts`'s renderMarksOpen/Close.
+  // This duplicate exists only because `build-book-html.ts` inlines this
+  // whole function via `.toString()`, which has no module scope to import
+  // from. Any mark the shared renderer supports and this one does not is
+  // SILENTLY DROPPED for paragraphs that split across a page boundary —
+  // exactly how `fontSize`/`textColor` vanished from Staff Preview and the
+  // PDF while rendering correctly in the client Flipbook, which uses the
+  // shared renderer directly. Token lists are inlined for the same reason.
+  const SIZE_TOKENS_LOCAL = ["size-10","size-11","size-12","size-14","size-16","size-18","size-20","size-24"];
+  const COLOR_TOKENS_LOCAL = ["ink","primary","primary-dark","muted","accent"];
+  const HIGHLIGHT_TOKENS_LOCAL = ["yellow","green","blue","pink"];
+
   function renderMarksOpenLocal(marks: FlatPiece["marks"]): string {
     return marks
       .map((mark) => {
@@ -84,8 +96,16 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
             return "<strong>";
           case "italic":
             return "<em>";
-          case "highlight":
-            return '<mark class="book-highlight">';
+          case "highlight": {
+            // Absent/unknown colour keeps the historical yellow, so marks
+            // from Editions published before colours existed are unchanged.
+            const color = HIGHLIGHT_TOKENS_LOCAL.includes(String(mark.attrs?.color)) ? String(mark.attrs?.color) : "yellow";
+            return `<mark class="book-highlight book-highlight--${color}">`;
+          }
+          case "fontSize":
+            return SIZE_TOKENS_LOCAL.includes(String(mark.attrs?.size)) ? `<span class="book-text-${String(mark.attrs?.size)}">` : "<span>";
+          case "textColor":
+            return COLOR_TOKENS_LOCAL.includes(String(mark.attrs?.color)) ? `<span class="book-text-color-${String(mark.attrs?.color)}">` : "<span>";
           case "link": {
             const href = mark.attrs?.href && SAFE_HREF_PATTERN_LOCAL.test(mark.attrs.href) ? mark.attrs.href : "";
             return href ? `<a href="${escapeHtmlLocal(href)}">` : "<span>";
@@ -111,6 +131,9 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
             return "</em>";
           case "highlight":
             return "</mark>";
+          case "fontSize":
+          case "textColor":
+            return "</span>";
           case "link":
             return mark.attrs?.href && SAFE_HREF_PATTERN_LOCAL.test(mark.attrs.href) ? "</a>" : "</span>";
           case "citation":

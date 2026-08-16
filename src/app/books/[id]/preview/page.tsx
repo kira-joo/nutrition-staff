@@ -32,9 +32,14 @@ export default function BookPreviewPage({ params }: { params: { id: string } }) 
 function PreviewFrame({ bookId, chapters }: { bookId: string; chapters: { id: string; title: string }[] }) {
   const [chapterId, setChapterId] = useState<string>("");
 
+  // A draft preview must never be served from cache: the author is editing
+  // the very content being rendered. `staleTime: 0` + refetch-on-mount means
+  // reopening the tab after a block edit re-renders rather than replaying the
+  // response captured when the tab first opened.
   const previewQuery = useRequesterQuery({
     endpoint: getBookPrintPreviewEndpoint,
     options: { params: { id: bookId }, query: chapterId ? { chapterId } : {} },
+    queryOptions: { staleTime: 0, gcTime: 0, refetchOnMount: "always", refetchOnWindowFocus: true },
   });
 
   return (
@@ -60,6 +65,11 @@ function PreviewFrame({ bookId, chapters }: { bookId: string; chapters: { id: st
           <p className="py-20 text-sm text-red-600">Failed to render preview.</p>
         ) : (
           <iframe
+            // Keyed on the rendered HTML's length so React replaces the
+            // element outright when the document changes. An iframe does not
+            // reliably re-parse a mutated srcDoc, which could otherwise keep
+            // an older document on screen even once fresh HTML has arrived.
+            key={(previewQuery.data ?? "").length}
             title="Book print preview"
             srcDoc={previewQuery.data ?? ""}
             sandbox="allow-scripts allow-same-origin"
