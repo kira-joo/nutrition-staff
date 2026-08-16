@@ -169,9 +169,21 @@ ${watermark ? `
   background-size: ${watermark.scaleMm}mm auto;
   opacity: ${watermark.opacity};
 }
-/* Lifts real content above the watermark. Layout-neutral: \`position:
-   relative\` on an already-\`flow-root\` box changes nothing about its size. */
-.book-page-content { position: relative; z-index: 1; }
+/* Lifts real content above the watermark — but ONLY on ordinary paper
+   pages, which is why it repeats the exclusion selector rather than
+   targeting .book-page-content globally.
+   .book-cover, .book-back-cover and .book-chapter-opener are all
+   position:absolute + inset:0, so they fill the physical page by
+   resolving against the nearest POSITIONED ancestor — .book-page. Making
+   .book-page-content positioned unconditionally silently moved that
+   containing block to the padded content box, and every full-bleed
+   surface rendered inset inside a white margin. Full-bleed pages have no
+   watermark to sit above anyway, so they must keep .book-page as their
+   containing block. */
+.book-page:not(:has(.book-cover)):not(:has(.book-chapter-opener)):not(:has(.book-back-cover)) > .book-page-content {
+  position: relative;
+  z-index: 1;
+}
 ` : ""}
 .book-running-head {
   position: absolute;
