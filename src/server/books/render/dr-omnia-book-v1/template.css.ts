@@ -182,7 +182,17 @@ p { margin-bottom: 3mm; text-align: justify; text-justify: inter-word; }
 .book-citation { color: ${BRAND_COLORS.primary}; font-size: 0.75em; }
 a { color: ${BRAND_COLORS.primary}; text-decoration: underline; }
 
-ul, ol { margin: 0 0 3mm 0; padding-inline-start: 6mm; }
+/* \`list-style\` stated explicitly, hand-synced with nutrition-client's
+   \`template-css.ts\`. It is a no-op for the PDF and Staff Preview, which
+   already got disc/decimal from UA defaults — but the client reader
+   renders inside an app whose Tailwind preflight sets
+   \`ol, ul, menu { list-style: none }\`, so relying on defaults silently
+   dropped every marker there. Stating it keeps one stylesheet true for
+   the reader, Staff Preview and the PDF alike. */
+ul, ol { margin: 0 0 3mm 0; padding-inline-start: 6mm; list-style-position: outside; }
+ul { list-style-type: disc; }
+ol { list-style-type: decimal; }
+ul ul { list-style-type: circle; }
 ul.book-checklist { list-style: none; padding-inline-start: 0; }
 ul.book-checklist li { display: flex; align-items: baseline; gap: 2mm; margin-bottom: 1.5mm; }
 ul.book-checklist .book-checkbox { display: inline-block; width: 3.2mm; height: 3.2mm; border: 0.4mm solid ${BRAND_COLORS.primary}; border-radius: 0.6mm; flex-shrink: 0; }

@@ -10,7 +10,11 @@ import type { Book } from "src/common/interfaces/book.interface";
 import { bookBlockRegistry } from "./book-block-registry";
 
 /** Every block add/replace endpoint (chapter or section container) shares this exact shape — see the doc comment on the params types in `book-content.endpoints.ts`. */
-export type BookBlockEndpoint = Endpoint<{ params: Record<string, string>; body: Record<string, unknown>; returnType: Book }>;
+export type BookBlockEndpoint = Endpoint<{
+  params: Record<string, string>;
+  body: Record<string, unknown>;
+  returnType: Book;
+}>;
 
 export interface BookBlockFormProps {
   blockType: BookBlockType;
@@ -18,7 +22,14 @@ export interface BookBlockFormProps {
   references: BookReference[];
   endpoint: BookBlockEndpoint;
   submitParams: Record<string, string>;
-  expectedRevision: number;
+  /**
+   * `useBookContentQueue`'s queue, threaded down from `BookBlockList`
+   * exactly as remove/duplicate/move/reorder already receive it. It is
+   * what makes the editor re-render on success, and it also SUPPLIES the
+   * expected revision — which is why this component takes no
+   * `expectedRevision` prop: the queue holds the only current one.
+   */
+  enqueue: <T>(run: (expectedRevision: number) => Promise<T & Book>) => Promise<T & Book>;
   onSuccess: () => void;
 }
 
@@ -42,28 +53,44 @@ export interface BookBlockFormProps {
  * else goes into the JSON `payload` field, exactly as `buildSubmitBody`
  * would for a form that DOES declare an asset field.
  */
-export function BookBlockForm({ blockType, defaultBlock, references, endpoint, submitParams, expectedRevision, onSuccess }: BookBlockFormProps) {
+export function BookBlockForm({
+  blockType,
+  defaultBlock,
+  references,
+  endpoint,
+  submitParams,
+  enqueue,
+  onSuccess,
+}: BookBlockFormProps) {
   const entry = bookBlockRegistry[blockType];
 
-  const mutation = useRequesterMutation({
-    endpoint,
-    onSuccess: () => {
-      toast.success(defaultBlock ? "Block updated" : "Block added");
-      onSuccess();
-    },
-    onError: (error: ApiError) => toast.error(error.message),
-  });
+  // `mutateAsync`, and no `onSuccess`/`onError` here: the result has to
+  // flow back through `enqueue` so the queue can call `setBook` with the
+  // returned Book and record its new `contentRevision`. An earlier
+  // version used `mutate` with a local `onSuccess` that only closed the
+  // form, which dropped the returned Book on the floor — the editor kept
+  // rendering the stale one until a manual page refresh, and the queue's
+  // revision went stale too, so the NEXT content mutation was one
+  // revision behind and would 409.
+  const mutation = useRequesterMutation({ endpoint });
 
   function handleSubmit(values: Record<string, unknown>): void {
-    const payload = { ...entry.transformSubmit(values), type: blockType, expectedRevision };
-    const formData = new FormData();
-    const jsonPayload: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(payload) as [string, unknown][]) {
-      if (value instanceof File) formData.set(key, value);
-      else jsonPayload[key] = value;
-    }
-    formData.set("payload", JSON.stringify(jsonPayload));
-    mutation.mutate({ params: submitParams, body: formData as unknown as Record<string, unknown> });
+    enqueue((expectedRevision) => {
+      const payload = { ...entry.transformSubmit(values), type: blockType, expectedRevision };
+      const formData = new FormData();
+      const jsonPayload: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(payload) as [string, unknown][]) {
+        if (value instanceof File) formData.set(key, value);
+        else jsonPayload[key] = value;
+      }
+      formData.set("payload", JSON.stringify(jsonPayload));
+      return mutation.mutateAsync({ params: submitParams, body: formData as unknown as Record<string, unknown> });
+    })
+      .then(() => {
+        toast.success(defaultBlock ? "Block updated" : "Block added");
+        onSuccess();
+      })
+      .catch((error: ApiError) => toast.error(error.message));
   }
 
   return (

@@ -207,7 +207,7 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
             references={book.references}
             endpoint={addEndpoint}
             submitParams={routeParams}
-            expectedRevision={book.contentRevision}
+            enqueue={enqueue}
             onSuccess={() => setAdding(null)}
           />
         </Modal>
@@ -221,7 +221,7 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
             references={book.references}
             endpoint={replaceEndpoint}
             submitParams={{ ...routeParams, blockId: editingBlock.id }}
-            expectedRevision={book.contentRevision}
+            enqueue={enqueue}
             onSuccess={() => setEditingBlock(null)}
           />
         </Modal>
