@@ -4,6 +4,7 @@ import { IsArray, IsOptional, IsString, ValidateNested } from "class-validator";
 import "reflect-metadata";
 import { BookContactBlockDto } from "src/server/book-settings/dto/book-contact-block.dto";
 import { BookPrintSettingsDto } from "src/server/book-settings/dto/book-print-settings.dto";
+import { BookPageWatermarkDto } from "src/server/book-settings/dto/book-page-watermark.dto";
 import { BookSocialLinkDto } from "src/server/book-settings/dto/book-social-link.dto";
 
 /** Mirrors BookSettings' overridable shape exactly — every field optional; `Book.overriddenFields` (not this DTO) is what decides which ones are actually active. */
@@ -69,4 +70,9 @@ export class BookOverridesDto {
   @ValidateNested()
   @Type(() => BookPrintSettingsDto)
   print?: BookPrintSettingsDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => BookPageWatermarkDto)
+  pageWatermark?: BookPageWatermarkDto;
 }

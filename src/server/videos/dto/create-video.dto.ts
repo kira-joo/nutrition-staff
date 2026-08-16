@@ -2,6 +2,7 @@ import { ImageAssetDto, LocalizedStringDto, VideoAssetDto } from "@kira-joo/back
 import { Type } from "class-transformer";
 import { IsEnum, IsOptional, IsUrl, ValidateNested } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { ContentStatus } from "src/common/enums";
 import { HasVideoSource } from "src/server/videos/dto/has-video-source.validator";
 
@@ -21,7 +22,7 @@ export class CreateVideoDto {
   @Type(() => VideoAssetDto)
   video?: VideoAssetDto | null;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsUrl()
   externalUrl?: string;
 

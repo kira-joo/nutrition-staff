@@ -21,6 +21,7 @@ import { CURRENT_BOOK_TEMPLATE_VERSION } from "../../src/common/books/book-templ
 import { BookBlockType, BookMarginPreset, BookPageSize } from "../../src/common/enums";
 import type { FrozenBookContent } from "../../src/server/books/editions/book-edition.schema";
 import type { ResolvedBookIdentity } from "../../src/common/books/resolve-book-identity";
+import { DEFAULT_PAGE_WATERMARK } from "../../src/common/interfaces/book-settings.interface";
 
 const QR_DESTINATION = "https://example.com/books/smoke-test";
 
@@ -69,6 +70,7 @@ const resolvedSettings: ResolvedBookIdentity = {
   backCoverAudienceText: "",
   qrDestination: QR_DESTINATION,
   print: { pageSize: BookPageSize.A5, marginPreset: BookMarginPreset.STANDARD, gutterMm: 14, pageNumberStart: 1, doublePageSpread: true },
+  pageWatermark: DEFAULT_PAGE_WATERMARK,
   templateVersion: CURRENT_BOOK_TEMPLATE_VERSION,
   sources: {} as ResolvedBookIdentity["sources"],
 };

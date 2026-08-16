@@ -37,6 +37,11 @@ const bookOverridesSchema = new mongoose.Schema(
     // what's given, with no casting/defaulting, which is what a genuine
     // partial value requires.
     print: { type: mongoose.Schema.Types.Mixed, required: false },
+    // Mixed for exactly the reason `print` above is: the watermark
+    // resolves as a PARTIAL MERGE, so overriding only `opacity` must not
+    // silently write the sub-schema's defaults over the books-level
+    // `image` and `scaleMm`.
+    pageWatermark: { type: mongoose.Schema.Types.Mixed, required: false },
   },
   { _id: false }
 );

@@ -1,6 +1,6 @@
 import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import type { BookOverrideKey, BookStatus, BookVisibility } from "../enums";
-import type { BookContactBlock, BookPrintSettings, BookSocialLink } from "./book-settings.interface";
+import type { BookContactBlock, BookPrintSettings, BookPageWatermark, BookSocialLink } from "./book-settings.interface";
 import type { Chapter, BookFrontMatter, BookBackMatter, BookReference } from "./book-chapter.interface";
 
 /** Mirrors the overridable subset of BookSettings. Every field is optional — only keys present in `Book.overriddenFields` are actually resolved from here. */
@@ -19,6 +19,7 @@ export interface BookOverrides {
   backCoverAudienceText?: string;
   qrDestination?: string;
   print?: Partial<BookPrintSettings>;
+  pageWatermark?: Partial<BookPageWatermark>;
 }
 
 /**

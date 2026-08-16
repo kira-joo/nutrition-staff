@@ -25,6 +25,18 @@ export const BRAND_COLORS = {
 
 export interface BuildTemplateCssOptions {
   /**
+   * Resolved from `resolvedSettings.pageWatermark`. Omitted (or with no
+   * `url`) means the book has no watermark and pages render byte-identically
+   * to how they did before the setting existed.
+   */
+  pageWatermark?: { url: string; opacity: number; scaleMm: number };
+  /**
+   * The footer's botanical mark. Left undefined until the real asset is
+   * supplied — the footer then renders its rules, dots and centred folio
+   * with no leaf, rather than substituting invented artwork.
+   */
+  footerLeafUrl?: string;
+  /**
    * The template's botanical/leaf artwork (a data URI here — Puppeteer's
    * `setContent` has no base URL to resolve a relative path against; see
    * `art/chapter-background.ts`). Reused across covers, the back cover,
@@ -43,6 +55,8 @@ export interface BuildTemplateCssOptions {
  * itself never varies by Book.
  */
 export function buildTemplateCss(geometry: ResolvedGeometry, options: BuildTemplateCssOptions = {}): string {
+  const watermark = options.pageWatermark?.url ? options.pageWatermark : null;
+  const leafUrl = options.footerLeafUrl;
   const botanical = options.chapterBackgroundUrl ? `, url("${options.chapterBackgroundUrl}")` : "";
   const botanicalSize = options.chapterBackgroundUrl ? ", cover" : "";
   return `
@@ -130,8 +144,38 @@ body { direction: rtl; }
 .book-page-footer-note p:last-child { margin-bottom: 0; }
 
 /* ---- Page chrome: folio at the outer edge, running head at the inner edge ---- */
+${watermark ? `
+/* Tiled watermark for ordinary paper pages only. The exclusion list is the
+   template's existing one (see the inner-frame rule): uploaded/generated
+   covers and chapter openers carry their own full-bleed artwork and must
+   never have this painted over them.
+
+   A pseudo-element with \`position: absolute; inset: 0\` has NO layout box,
+   so it cannot shift a line of text or change what the measurement-based
+   paginator computes — \`measureContentBoxPx\`/\`measureHtmlHeight\` are
+   untouched and page counts are identical with the watermark on or off.
+
+   \`background-size\` is in mm because the same stylesheet drives the
+   reader, Staff Preview and the PDF; a percentage would resolve against
+   three different box sizes. */
+.book-page:not(:has(.book-cover)):not(:has(.book-chapter-opener)):not(:has(.book-back-cover))::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("${watermark.url}");
+  background-repeat: repeat;
+  background-size: ${watermark.scaleMm}mm auto;
+  opacity: ${watermark.opacity};
+}
+/* Lifts real content above the watermark. Layout-neutral: \`position:
+   relative\` on an already-\`flow-root\` box changes nothing about its size. */
+.book-page-content { position: relative; z-index: 1; }
+` : ""}
 .book-running-head {
   position: absolute;
+  z-index: 2;
   top: 6mm;
   font-size: 8pt;
   color: ${BRAND_COLORS.muted};
@@ -142,13 +186,81 @@ body { direction: rtl; }
 
 .book-folio {
   position: absolute;
-  bottom: 7mm;
+  bottom: 6mm;
+  left: ${geometry.outerMm}mm;
+  right: ${geometry.outerMm}mm;
+  /* Above the watermark layer (z-index 0) and the page content (1). */
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2mm;
   font-size: 9pt;
+  line-height: 1;
   color: ${BRAND_COLORS.muted};
   font-family: "${BOOK_HEADING_FONT_FAMILY}", "Cairo", sans-serif;
 }
-.book-page[data-side="left"] .book-folio { left: ${geometry.outerMm}mm; text-align: left; }
-.book-page[data-side="right"] .book-folio { right: ${geometry.outerMm}mm; text-align: right; }
+/* The thin rules running outward from the number. Bounded by the page's own
+   outer margin above, so the footer can never leave the safe printable area.
+   The gradient is symmetric on purpose: ::before/::after swap visual
+   sides under dir:rtl, so a one-directional fade would mirror itself
+   between LTR and RTL and between left and right pages. */
+.book-folio::before,
+.book-folio::after {
+  content: "";
+  flex: 1 1 auto;
+  /* 0.3mm, not a 0.2mm hairline: the reader draws the page at a fit-to-stage
+     scale (~0.88), so a 0.75px rule with transparent gradient ends
+     antialiased away to nothing on screen while still being fine in the
+     PDF. 0.3mm is ~1.1px scaled and still thin in print (~0.85pt).
+     Tinted with the brand green at 35% rather than the neutral hairline so
+     the rule, the dots and the leaves read as one composition instead of
+     three unrelated marks. */
+  height: 0.3mm;
+  background: linear-gradient(to right, transparent, rgba(47, 111, 79, 0.35) 30%, rgba(47, 111, 79, 0.35) 70%, transparent);
+}
+/* The flanking dots: bullet 12 bullet. Drawn as pseudo-elements on the
+   number itself because .book-folio's own pair is already the rules. */
+.book-folio-number { position: relative; padding: 0 3mm; white-space: nowrap; }
+.book-folio-number::before,
+.book-folio-number::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.9mm;
+  height: 0.9mm;
+  margin-top: -0.45mm;
+  border-radius: 50%;
+  background: ${BRAND_COLORS.primary};
+  opacity: 0.55;
+}
+.book-folio-number::before { left: 0; }
+.book-folio-number::after { right: 0; }
+${leafUrl ? `
+/* Botanical mark at each outer end of the footer. ONE asset, mirrored on
+   the far side via scaleX(-1) so the pair reads as a symmetric composition
+   rather than the same image printed twice facing the same way.
+
+   \`order\` is what puts them OUTSIDE the rules: .book-folio's ::before and
+   ::after (the rules) and the number all sit at the default order 0, so
+   -1/1 push the leaves beyond them, giving
+   leaf - rule - dot number dot - rule - leaf.
+
+   The box is 3:2 because that is the artwork's own aspect ratio — the leaf
+   is not tightly cropped in the source, and forcing it square would either
+   distort it or shrink it. \`contain\` keeps it undistorted at roughly 8mm
+   of visible leaf, and the asset's own empty margin becomes breathing room
+   toward the rule. Purely decorative, so it is aria-hidden in the markup. */
+.book-folio-leaf {
+  flex: 0 0 auto;
+  width: 12mm;
+  height: 8mm;
+  background: url("${leafUrl}") center / contain no-repeat;
+  opacity: 0.55;
+}
+.book-folio-leaf:first-child { order: -1; }
+.book-folio-leaf:last-child { order: 1; transform: scaleX(-1); }
+` : ""}
 
 /* An ordinary printed page's inner frame — a thin decorative rule set
    IN the margin, between the trim edge and the text block, not around

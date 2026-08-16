@@ -2,6 +2,7 @@ import { ImageAssetDto } from "@kira-joo/backend-toolkit-core";
 import { Type } from "class-transformer";
 import { IsArray, IsEmail, IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { Currency } from "src/common/enums";
 import { SeoDto } from "src/server/site-settings/dto/seo.dto";
 import { SocialLinkDto } from "src/server/site-settings/dto/social-link.dto";
@@ -15,7 +16,7 @@ export class UpdateSiteSettingsDto {
   @IsString()
   whatsappNumber?: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsEmail()
   email?: string;
 

@@ -2,6 +2,7 @@ import { ImageAssetDto, LocalizedStringDto, ToNumber } from "@kira-joo/backend-t
 import { Type } from "class-transformer";
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsUrl, Max, Min, ValidateNested } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { ContentStatus } from "src/common/enums";
 import { HasReviewContent } from "./has-review-content.validator";
 
@@ -55,7 +56,7 @@ export class UpdateReviewDto {
   @IsBoolean()
   featured?: boolean;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsUrl()
   sourceUrl?: string;
 

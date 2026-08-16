@@ -19,4 +19,5 @@ export enum BookOverrideKey {
   BACK_COVER_AUDIENCE_TEXT = "backCoverAudienceText",
   QR_DESTINATION = "qrDestination",
   PRINT = "print",
+  PAGE_WATERMARK = "pageWatermark",
 }

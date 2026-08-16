@@ -1,5 +1,6 @@
 import { IsEmail, IsEnum, IsMongoId, IsOptional, IsString, MinLength } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { ClientSource } from "src/common/enums";
 
 /**
@@ -17,7 +18,7 @@ export class CreateClientDto {
   @MinLength(6)
   phone!: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsEmail()
   email?: string;
 

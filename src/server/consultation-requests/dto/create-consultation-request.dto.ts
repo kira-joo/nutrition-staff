@@ -1,5 +1,6 @@
 import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { ConsultationRequestIntent } from "src/common/enums";
 
 /**
@@ -19,7 +20,7 @@ export class CreateConsultationRequestDto {
   @MinLength(6)
   phone!: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsEmail()
   email?: string;
 

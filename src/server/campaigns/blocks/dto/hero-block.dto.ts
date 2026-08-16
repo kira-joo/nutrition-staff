@@ -2,6 +2,7 @@ import { ImageAssetDto, LocalizedStringDto } from "@kira-joo/backend-toolkit-cor
 import { Type } from "class-transformer";
 import { IsEnum, IsOptional, IsUrl, ValidateNested } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { CampaignBlockType } from "src/common/enums";
 
 /**
@@ -34,7 +35,7 @@ export class HeroBlockDto {
   @Type(() => LocalizedStringDto)
   ctaLabel?: LocalizedStringDto;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsUrl()
   ctaUrl?: string;
 }

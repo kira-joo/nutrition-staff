@@ -1,5 +1,6 @@
 import { IsEmail, IsMongoId, IsEnum, IsOptional, IsString, MinLength } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { Status } from "../../../common/enums";
 
 export class UpdateUserDto {
@@ -8,7 +9,7 @@ export class UpdateUserDto {
   @MinLength(1)
   name?: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsEmail()
   email?: string;
 

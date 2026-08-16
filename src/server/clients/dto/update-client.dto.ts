@@ -11,6 +11,7 @@ import {
   MinLength,
 } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 import { ClientLifecycle, ClientSource, Gender } from "src/common/enums";
 
 export class UpdateClientDto {
@@ -24,7 +25,7 @@ export class UpdateClientDto {
   @MinLength(6)
   phone?: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsEmail()
   email?: string;
 

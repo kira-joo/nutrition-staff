@@ -1,5 +1,6 @@
 import { IsInt, IsOptional, IsString, IsUrl, MaxLength } from "class-validator";
 import "reflect-metadata";
+import { OptionalOrCleared } from "src/server/core/validation";
 
 export class CreateBookReferenceDto {
   @IsString()
@@ -10,7 +11,7 @@ export class CreateBookReferenceDto {
   @MaxLength(1000)
   text!: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsUrl({ require_protocol: true, protocols: ["http", "https"] })
   url?: string;
 
@@ -29,7 +30,7 @@ export class UpdateBookReferenceDto {
   @MaxLength(1000)
   text?: string;
 
-  @IsOptional()
+  @OptionalOrCleared()
   @IsUrl({ require_protocol: true, protocols: ["http", "https"] })
   url?: string;
 

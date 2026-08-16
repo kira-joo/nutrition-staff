@@ -1,6 +1,7 @@
 import { BookOverrideKey } from "../enums";
 import type { BookOverrides } from "../interfaces/book.interface";
-import type { BookContactBlock, BookPrintSettings, BookSettings, BookSocialLink } from "../interfaces/book-settings.interface";
+import type { BookContactBlock, BookPageWatermark, BookPrintSettings, BookSettings, BookSocialLink } from "../interfaces/book-settings.interface";
+import { DEFAULT_PAGE_WATERMARK } from "../interfaces/book-settings.interface";
 import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 
 export interface ResolvedBookIdentity {
@@ -18,6 +19,7 @@ export interface ResolvedBookIdentity {
   backCoverAudienceText: string;
   qrDestination: string | null;
   print: BookPrintSettings;
+  pageWatermark: BookPageWatermark;
   templateVersion: string;
   /** Per key: where the resolved value came from — drives both the staff UI badges and publish validation. */
   sources: Record<BookOverrideKey, "override" | "default" | "unset">;
@@ -67,8 +69,18 @@ export function resolveBookIdentity(settings: BookSettings, book: BookForResolut
       ? (overrides.qrDestination ?? null)
       : (settings.defaultQrDestination ?? null),
     print: isOverridden(book, BookOverrideKey.PRINT) ? { ...settings.print, ...overrides.print } : settings.print,
+    // Same partial-merge shape as `print`, and layered over
+    // DEFAULT_PAGE_WATERMARK so a settings document written before this
+    // field existed still resolves to a complete, renderable object
+    // rather than `undefined` reaching the template.
+    pageWatermark: {
+      ...DEFAULT_PAGE_WATERMARK,
+      ...(settings.pageWatermark ?? {}),
+      ...(isOverridden(book, BookOverrideKey.PAGE_WATERMARK) ? (overrides.pageWatermark ?? {}) : {}),
+    },
     templateVersion: settings.templateVersion,
     sources: {
+      [BookOverrideKey.PAGE_WATERMARK]: sourceFor(book, BookOverrideKey.PAGE_WATERMARK, settings.pageWatermark?.image),
       [BookOverrideKey.DOCTOR_NAME]: sourceFor(book, BookOverrideKey.DOCTOR_NAME, settings.doctorName),
       [BookOverrideKey.DOCTOR_TITLE]: sourceFor(book, BookOverrideKey.DOCTOR_TITLE, settings.doctorTitle),
       [BookOverrideKey.DOCTOR_BIO]: sourceFor(book, BookOverrideKey.DOCTOR_BIO, settings.doctorBio),

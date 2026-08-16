@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { BookMarginPreset, BookPageSize } from "src/common/enums";
 import { CURRENT_BOOK_TEMPLATE_VERSION } from "src/common/books/book-template-version";
-import type { BookContactBlock, BookPrintSettings, BookSocialLink } from "src/common/interfaces/book-settings.interface";
+import type { BookContactBlock, BookPageWatermark, BookPrintSettings, BookSocialLink } from "src/common/interfaces/book-settings.interface";
+import { DEFAULT_PAGE_WATERMARK } from "src/common/interfaces/book-settings.interface";
 
 // See doctor-profile.schema.ts for why this cast exists: MongoFieldOptions
 // is typed loosely for `@MongoField()`, and doesn't structurally match
@@ -43,6 +44,20 @@ export const bookPrintSettingsSchema = new mongoose.Schema(
     gutterMm: { type: Number, default: 18 },
     pageNumberStart: { type: Number, default: 1 },
     doublePageSpread: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
+/**
+ * Exported for the same reason as `bookPrintSettingsSchema`: `Book.overrides`
+ * and the Edition's frozen `resolvedSettings` reuse this one definition
+ * rather than each restating the shape.
+ */
+export const bookPageWatermarkSchema = new mongoose.Schema(
+  {
+    image: asSchemaField(imageAssetField()),
+    opacity: { type: Number, default: DEFAULT_PAGE_WATERMARK.opacity, min: 0, max: 1 },
+    scaleMm: { type: Number, default: DEFAULT_PAGE_WATERMARK.scaleMm, min: 1 },
   },
   { _id: false }
 );
@@ -103,6 +118,9 @@ export class BookSettingsSchema {
 
   @MongoField({ type: bookPrintSettingsSchema, default: () => ({}) })
   print!: BookPrintSettings;
+
+  @MongoField({ type: bookPageWatermarkSchema, default: () => ({}) })
+  pageWatermark!: BookPageWatermark;
 
   @MongoField({ type: String, required: true, default: CURRENT_BOOK_TEMPLATE_VERSION })
   templateVersion!: string;

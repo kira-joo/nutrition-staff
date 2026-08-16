@@ -9,6 +9,7 @@ import type { updateBookSettingsEndpoint } from "../../../api/book-settings.endp
 import { BookMarginPreset, BookPageSize } from "../enums";
 import { BookSettings, BookSettingsFormValues } from "../interfaces/book-settings.interface";
 import { bookLogoPolicy, bookPortraitPolicy } from "../upload-policies";
+import { DEFAULT_PAGE_WATERMARK } from "../interfaces/book-settings.interface";
 import { ArrayFieldEditor } from "./array-field-editor";
 import { arabicInput, arabicTextarea } from "./books/arabic-fields";
 
@@ -29,6 +30,9 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
       doctorBio: defaultValues.doctorBio,
       doctorImage: defaultValues.doctorImage ?? null,
       bookLogo: defaultValues.bookLogo ?? null,
+      // Layered over the shared defaults so a settings document saved
+      // before this field existed still populates the form completely.
+      pageWatermark: { ...DEFAULT_PAGE_WATERMARK, ...(defaultValues.pageWatermark ?? {}) },
       websiteUrl: defaultValues.websiteUrl ?? "",
       socialLinks: defaultValues.socialLinks ?? [],
       contact: defaultValues.contact ?? {},
@@ -121,6 +125,18 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
     { type: FieldType.SWITCH, name: "print.doublePageSpread", label: "Double-page spread preview" },
   ];
 
+  /**
+   * Page background watermark. Uploaded through the SAME image-asset field
+   * every other book image uses — the dotted `pageWatermark.image` name is
+   * resolved by `processAssetUploadFields`'s path helper, so this needs no
+   * upload code of its own. Leaving the image empty is the off switch.
+   */
+  const watermarkFields: FormFieldConfig<BookSettingsFormValues>[] = [
+    { type: FieldType.IMAGE_ASSET, name: "pageWatermark.image", label: "Page watermark (tiled, transparent PNG)", policy: bookLogoPolicy },
+    { type: FieldType.INPUT, name: "pageWatermark.opacity", label: "Watermark opacity (0-1)", inputType: "number" },
+    { type: FieldType.INPUT, name: "pageWatermark.scaleMm", label: "Watermark tile size (mm)", inputType: "number" },
+  ];
+
   return (
     <>
       <div className="mb-4 flex justify-end">
@@ -135,6 +151,7 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
           { title: "Contact & social", icon: Contact, fields: contactFields },
           { title: "Legal & back cover", icon: BookMarked, fields: legalFields },
           { title: "Print defaults", icon: Printer, fields: printFields },
+          { title: "Page watermark", icon: ImageIcon, fields: watermarkFields },
         ]}
         submitEndpoint={endpoint}
         warnOnUnsavedChanges

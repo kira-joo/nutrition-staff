@@ -2,6 +2,7 @@ import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identit
 import { BINDING_EDGE } from "src/common/books/book-physical-order";
 import type { Book } from "src/common/interfaces/book.interface";
 import { buildTemplateCss } from "./dr-omnia-book-v1/template.css";
+import { FOOTER_LEAF_DATA_URI } from "./dr-omnia-book-v1/art/footer-leaf";
 import { CHAPTER_BACKGROUND_DATA_URI } from "./dr-omnia-book-v1/art/chapter-background";
 import { chapterLabel } from "src/common/books/chapter-label";
 import { resolveGeometry } from "./dr-omnia-book-v1/geometry";
@@ -48,7 +49,20 @@ export interface BuildBookHtmlOptions {
  */
 export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots }: BuildBookHtmlOptions): Promise<string> {
   const geometry = resolveGeometry(identity.print.pageSize, identity.print.marginPreset, identity.print.gutterMm);
-  const css = buildTemplateCss(geometry, { chapterBackgroundUrl: CHAPTER_BACKGROUND_DATA_URI });
+  // One call site, so Staff Preview and the PDF are guaranteed the same
+  // watermark — `identity` is the live-resolved identity for preview and
+  // the Edition's FROZEN `resolvedSettings` for a published render, so a
+  // historical Edition keeps the watermark it was published with.
+  // A Cloudinary secureUrl is absolute, so unlike the template's own
+  // artwork it needs no data-URI treatment for Puppeteer's `setContent`.
+  const watermarkImage = identity.pageWatermark?.image;
+  const css = buildTemplateCss(geometry, {
+    chapterBackgroundUrl: CHAPTER_BACKGROUND_DATA_URI,
+    footerLeafUrl: FOOTER_LEAF_DATA_URI,
+    pageWatermark: watermarkImage?.secureUrl
+      ? { url: watermarkImage.secureUrl, opacity: identity.pageWatermark.opacity, scaleMm: identity.pageWatermark.scaleMm }
+      : undefined,
+  });
 
   const stream: StreamFragment[] = [];
   const chapters = chapterId ? book.chapters.filter((chapter) => chapter.id === chapterId) : book.chapters;
@@ -225,7 +239,10 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
         var chapterTitle = page.chapterId ? chapterTitleById[page.chapterId] : null;
         runningHeadHtml = '<div class="book-running-head">' + buildRunningHead(bookTitle, chapterTitle) + "</div>";
         if (page.pageNumber !== null) {
-          folioHtml = '<div class="book-folio">' + page.pageNumber + "</div>";
+          // The inner span is what lets the template draw the reference
+          // footer: .book-folio's own ::before/::after are the thin rules
+          // and leaf marks, so the flanking dots need their own element.
+          folioHtml = '<div class="book-folio"><span class="book-folio-leaf" aria-hidden="true"></span><span class="book-folio-number">' + page.pageNumber + '</span><span class="book-folio-leaf" aria-hidden="true"></span></div>';
         }
       }
       html +=

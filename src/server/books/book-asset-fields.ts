@@ -15,6 +15,7 @@ export const BOOK_ASSET_FIELDS: readonly AssetFieldConfig[] = [
   // than the default it's overriding.
   { name: "overrides.doctorImage", kind: AssetKind.IMAGE, policy: bookPortraitPolicy },
   { name: "overrides.bookLogo", kind: AssetKind.IMAGE, policy: bookLogoPolicy },
+  { name: "overrides.pageWatermark.image", kind: AssetKind.IMAGE, policy: bookLogoPolicy },
 ];
 
 export const BOOK_ASSET_FOLDER = "nutrition/books/covers";
