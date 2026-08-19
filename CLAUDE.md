@@ -9,14 +9,18 @@ itself are the orientation material.
 
 ## Branch policy — the one rule that matters most
 
-**Never push directly to `main`.** Every feature gets its own
-`feature/<name>` branch, verified there, and merged only at the user's explicit
-direction. Several feature branches are usually open at once; run
-`git branch --show-current` before doing anything, and never assume the working
-tree is where you left it — other sessions share these trees.
+**Never merge into `main`.** Implementation work happens on the `staging` branch
+(branched from `main`); commit and push there freely, and leave every merge into
+`main` to the user, who handles it personally when they decide the work is ready.
 
-`main` contains merge commits from before this rule existed. That is history,
-not permission.
+This supersedes the older `feature/<name>`-per-feature convention for the current
+workflow. Older `feature/*` branches may still exist locally and remotely — they
+are history, not the active pattern.
+
+Run `git branch --show-current` before doing anything, and never assume the
+working tree is where you left it — other sessions share these trees. `main`
+contains merge commits from before any of this existed. That is history, not
+permission.
 
 ## Route architecture
 
