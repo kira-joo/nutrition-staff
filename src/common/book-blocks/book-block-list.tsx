@@ -10,8 +10,8 @@ import {
   DropdownMenuTrigger,
   Modal,
   toast,
-  useConfirmDialog,
 } from "@kira-joo/frontend-toolkit-tailwind";
+import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { Copy, MoveRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -59,7 +59,7 @@ function toMoveDescriptor(container: ContainerDescriptor): { chapterId?: string;
 
 /** Shared by chapter blocks and front-matter/back-matter blocks — one implementation, per the approved architecture ("front/back matter reuse the identical block registry, DTO dispatch, and sub-resource routes chapters use"). */
 export function BookBlockList({ bookId, book, container, blocks, enqueue }: BookBlockListProps) {
-  const { confirm, dialog } = useConfirmDialog();
+  const { confirm } = useConfirm();
   const [adding, setAdding] = useState<BookBlockType | null>(null);
   const [editingBlock, setEditingBlock] = useState<BookBlock | null>(null);
   const [movingBlock, setMovingBlock] = useState<BookBlock | null>(null);
@@ -84,7 +84,7 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
   }
 
   async function handleRemove(block: BookBlock): Promise<void> {
-    const confirmed = await confirm({ title: "Remove block?", description: "This permanently deletes the block and any assets it owns.", confirmText: "Remove", variant: "destructive" });
+    const confirmed = await confirm({ title: "Remove block?", description: "This permanently deletes the block and any assets it owns.", confirmLabel: "Remove", destructive: true });
     if (!confirmed) return;
     enqueue((expectedRevision) => removeMutation.mutateAsync({ params: { ...routeParams, blockId: block.id }, body: { expectedRevision } })).catch((error: { message?: string }) =>
       toast.error(error.message ?? "Failed to remove block")
@@ -232,8 +232,6 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
           <MoveBlockDestinationPicker book={book} currentContainer={container} onSelect={handleMove} />
         </Modal>
       ) : null}
-
-      {dialog}
     </div>
   );
 }

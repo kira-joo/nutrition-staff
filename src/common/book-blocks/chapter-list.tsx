@@ -1,7 +1,8 @@
 "use client";
 
 import { useRequesterMutation } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, CustomInput, Modal, toast, useConfirmDialog } from "@kira-joo/frontend-toolkit-tailwind";
+import { CustomButton, CustomInput, Modal, toast } from "@kira-joo/frontend-toolkit-tailwind";
+import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { ChevronDown, ChevronUp, Copy, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -24,7 +25,7 @@ export interface ChapterListProps {
 }
 
 export function ChapterList({ bookId, book, enqueue }: ChapterListProps) {
-  const { confirm, dialog } = useConfirmDialog();
+  const { confirm } = useConfirm();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [addingChapter, setAddingChapter] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -59,8 +60,8 @@ export function ChapterList({ bookId, book, enqueue }: ChapterListProps) {
     const confirmed = await confirm({
       title: "Remove chapter?",
       description: "This permanently deletes the chapter, every block inside it, and any assets they own.",
-      confirmText: "Remove",
-      variant: "destructive",
+      confirmLabel: "Remove",
+      destructive: true,
     });
     if (!confirmed) return;
     enqueue((expectedRevision) => removeMutation.mutateAsync({ params: { bookId, chapterId }, body: { expectedRevision } })).catch(
@@ -110,8 +111,6 @@ export function ChapterList({ bookId, book, enqueue }: ChapterListProps) {
       <CustomButton type="button" variant="outline" leftIcon={Plus} onClick={() => setAddingChapter(true)}>
         Add chapter
       </CustomButton>
-
-      {dialog}
     </div>
   );
 }

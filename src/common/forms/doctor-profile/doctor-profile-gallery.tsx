@@ -8,8 +8,8 @@ import {
   CustomButton,
   PageSection,
   toast,
-  useConfirmDialog,
 } from "@kira-joo/frontend-toolkit-tailwind";
+import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { ArrowLeft, ArrowRight, Images, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -52,7 +52,7 @@ function buildGalleryFormData(file: File | null, altText: LocalizedString): Reco
  * case `AssetViewer` isn't meant to absorb.
  */
 export function DoctorProfileGallery({ gallery, onChanged }: DoctorProfileGalleryProps) {
-  const { confirm, dialog } = useConfirmDialog();
+  const { confirm } = useConfirm();
   const [addOpen, setAddOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
   // A single shared lightbox for the whole gallery (not one per thumbnail)
@@ -96,8 +96,8 @@ export function DoctorProfileGallery({ gallery, onChanged }: DoctorProfileGaller
     const confirmed = await confirm({
       title: "Remove gallery item?",
       description: "This permanently deletes the photo from Cloudinary.",
-      confirmText: "Remove",
-      variant: "destructive",
+      confirmLabel: "Remove",
+      destructive: true,
     });
     if (confirmed) removeMutation.mutate({ params: { itemId: item.id } });
   }
@@ -192,8 +192,6 @@ export function DoctorProfileGallery({ gallery, onChanged }: DoctorProfileGaller
           onClose={() => setLightboxIndex(null)}
         />
       ) : null}
-
-      {dialog}
     </PageSection>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRequesterMutation } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, CustomInput, Modal, toast, useConfirmDialog } from "@kira-joo/frontend-toolkit-tailwind";
+import { CustomButton, CustomInput, Modal, toast } from "@kira-joo/frontend-toolkit-tailwind";
+import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { addReferenceEndpoint, removeReferenceEndpoint, reorderReferencesEndpoint, updateReferenceEndpoint } from "../../../api/book-content.endpoints";
@@ -16,7 +17,7 @@ export interface ReferencesEditorProps {
 }
 
 export function ReferencesEditor({ bookId, book, enqueue }: ReferencesEditorProps) {
-  const { confirm, dialog } = useConfirmDialog();
+  const { confirm } = useConfirm();
   const [editing, setEditing] = useState<BookReference | "new" | null>(null);
 
   const reorderMutation = useRequesterMutation({ endpoint: reorderReferencesEndpoint });
@@ -29,7 +30,7 @@ export function ReferencesEditor({ bookId, book, enqueue }: ReferencesEditorProp
   }
 
   async function handleRemove(reference: BookReference): Promise<void> {
-    const confirmed = await confirm({ title: "Remove reference?", description: "Any block citing this reference must be updated first.", confirmText: "Remove", variant: "destructive" });
+    const confirmed = await confirm({ title: "Remove reference?", description: "Any block citing this reference must be updated first.", confirmLabel: "Remove", destructive: true });
     if (!confirmed) return;
     enqueue((expectedRevision) => removeMutation.mutateAsync({ params: { bookId, referenceId: reference.id }, body: { expectedRevision } })).catch(
       (error: { message?: string }) => toast.error(error.message ?? "Failed to remove reference")
@@ -70,8 +71,6 @@ export function ReferencesEditor({ bookId, book, enqueue }: ReferencesEditorProp
           <ReferenceForm bookId={bookId} reference={editing === "new" ? undefined : editing} enqueue={enqueue} onSuccess={() => setEditing(null)} />
         </Modal>
       ) : null}
-
-      {dialog}
     </div>
   );
 }

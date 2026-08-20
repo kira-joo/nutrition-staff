@@ -1,7 +1,8 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, CustomForm, FieldType, toast, useConfirmDialog, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { CustomButton, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { BookMarked, Contact, Image as ImageIcon, Printer } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { getDoctorProfileEndpoint } from "../../../api/doctor-profile.endpoints";
@@ -21,7 +22,7 @@ export interface BookSettingsFormProps {
 }
 
 export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormProps) {
-  const { confirm, dialog } = useConfirmDialog();
+  const { confirm } = useConfirm();
 
   const form = useForm<BookSettingsFormValues>({
     defaultValues: {
@@ -159,7 +160,6 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
         layout="grid"
         columns={2}
       />
-      {dialog}
     </>
   );
 }

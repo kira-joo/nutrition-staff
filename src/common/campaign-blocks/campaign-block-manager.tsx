@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
   Modal,
   toast,
-  useConfirmDialog,
 } from "@kira-joo/frontend-toolkit-tailwind";
+import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -41,7 +41,7 @@ export interface CampaignBlockManagerProps {
  * nothing here requires introducing one.
  */
 export function CampaignBlockManager({ campaignId, blocks, onChanged }: CampaignBlockManagerProps) {
-  const { confirm, dialog } = useConfirmDialog();
+  const { confirm } = useConfirm();
   const [adding, setAdding] = useState<CampaignBlockType | null>(null);
   const [editingBlock, setEditingBlock] = useState<CampaignBlock | null>(null);
 
@@ -66,8 +66,8 @@ export function CampaignBlockManager({ campaignId, blocks, onChanged }: Campaign
     const confirmed = await confirm({
       title: "Remove block?",
       description: "This permanently deletes the block and any assets it owns.",
-      confirmText: "Remove",
-      variant: "destructive",
+      confirmLabel: "Remove",
+      destructive: true,
     });
     if (confirmed) removeMutation.mutate({ params: { campaignId, blockId: block.id } });
   }
@@ -170,8 +170,6 @@ export function CampaignBlockManager({ campaignId, blocks, onChanged }: Campaign
           })()}
         </Modal>
       ) : null}
-
-      {dialog}
     </div>
   );
 }
