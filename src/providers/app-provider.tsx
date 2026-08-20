@@ -12,9 +12,11 @@ import {
   type AppLinkComponentProps,
 } from "@kira-joo/frontend-toolkit-core";
 import { Toaster, showApiErrorToast } from "@kira-joo/frontend-toolkit-tailwind";
+import { DialogProvider } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { DateTimeConfig } from "@kira-joo/toolkit-common";
 import Link from "next/link";
 import { APP_TIMEZONE } from "../common/config/app-timezone.constant";
+import { DIALOG_LABELS } from "../common/config/dialog-labels.constant";
 import { AppRoute } from "../common/routes/app-route";
 import { getAccessToken, removeAccessToken } from "../common/auth/token-storage";
 import { usePermissions } from "../common/auth/use-permissions";
@@ -91,7 +93,17 @@ export function AppProvider({ children }: AppProviderProps) {
   return (
     <ToolkitProviders client={queryClient}>
       <QueryParamsRouterProvider useAdapter={useNextQueryParamsRouter}>
-        <PermissionContextBridge>{children}</PermissionContextBridge>
+        {/* Every dialog surface — the imperative `openDialog` stack and the
+            declarative `<Modal>` alike — registers with this provider, which
+            owns the shared layer/focus/scroll-lock coordinator and the default
+            copy. Mounted inside the router provider so a dialog can navigate,
+            and above the shell so a dialog opened anywhere is coordinated by
+            one stack. The toast root deliberately stays a sibling: it sits at
+            z-[100], above the dialog range (60-69), so a toast raised from
+            inside a dialog is still visible over it. */}
+        <DialogProvider labels={DIALOG_LABELS}>
+          <PermissionContextBridge>{children}</PermissionContextBridge>
+        </DialogProvider>
       </QueryParamsRouterProvider>
       <Toaster />
     </ToolkitProviders>
