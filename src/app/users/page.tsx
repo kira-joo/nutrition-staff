@@ -128,7 +128,16 @@ export default function UsersPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (user) => deleteMutation.mutate({ params: { id: user._id } }),
+            // Names the user rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (user) => ({
+              title: `Delete ${user.name || "this user"}?`,
+              description: "This permanently deletes the user and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (user) => deleteMutation.mutateAsync({ params: { id: user._id } }),
             hidden: !can(AppPermission.USER.DELETE),
           },
         ]}

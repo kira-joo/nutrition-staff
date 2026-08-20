@@ -86,7 +86,16 @@ export default function VideosPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (video) => deleteMutation.mutate({ params: { id: video._id } }),
+            // Names the video rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (video) => ({
+              title: `Delete ${video.title?.en || video.title?.ar || "this video"}?`,
+              description: "This permanently deletes the video and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (video) => deleteMutation.mutateAsync({ params: { id: video._id } }),
             hidden: !can(AppPermission.VIDEO.DELETE),
           },
         ]}

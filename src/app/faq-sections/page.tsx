@@ -86,7 +86,16 @@ export default function FaqSectionsPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (section) => deleteMutation.mutate({ params: { id: section._id } }),
+            // Names the section rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (section) => ({
+              title: `Delete ${section.title?.en || section.title?.ar || "this section"}?`,
+              description: "This permanently deletes the section and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (section) => deleteMutation.mutateAsync({ params: { id: section._id } }),
             hidden: !can(AppPermission.FAQ_SECTION.DELETE),
           },
         ]}

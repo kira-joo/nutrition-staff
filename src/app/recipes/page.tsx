@@ -142,7 +142,16 @@ export default function RecipesPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (recipe) => deleteMutation.mutate({ params: { id: recipe._id } }),
+            // Names the recipe rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (recipe) => ({
+              title: `Delete ${recipe.title?.en || recipe.title?.ar || "this recipe"}?`,
+              description: "This permanently deletes the recipe and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (recipe) => deleteMutation.mutateAsync({ params: { id: recipe._id } }),
             hidden: !can(AppPermission.RECIPE.DELETE),
           },
         ]}

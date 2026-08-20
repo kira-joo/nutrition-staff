@@ -103,7 +103,16 @@ export default function BooksPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (book) => deleteMutation.mutate({ params: { id: book._id } }),
+            // Names the book rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (book) => ({
+              title: `Delete ${book.title || "this book"}?`,
+              description: "This permanently deletes the book and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (book) => deleteMutation.mutateAsync({ params: { id: book._id } }),
             hidden: !can(AppPermission.BOOK.DELETE),
           },
         ]}

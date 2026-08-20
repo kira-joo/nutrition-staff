@@ -99,7 +99,16 @@ export default function RolesPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (role) => deleteMutation.mutate({ params: { id: role._id } }),
+            // Names the role rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (role) => ({
+              title: `Delete ${role.name || "this role"}?`,
+              description: "This permanently deletes the role and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (role) => deleteMutation.mutateAsync({ params: { id: role._id } }),
             hidden: !can(AppPermission.ROLE.DELETE),
           },
         ]}

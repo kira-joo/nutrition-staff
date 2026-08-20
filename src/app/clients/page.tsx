@@ -171,7 +171,16 @@ export default function ClientsPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (client) => deleteMutation.mutate({ params: { id: client._id } }),
+            // Names the client rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (client) => ({
+              title: `Delete ${client.userId?.name || "this client"}?`,
+              description: "This permanently deletes the client and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (client) => deleteMutation.mutateAsync({ params: { id: client._id } }),
             hidden: !can(AppPermission.CLIENT.DELETE),
           },
         ]}

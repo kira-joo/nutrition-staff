@@ -91,7 +91,16 @@ export default function FaqItemsPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (item) => deleteMutation.mutate({ params: { id: item._id } }),
+            // Names the question rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (item) => ({
+              title: `Delete ${item.question?.en || item.question?.ar || "this question"}?`,
+              description: "This permanently deletes the question and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (item) => deleteMutation.mutateAsync({ params: { id: item._id } }),
             hidden: !can(AppPermission.FAQ_ITEM.DELETE),
           },
         ]}

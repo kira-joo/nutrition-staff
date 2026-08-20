@@ -85,7 +85,16 @@ export default function RecipeCategoriesPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (category) => deleteMutation.mutate({ params: { id: category._id } }),
+            // Names the category rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (category) => ({
+              title: `Delete ${category.title?.en || category.title?.ar || "this category"}?`,
+              description: "This permanently deletes the category and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (category) => deleteMutation.mutateAsync({ params: { id: category._id } }),
             hidden: !can(AppPermission.RECIPE_CATEGORY.DELETE),
           },
         ]}

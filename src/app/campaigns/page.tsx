@@ -89,7 +89,16 @@ export default function CampaignsPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (campaign) => deleteMutation.mutate({ params: { campaignId: campaign._id } }),
+            // Names the campaign rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (campaign) => ({
+              title: `Delete ${campaign.title?.en || campaign.title?.ar || "this campaign"}?`,
+              description: "This permanently deletes the campaign and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (campaign) => deleteMutation.mutateAsync({ params: { campaignId: campaign._id } }),
             hidden: !can(AppPermission.CAMPAIGN.DELETE),
           },
         ]}

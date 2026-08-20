@@ -91,7 +91,16 @@ export default function RecipeFoodGroupsPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (foodGroup) => deleteMutation.mutate({ params: { id: foodGroup._id } }),
+            // Names the food group rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (foodGroup) => ({
+              title: `Delete ${foodGroup.title?.en || foodGroup.title?.ar || "this food group"}?`,
+              description: "This permanently deletes the food group and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (foodGroup) => deleteMutation.mutateAsync({ params: { id: foodGroup._id } }),
             hidden: !can(AppPermission.RECIPE_FOOD_GROUP.DELETE),
           },
         ]}

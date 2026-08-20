@@ -95,7 +95,16 @@ export default function ReviewsPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (review) => deleteMutation.mutate({ params: { id: review._id } }),
+            // Names the review rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (review) => ({
+              title: `Delete ${review.authorName?.en || review.authorName?.ar || "this review"}?`,
+              description: "This permanently deletes the review and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (review) => deleteMutation.mutateAsync({ params: { id: review._id } }),
             hidden: !can(AppPermission.REVIEW.DELETE),
           },
         ]}

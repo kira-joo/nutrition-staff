@@ -88,7 +88,16 @@ export default function PackagesPage() {
             label: "Delete",
             icon: Trash2,
             destructive: true,
-            onClick: (pkg) => deleteMutation.mutate({ params: { id: pkg._id } }),
+            // Names the package rather than saying "this item": the row that was
+            // clicked and the row someone meant to click are not always the same.
+            confirm: (pkg) => ({
+              title: `Delete ${pkg.name?.en || pkg.name?.ar || "this package"}?`,
+              description: "This permanently deletes the package and cannot be undone.",
+              confirmLabel: "Delete",
+            }),
+            // `mutateAsync`, so the table can await the real request and show an
+            // executing state instead of clearing the moment the click lands.
+            onClick: (pkg) => deleteMutation.mutateAsync({ params: { id: pkg._id } }),
             hidden: !can(AppPermission.PACKAGE.DELETE),
           },
         ]}
