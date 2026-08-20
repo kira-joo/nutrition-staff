@@ -1,0 +1,32 @@
+#!/bin/sh
+# Blocks credentials from entering history. Enable once per clone:
+#   git config core.hooksPath .githooks
+#
+# Two rules, deliberately narrow so it never cries wolf:
+#   1. A staged .npmrc may declare a registry, but not a literal _authToken.
+#      A ${VAR} placeholder is also rejected: it is not a leak, but it shadows
+#      the real credential in ~/.npmrc and fails every install with a 401.
+#   2. No staged file may contain a real GitHub token.
+status=0
+
+staged() { git diff --cached --name-only --diff-filter=ACM; }
+
+# Rule 1 — auth directives in any tracked npmrc.
+for f in $(staged | grep -E '(^|/)\.npmrc$'); do
+  if git show ":$f" | grep -qE '^[[:space:]]*(//.*:_authToken|_auth|_password)[[:space:]]*='; then
+    echo "blocked: $f declares an auth directive."
+    echo "  Credentials belong in ~/.npmrc (or CI's NODE_AUTH_TOKEN), never in the repo."
+    status=1
+  fi
+done
+
+# Rule 2 — real GitHub tokens anywhere in the staged content.
+for f in $(staged); do
+  git show ":$f" 2>/dev/null \
+    | grep -qE '(gh[porsu]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{50,})' || continue
+  echo "blocked: $f contains what looks like a GitHub token."
+  status=1
+done
+
+[ "$status" -ne 0 ] && echo "Commit aborted. Remove the credential, or use 'git commit --no-verify' if this is a false positive."
+exit $status
