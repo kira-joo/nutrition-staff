@@ -1,10 +1,10 @@
+import { BADGE_VARIANT_HEX, LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { ClientLifecycle } from "src/common/enums";
 import type { DashboardLifecycleChart } from "src/common/interfaces/dashboard.interface";
 import { clientProfileRepository } from "src/server/clients/client-profiles.repository";
 import { withAssignedStaffWhere } from "src/server/dashboard/dashboard-scope.util";
 import { DashboardQueryDto } from "src/server/dashboard/dto/dashboard-query.dto";
 
-/** Matches the existing `LIFECYCLE_BADGE_VARIANT` color mapping used on the Clients list, so the same lifecycle always reads as the same color everywhere in the app. */
 const LIFECYCLE_LABELS: Record<ClientLifecycle, string> = {
   [ClientLifecycle.LEAD]: "Lead",
   [ClientLifecycle.PROSPECT]: "Prospect",
@@ -13,14 +13,12 @@ const LIFECYCLE_LABELS: Record<ClientLifecycle, string> = {
   [ClientLifecycle.COMPLETED]: "Completed",
   [ClientLifecycle.LOST]: "Lost",
 };
-const LIFECYCLE_COLORS: Record<ClientLifecycle, string> = {
-  [ClientLifecycle.LEAD]: "#94a3b8",
-  [ClientLifecycle.PROSPECT]: "#94a3b8",
-  [ClientLifecycle.ACTIVE]: "#10b981",
-  [ClientLifecycle.PAUSED]: "#f59e0b",
-  [ClientLifecycle.COMPLETED]: "#10b981",
-  [ClientLifecycle.LOST]: "#ef4444",
-};
+
+/** Derived from `LIFECYCLE_BADGE_VARIANT`, not hand-listed, so this chart's colors can never drift from the Badge the Clients list renders for the same lifecycle. */
+const LIFECYCLE_COLORS: Record<ClientLifecycle, string> = Object.fromEntries(
+  Object.values(ClientLifecycle).map((lifecycle) => [lifecycle, BADGE_VARIANT_HEX[LIFECYCLE_BADGE_VARIANT[lifecycle]]]),
+) as Record<ClientLifecycle, string>;
+
 const FUNNEL_STAGES = [ClientLifecycle.LEAD, ClientLifecycle.PROSPECT, ClientLifecycle.ACTIVE, ClientLifecycle.COMPLETED];
 
 /**

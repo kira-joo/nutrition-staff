@@ -19,6 +19,7 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
 import { EntityName } from "src/common/authorization/entity-name.enum";
+import { LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { ClientLifecycle, ClientSource, ProfileType } from "src/common/enums";
 import { Client } from "src/common/interfaces/client.interface";
 import { calculateProfileCompleteness } from "src/common/utils/profile-completeness";
@@ -26,15 +27,6 @@ import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
 import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { deleteClientEndpoint, getClientsEndpoint } from "../../../api/client.endpoints";
-
-const LIFECYCLE_BADGE_VARIANT: Record<ClientLifecycle, "success" | "secondary" | "warning" | "destructive"> = {
-  [ClientLifecycle.LEAD]: "secondary",
-  [ClientLifecycle.PROSPECT]: "secondary",
-  [ClientLifecycle.ACTIVE]: "success",
-  [ClientLifecycle.PAUSED]: "warning",
-  [ClientLifecycle.COMPLETED]: "success",
-  [ClientLifecycle.LOST]: "destructive",
-};
 
 export default function ClientsPage() {
   const navigate = useNavigate();

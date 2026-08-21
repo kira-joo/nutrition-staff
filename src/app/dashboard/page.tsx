@@ -10,6 +10,7 @@ import {
   DashboardFilterBar,
   DateText,
   DonutChart,
+  EmptyState,
   KpiCard,
   LineChart,
   PageShell,
@@ -20,6 +21,7 @@ import {
 import {
   AlertTriangle,
   CalendarClock,
+  CheckCircle2,
   FlaskConical,
   Ruler,
   UserPlus,
@@ -29,6 +31,7 @@ import {
 import { addDaysInZone, formatZonedDate } from "@kira-joo/toolkit-common";
 import { useMemo, useState } from "react";
 import { AppRoute } from "src/common/routes/app-route";
+import { LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { ClientLifecycle, ProfileType } from "src/common/enums";
 import {
   getDashboardActivityEndpoint,
@@ -48,15 +51,6 @@ const RANGE_PRESETS = [
   { id: "year", label: "This year" },
   { id: "custom", label: "Custom range" },
 ];
-
-const LIFECYCLE_BADGE_VARIANT: Record<string, "success" | "secondary" | "warning" | "destructive"> = {
-  [ClientLifecycle.LEAD]: "secondary",
-  [ClientLifecycle.PROSPECT]: "secondary",
-  [ClientLifecycle.ACTIVE]: "success",
-  [ClientLifecycle.PAUSED]: "warning",
-  [ClientLifecycle.COMPLETED]: "success",
-  [ClientLifecycle.LOST]: "destructive",
-};
 
 const ATTENTION_LABELS = {
   notContactedRecently: "Not contacted recently",
@@ -113,7 +107,8 @@ function FollowUpRowContent({ row, overdue }: { row: FollowUpRow; overdue: boole
         </AppLink>
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
           {row.clientPhone ? <span>{row.clientPhone}</span> : null}
-          <Badge variant={LIFECYCLE_BADGE_VARIANT[row.lifecycle] ?? "secondary"}>{row.lifecycle}</Badge>
+          {/* `row.lifecycle` is a loosely-typed API string, not guaranteed to be a known `ClientLifecycle` — fall back rather than index out of bounds. */}
+          <Badge variant={LIFECYCLE_BADGE_VARIANT[row.lifecycle as ClientLifecycle] ?? "secondary"}>{row.lifecycle}</Badge>
           {row.assignedStaffName ? <span>Assigned: {row.assignedStaffName}</span> : null}
         </div>
       </div>
@@ -375,9 +370,12 @@ export default function DashboardPage() {
                 ))
             : null}
           {attention && attentionCount === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500 lg:col-span-2">
-              Nothing needs attention right now.
-            </div>
+            <EmptyState
+              icon={CheckCircle2}
+              title="Nothing needs attention right now"
+              description="Overdue follow-ups, incomplete profiles, and other flagged items will show up here as they come up."
+              className="lg:col-span-2"
+            />
           ) : null}
         </div>
       </div>

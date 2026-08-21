@@ -18,18 +18,12 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";
 import { EntityName } from "src/common/authorization/entity-name.enum";
+import { BOOK_STATUS_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { thumbUrl } from "src/common/books/cloudinary-thumb";
 import { BookStatus, BookVisibility } from "src/common/enums";
 import { Book } from "src/common/interfaces/book.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-
-const BOOK_STATUS_BADGE_VARIANT: Record<BookStatus, "success" | "secondary" | "warning" | "destructive"> = {
-  [BookStatus.DRAFT]: "secondary",
-  [BookStatus.READY_FOR_REVIEW]: "warning",
-  [BookStatus.PUBLISHED]: "success",
-  [BookStatus.ARCHIVED]: "destructive",
-};
 
 export default function BooksPage() {
   const navigate = useNavigate();

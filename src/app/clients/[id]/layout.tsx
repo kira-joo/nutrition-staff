@@ -6,18 +6,9 @@ import { UserRoundCog } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { AppPermission } from "src/common/authorization/app-permission";
-import { ClientLifecycle } from "src/common/enums";
+import { LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { AppRoute } from "src/common/routes/app-route";
 import { getClientByIdEndpoint } from "../../../../api/client.endpoints";
-
-const LIFECYCLE_BADGE_VARIANT: Record<ClientLifecycle, "success" | "secondary" | "warning" | "destructive"> = {
-  [ClientLifecycle.LEAD]: "secondary",
-  [ClientLifecycle.PROSPECT]: "secondary",
-  [ClientLifecycle.ACTIVE]: "success",
-  [ClientLifecycle.PAUSED]: "warning",
-  [ClientLifecycle.COMPLETED]: "success",
-  [ClientLifecycle.LOST]: "destructive",
-};
 
 /**
  * Single source of truth for the Client Details workspace's tabs — id,

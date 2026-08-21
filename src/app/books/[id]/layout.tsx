@@ -7,15 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { getBookByIdEndpoint } from "../../../../api/book.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
-import { BookStatus } from "src/common/enums";
+import { BOOK_STATUS_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { AppRoute } from "src/common/routes/app-route";
-
-const BOOK_STATUS_BADGE_VARIANT: Record<BookStatus, "success" | "secondary" | "warning" | "destructive"> = {
-  [BookStatus.DRAFT]: "secondary",
-  [BookStatus.READY_FOR_REVIEW]: "warning",
-  [BookStatus.PUBLISHED]: "success",
-  [BookStatus.ARCHIVED]: "destructive",
-};
 
 /**
  * Content/Front Matter/Back Matter/References are Phase C; Preview is

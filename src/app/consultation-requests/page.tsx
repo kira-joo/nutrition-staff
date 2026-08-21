@@ -10,7 +10,8 @@ import {
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
 
-import { ClientLifecycle, ConsultationRequestIntent } from "src/common/enums";
+import { LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
+import { ConsultationRequestIntent } from "src/common/enums";
 import { ConsultationRequest } from "src/common/interfaces/consultation-request.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
@@ -20,15 +21,6 @@ const INTENT_LABEL: Record<ConsultationRequestIntent, string> = {
   [ConsultationRequestIntent.CONSULTATION]: "Consultation",
   [ConsultationRequestIntent.PACKAGE_INQUIRY]: "Package inquiry",
   [ConsultationRequestIntent.NEWSLETTER]: "Newsletter",
-};
-
-const LIFECYCLE_BADGE_VARIANT: Record<ClientLifecycle, "success" | "secondary" | "warning" | "destructive"> = {
-  [ClientLifecycle.LEAD]: "secondary",
-  [ClientLifecycle.PROSPECT]: "secondary",
-  [ClientLifecycle.ACTIVE]: "success",
-  [ClientLifecycle.PAUSED]: "warning",
-  [ClientLifecycle.COMPLETED]: "success",
-  [ClientLifecycle.LOST]: "destructive",
 };
 
 /**
