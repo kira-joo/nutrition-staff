@@ -4,6 +4,7 @@ import { IsArray, IsOptional, ValidateNested } from "class-validator";
 import "reflect-metadata";
 import { BioSectionDto } from "src/server/doctor-profile/dto/bio-section.dto";
 import { LabeledOrderedItemDto } from "src/server/doctor-profile/dto/labeled-ordered-item.dto";
+import { StatItemDto } from "src/server/doctor-profile/dto/stat-item.dto";
 
 // Note: no `gallery` field here — gallery items are managed via their own
 // sub-resource routes (src/app/api/doctor-profile/gallery/**), each with
@@ -56,6 +57,12 @@ export class UpdateDoctorProfileDto {
   @ValidateNested({ each: true })
   @Type(() => LabeledOrderedItemDto)
   whyChooseReasons?: LabeledOrderedItemDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StatItemDto)
+  stats?: StatItemDto[];
 
   @IsOptional()
   @ValidateNested()

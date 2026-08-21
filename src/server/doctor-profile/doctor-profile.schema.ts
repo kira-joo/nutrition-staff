@@ -38,6 +38,19 @@ const labeledOrderedItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const statItemSchema = new mongoose.Schema(
+  {
+    label: asSchemaField(localizedStringField()),
+    /* Not integer-only: an average rating like 4.9 is a legitimate figure. */
+    value: { type: Number, required: true, min: 0 },
+    suffix: { type: String, required: false },
+    order: { type: Number, default: 0 },
+    /* Lets an editor retire a figure without losing it. */
+    enabled: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
 const galleryItemSchema = new mongoose.Schema(
   {
     id: { type: String, required: true },
@@ -57,6 +70,15 @@ export interface BioSection {
 export interface LabeledOrderedItem {
   text: LocalizedString;
   order: number;
+}
+
+/** One headline figure in the public site's stats band. */
+export interface StatItem {
+  label: LocalizedString;
+  value: number;
+  suffix?: string;
+  order: number;
+  enabled: boolean;
 }
 
 export interface GalleryItem {
@@ -99,6 +121,16 @@ export class DoctorProfileSchema {
 
   @MongoField(localizedStringField())
   featuredInLabel!: LocalizedString;
+
+  /**
+   * The public site's stats band. Lives on this profile rather than in its own
+   * collection because it is the same shape family as `programHighlights` and
+   * `whyChooseReasons` — a short ordered list of localized items belonging to
+   * the doctor — and putting it here means no new collection, route, public
+   * endpoint, cache tag or client data function was needed to ship it.
+   */
+  @MongoField({ type: [statItemSchema], default: () => [] })
+  stats!: StatItem[];
 
   // Managed via its own sub-resource routes (add/replace/remove/reorder),
   // not through the main profile PUT — each item has its own asset, and

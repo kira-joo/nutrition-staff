@@ -1,9 +1,9 @@
 "use client";
 
-import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { Award, BookOpen, UserRound } from "lucide-react";
+import { CustomForm, CustomInput, CustomSwitch, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import { Award, BarChart3, BookOpen, UserRound } from "lucide-react";
 import type { updateDoctorProfileEndpoint } from "../../../api/doctor-profile.endpoints";
-import type { BioSection, DoctorProfile, DoctorProfileFormValues, LabeledOrderedItem } from "../interfaces/doctor-profile.interface";
+import type { BioSection, DoctorProfile, DoctorProfileFormValues, LabeledOrderedItem, StatItem } from "../interfaces/doctor-profile.interface";
 import { doctorPhotoPolicy } from "../upload-policies";
 import { ArrayFieldEditor } from "./array-field-editor";
 import { LocalizedTextPair } from "./localized-text-pair";
@@ -93,12 +93,65 @@ export function DoctorProfileForm({ defaultValues, endpoint }: DoctorProfileForm
     { type: FieldType.LOCALIZED_INPUT, name: "featuredInLabel", label: "\"Featured in\" label" },
   ];
 
+  /**
+   * The public site's stats band.
+   *
+   * `order` is derived from array position on every change — the same convention
+   * the editors above use — so an editor reorders by moving rows rather than by
+   * typing numbers that can collide or leave gaps.
+   *
+   * `enabled` is a switch rather than a delete, so a figure can be taken off the
+   * site for a while without losing its label and value.
+   */
+  const statsFields: FormFieldConfig<DoctorProfileFormValues>[] = [
+    {
+      type: FieldType.CUSTOM,
+      name: "stats",
+      label: "Stats band",
+      colSpan: "full",
+      render: ({ field }) => (
+        <ArrayFieldEditor<StatItem>
+          items={(field.value as StatItem[]) ?? []}
+          onChange={(items) => field.onChange(items.map((item, order) => ({ ...item, order })))}
+          createItem={() => ({ label: EMPTY_LOCALIZED, value: 0, suffix: "", order: 0, enabled: true })}
+          addLabel="Add stat"
+          emptyLabel="No stats yet — the band stays hidden on the public site until at least one is enabled."
+          renderItem={(item, _index, update) => (
+            <div className="flex flex-col gap-3">
+              <LocalizedTextPair label="Label" value={item.label} onChange={(label) => update({ label })} />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <CustomInput
+                  label="Value"
+                  type="number"
+                  value={String(item.value ?? 0)}
+                  onChange={(event) => update({ value: Number(event.target.value) })}
+                />
+                <CustomInput
+                  label="Suffix"
+                  description="e.g. + or %"
+                  value={item.suffix ?? ""}
+                  onChange={(event) => update({ suffix: event.target.value })}
+                />
+                <CustomSwitch
+                  label="Shown on the site"
+                  checked={item.enabled}
+                  onChange={(enabled) => update({ enabled })}
+                />
+              </div>
+            </div>
+          )}
+        />
+      ),
+    },
+  ];
+
   return (
     <CustomForm<DoctorProfileFormValues, typeof endpoint>
       sections={[
         { title: "Identity", icon: UserRound, fields: identityFields },
         { title: "Bio", icon: BookOpen, fields: bioFields },
         { title: "Program & why choose us", icon: Award, fields: programFields },
+        { title: "Stats band", icon: BarChart3, fields: statsFields },
       ]}
       defaultValues={{
         name: defaultValues.name ?? EMPTY_LOCALIZED,
@@ -111,6 +164,7 @@ export function DoctorProfileForm({ defaultValues, endpoint }: DoctorProfileForm
         whyChooseHeading: defaultValues.whyChooseHeading ?? EMPTY_LOCALIZED,
         whyChooseReasons: defaultValues.whyChooseReasons ?? [],
         featuredInLabel: defaultValues.featuredInLabel ?? EMPTY_LOCALIZED,
+        stats: defaultValues.stats ?? [],
       }}
       submitEndpoint={endpoint}
       warnOnUnsavedChanges

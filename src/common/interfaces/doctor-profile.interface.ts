@@ -11,6 +11,18 @@ export interface LabeledOrderedItem {
   order: number;
 }
 
+/**
+ * One headline figure in the public site's stats band. No icon and no prefix by
+ * design — see `server/doctor-profile/dto/stat-item.dto.ts` for why.
+ */
+export interface StatItem {
+  label: LocalizedString;
+  value: number;
+  suffix?: string;
+  order: number;
+  enabled: boolean;
+}
+
 export interface GalleryItem {
   id: string;
   image: ImageAsset;
@@ -30,6 +42,7 @@ export interface DoctorProfile {
   whyChooseHeading: LocalizedString;
   whyChooseReasons: LabeledOrderedItem[];
   featuredInLabel: LocalizedString;
+  stats: StatItem[];
   gallery: GalleryItem[];
   createdAt: string;
   updatedAt: string;
@@ -47,4 +60,5 @@ export interface DoctorProfileFormValues {
   whyChooseHeading: LocalizedString;
   whyChooseReasons: LabeledOrderedItem[];
   featuredInLabel: LocalizedString;
+  stats: StatItem[];
 }
