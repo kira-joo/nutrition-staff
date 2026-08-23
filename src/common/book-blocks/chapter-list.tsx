@@ -11,7 +11,7 @@ import {
   removeChapterEndpoint,
   reorderChaptersEndpoint,
   updateChapterEndpoint,
-} from "../../../api/book-content.endpoints";
+} from "src/common/api/book-content.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import { useDebouncedAutosave } from "src/common/books/use-debounced-autosave";
 import { SortableList } from "src/common/books/sortable-list";

@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { Package as PackageIcon } from "lucide-react";
-import { createPackageEndpoint } from "../../../../api/package.endpoints";
+import { createPackageEndpoint } from "src/common/api/package.endpoints";
 import { PackageForm } from "src/common/forms/package-form";
 import { AppRoute } from "src/common/routes/app-route";
 

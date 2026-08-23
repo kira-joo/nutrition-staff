@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type {
   createRecipeFoodGroupEndpoint,
   updateRecipeFoodGroupEndpoint,
-} from "../../../api/recipe-food-group.endpoints";
+} from "src/common/api/recipe-food-group.endpoints";
 import { ContentStatus } from "../enums";
 import { RecipeFoodGroup, RecipeFoodGroupFormValues } from "../interfaces/recipe-food-group.interface";
 import { AppRoute } from "../routes/app-route";

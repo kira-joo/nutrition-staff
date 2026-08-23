@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { CreateRoleDto, Role, UpdateRoleDto } from "../src/common/interfaces/role.interface";
+import type { CreateRoleDto, Role, UpdateRoleDto } from "src/common/interfaces/role.interface";
 
 // Backed by the route handlers under src/app/api/roles.
 

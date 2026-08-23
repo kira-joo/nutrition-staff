@@ -25,8 +25,8 @@ import { Client } from "src/common/interfaces/client.interface";
 import { calculateProfileCompleteness } from "src/common/utils/profile-completeness";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getUsersEndpoint } from "../../../api/user.endpoints";
-import { deleteClientEndpoint, getClientsEndpoint } from "../../../api/client.endpoints";
+import { getUsersEndpoint } from "src/common/api/user.endpoints";
+import { deleteClientEndpoint, getClientsEndpoint } from "src/common/api/client.endpoints";
 
 export default function ClientsPage() {
   const navigate = useNavigate();

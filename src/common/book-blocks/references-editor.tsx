@@ -10,7 +10,7 @@ import {
   removeReferenceEndpoint,
   reorderReferencesEndpoint,
   updateReferenceEndpoint,
-} from "../../../api/book-content.endpoints";
+} from "src/common/api/book-content.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
 import { SortableList } from "src/common/books/sortable-list";

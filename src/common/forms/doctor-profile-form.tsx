@@ -9,7 +9,7 @@ import {
   type FormFieldConfig,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Award, BarChart3, BookOpen, UserRound } from "lucide-react";
-import type { updateDoctorProfileEndpoint } from "../../../api/doctor-profile.endpoints";
+import type { updateDoctorProfileEndpoint } from "src/common/api/doctor-profile.endpoints";
 import type {
   BioSection,
   DoctorProfile,

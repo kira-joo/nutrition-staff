@@ -10,7 +10,7 @@ import {
   toast,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { useState } from "react";
-import { updateChapterEndpoint } from "../../../api/book-content.endpoints";
+import { updateChapterEndpoint } from "src/common/api/book-content.endpoints";
 import type { Chapter } from "src/common/interfaces/book-chapter.interface";
 import type { Book } from "src/common/interfaces/book.interface";
 import { bookContentImagePolicy } from "src/common/upload-policies";

@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { ConsultationRequest } from "../src/common/interfaces/consultation-request.interface";
+import type { ConsultationRequest } from "src/common/interfaces/consultation-request.interface";
 
 // Backed by the MongoDB-backed route handlers under src/app/api/consultation-requests.
 // Read-only: staff never creates/updates/deletes one of these directly —

@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Campaign } from "../src/common/interfaces/campaign.interface";
+import type { Campaign } from "src/common/interfaces/campaign.interface";
 
 // Header CRUD is backed by src/app/api/campaigns/**. create/update use a
 // plain JSON body (a Campaign has no asset fields of its own — only its

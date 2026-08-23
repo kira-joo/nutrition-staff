@@ -21,7 +21,7 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { Role } from "src/common/interfaces/role.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { deleteRoleEndpoint, getRolesEndpoint } from "../../../api/role.endpoints";
+import { deleteRoleEndpoint, getRolesEndpoint } from "src/common/api/role.endpoints";
 
 export default function RolesPage() {
   const navigate = useNavigate();

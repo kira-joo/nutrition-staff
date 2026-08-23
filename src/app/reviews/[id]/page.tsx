@@ -17,7 +17,7 @@ import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
-import { getReviewByIdEndpoint } from "../../../../api/review.endpoints";
+import { getReviewByIdEndpoint } from "src/common/api/review.endpoints";
 
 export default function ReviewDetailsPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);

@@ -7,7 +7,7 @@ import { BookVisibility } from "../enums";
 import { Book, BookFormValues, type BookCoverMode } from "../interfaces/book.interface";
 import { bookPortraitPolicy } from "../upload-policies";
 import { CoverModeField } from "./books/cover-mode-field";
-import type { updateBookEndpoint } from "../../../api/book.endpoints";
+import type { updateBookEndpoint } from "src/common/api/book.endpoints";
 
 export interface BookFormProps {
   book: Book;

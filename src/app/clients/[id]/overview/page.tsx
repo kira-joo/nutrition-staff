@@ -19,10 +19,10 @@ import { ScheduleFollowUpForm } from "src/common/forms/schedule-follow-up-form";
 import { calculateProfileCompleteness } from "src/common/utils/profile-completeness";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getClientByIdEndpoint } from "../../../../../api/client.endpoints";
-import { getClientMeasurementsEndpoint } from "../../../../../api/client-measurement.endpoints";
-import { getNutritionAssessmentsEndpoint } from "../../../../../api/nutrition-assessment.endpoints";
-import { getNutritionCalculationsEndpoint } from "../../../../../api/nutrition-calculation.endpoints";
+import { getClientByIdEndpoint } from "src/common/api/client.endpoints";
+import { getClientMeasurementsEndpoint } from "src/common/api/client-measurement.endpoints";
+import { getNutritionAssessmentsEndpoint } from "src/common/api/nutrition-assessment.endpoints";
+import { getNutritionCalculationsEndpoint } from "src/common/api/nutrition-calculation.endpoints";
 
 type DialogKind = "lifecycle" | "followUp" | null;
 

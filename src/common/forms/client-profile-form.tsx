@@ -4,9 +4,9 @@ import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/fr
 import { Contact, IdCard, NotebookPen, Ruler } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { attachClientProfileEndpoint } from "../../../api/client-profile.endpoints";
-import { updateClientEndpoint } from "../../../api/client.endpoints";
-import { getUsersEndpoint } from "../../../api/user.endpoints";
+import { attachClientProfileEndpoint } from "src/common/api/client-profile.endpoints";
+import { updateClientEndpoint } from "src/common/api/client.endpoints";
+import { getUsersEndpoint } from "src/common/api/user.endpoints";
 import { Gender, ProfileType } from "../enums";
 import type { AttachClientProfileFormValues, Client } from "../interfaces/client.interface";
 

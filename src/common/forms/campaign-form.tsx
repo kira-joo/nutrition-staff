@@ -1,7 +1,7 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import type { createCampaignEndpoint, updateCampaignEndpoint } from "../../../api/campaign.endpoints";
+import type { createCampaignEndpoint, updateCampaignEndpoint } from "src/common/api/campaign.endpoints";
 import { ContentStatus } from "../enums";
 import { Campaign, CampaignFormValues } from "../interfaces/campaign.interface";
 import { AppRoute } from "../routes/app-route";

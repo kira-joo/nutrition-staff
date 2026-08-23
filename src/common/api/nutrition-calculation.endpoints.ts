@@ -10,7 +10,7 @@ import type {
   CreateNutritionCalculationDto,
   NutritionCalculation,
   UpdateNutritionCalculationDto,
-} from "../src/common/interfaces/nutrition-calculation.interface";
+} from "src/common/interfaces/nutrition-calculation.interface";
 
 // Backed by the route handlers under src/app/api/nutrition-calculations.
 

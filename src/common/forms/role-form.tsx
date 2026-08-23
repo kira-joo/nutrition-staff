@@ -2,8 +2,8 @@
 
 import { ApiErrorState, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { useRouter } from "next/navigation";
-import { getPermissionsEndpoint } from "../../../api/permission.endpoints";
-import type { createRoleEndpoint, updateRoleEndpoint } from "../../../api/role.endpoints";
+import { getPermissionsEndpoint } from "src/common/api/permission.endpoints";
+import type { createRoleEndpoint, updateRoleEndpoint } from "src/common/api/role.endpoints";
 import { Role, RoleFormValues } from "../interfaces/role.interface";
 import { AppRoute } from "../routes/app-route";
 import { AppPermission } from "../authorization/app-permission";

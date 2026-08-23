@@ -26,7 +26,7 @@ import {
   removeSectionBlockEndpoint,
   replaceChapterBlockEndpoint,
   replaceSectionBlockEndpoint,
-} from "../../../api/book-content.endpoints";
+} from "src/common/api/book-content.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookBlock } from "src/common/interfaces/book-block.interface";
 import type { Chapter } from "src/common/interfaces/book-chapter.interface";

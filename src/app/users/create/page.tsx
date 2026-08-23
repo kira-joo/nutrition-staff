@@ -4,7 +4,7 @@ import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { UserPlus } from "lucide-react";
 import { UserForm } from "src/common/forms/user-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { createUserEndpoint } from "../../../../api/user.endpoints";
+import { createUserEndpoint } from "src/common/api/user.endpoints";
 
 export default function UserCreatePage() {
   return (

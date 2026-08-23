@@ -14,9 +14,9 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { ChefHat, Download, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { getRecipeCategoriesEndpoint } from "../../../api/recipe-category.endpoints";
-import { getRecipeFoodGroupsEndpoint } from "../../../api/recipe-food-group.endpoints";
-import { deleteRecipeEndpoint, exportRecipesPdfEndpoint, getRecipesEndpoint } from "../../../api/recipe.endpoints";
+import { getRecipeCategoriesEndpoint } from "src/common/api/recipe-category.endpoints";
+import { getRecipeFoodGroupsEndpoint } from "src/common/api/recipe-food-group.endpoints";
+import { deleteRecipeEndpoint, exportRecipesPdfEndpoint, getRecipesEndpoint } from "src/common/api/recipe.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

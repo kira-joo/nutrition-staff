@@ -15,7 +15,7 @@ import { useCurrentUser } from "src/common/auth/use-current-user";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { Status } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
-import { getUserByIdEndpoint } from "../../../api/user.endpoints";
+import { getUserByIdEndpoint } from "src/common/api/user.endpoints";
 
 // The current authenticated user's own account settings — a read-only
 // details view (same layout as the Users detail page), not a duplicate of

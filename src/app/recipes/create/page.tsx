@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { ChefHat } from "lucide-react";
-import { createRecipeEndpoint } from "../../../../api/recipe.endpoints";
+import { createRecipeEndpoint } from "src/common/api/recipe.endpoints";
 import { RecipeForm } from "src/common/forms/recipe-form";
 import { AppRoute } from "src/common/routes/app-route";
 

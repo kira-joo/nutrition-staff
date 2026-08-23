@@ -1,7 +1,7 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { getCurrentUserEndpoint } from "../../../api/auth.endpoints";
+import { getCurrentUserEndpoint } from "src/common/api/auth.endpoints";
 
 /**
  * Resolves the current authenticated user via `GET /api/auth/me`.

@@ -3,8 +3,8 @@
 import { ApiErrorState, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getRolesEndpoint } from "../../../api/role.endpoints";
-import type { createUserEndpoint, updateUserEndpoint } from "../../../api/user.endpoints";
+import { getRolesEndpoint } from "src/common/api/role.endpoints";
+import type { createUserEndpoint, updateUserEndpoint } from "src/common/api/user.endpoints";
 import { usePermissions } from "../auth/use-permissions";
 import { AppPermission } from "../authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "../authorization/entity-labels";

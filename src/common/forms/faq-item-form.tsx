@@ -2,8 +2,8 @@
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { useRouter } from "next/navigation";
-import { getFaqSectionsEndpoint } from "../../../api/faq-section.endpoints";
-import type { createFaqItemEndpoint, updateFaqItemEndpoint } from "../../../api/faq-item.endpoints";
+import { getFaqSectionsEndpoint } from "src/common/api/faq-section.endpoints";
+import type { createFaqItemEndpoint, updateFaqItemEndpoint } from "src/common/api/faq-item.endpoints";
 import { ContentStatus } from "../enums";
 import { FaqItem, FaqItemFormValues } from "../interfaces/faq-item.interface";
 import { FaqSection } from "../interfaces/faq-section.interface";

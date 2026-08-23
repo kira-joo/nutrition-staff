@@ -12,7 +12,7 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { ListTree, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { deleteRecipeCategoryEndpoint, getRecipeCategoriesEndpoint } from "../../../api/recipe-category.endpoints";
+import { deleteRecipeCategoryEndpoint, getRecipeCategoriesEndpoint } from "src/common/api/recipe-category.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

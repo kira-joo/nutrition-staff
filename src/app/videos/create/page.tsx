@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { Video as VideoIcon } from "lucide-react";
-import { createVideoEndpoint } from "../../../../api/video.endpoints";
+import { createVideoEndpoint } from "src/common/api/video.endpoints";
 import { VideoForm } from "src/common/forms/video-form";
 import { AppRoute } from "src/common/routes/app-route";
 

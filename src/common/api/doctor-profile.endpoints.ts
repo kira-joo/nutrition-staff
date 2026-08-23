@@ -1,5 +1,5 @@
 import { MethodType, type Endpoint } from "@kira-joo/frontend-toolkit-core";
-import type { DoctorProfile } from "../src/common/interfaces/doctor-profile.interface";
+import type { DoctorProfile } from "src/common/interfaces/doctor-profile.interface";
 
 // Backed by src/app/api/doctor-profile/**. The main profile endpoints use a
 // multipart upload-on-submit body (see review.endpoints.ts for why it's

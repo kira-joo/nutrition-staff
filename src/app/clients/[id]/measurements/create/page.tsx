@@ -7,8 +7,8 @@ import { Ruler } from "lucide-react";
 import { ClientMeasurementForm } from "src/common/forms/client-measurement-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getClientByIdEndpoint } from "../../../../../../api/client.endpoints";
-import { createClientMeasurementEndpoint } from "../../../../../../api/client-measurement.endpoints";
+import { getClientByIdEndpoint } from "src/common/api/client.endpoints";
+import { createClientMeasurementEndpoint } from "src/common/api/client-measurement.endpoints";
 
 export default function ClientMeasurementCreatePage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);

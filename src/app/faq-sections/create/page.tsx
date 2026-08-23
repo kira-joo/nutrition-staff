@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { ListTree } from "lucide-react";
-import { createFaqSectionEndpoint } from "../../../../api/faq-section.endpoints";
+import { createFaqSectionEndpoint } from "src/common/api/faq-section.endpoints";
 import { FaqSectionForm } from "src/common/forms/faq-section-form";
 import { AppRoute } from "src/common/routes/app-route";
 

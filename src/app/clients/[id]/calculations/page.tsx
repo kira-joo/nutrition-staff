@@ -8,7 +8,7 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getNutritionCalculationsEndpoint } from "../../../../../api/nutrition-calculation.endpoints";
+import { getNutritionCalculationsEndpoint } from "src/common/api/nutrition-calculation.endpoints";
 
 export default function ClientCalculationsPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);

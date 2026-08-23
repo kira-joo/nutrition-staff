@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type {
   createRecipeCategoryEndpoint,
   updateRecipeCategoryEndpoint,
-} from "../../../api/recipe-category.endpoints";
+} from "src/common/api/recipe-category.endpoints";
 import { ContentStatus } from "../enums";
 import { RecipeCategory, RecipeCategoryFormValues } from "../interfaces/recipe-category.interface";
 import { AppRoute } from "../routes/app-route";

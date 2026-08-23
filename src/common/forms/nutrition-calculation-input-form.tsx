@@ -3,7 +3,7 @@
 import { CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { computeNutritionCalculationEndpoint } from "../../../api/nutrition-calculation.endpoints";
+import { computeNutritionCalculationEndpoint } from "src/common/api/nutrition-calculation.endpoints";
 import { ActivityLevel, BmrFormula, Gender, NutritionGoal } from "../enums";
 import {
   ComputeNutritionCalculationInputs,

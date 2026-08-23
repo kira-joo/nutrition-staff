@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { BookOpen } from "lucide-react";
-import { createBookEndpoint } from "../../../../api/book.endpoints";
+import { createBookEndpoint } from "src/common/api/book.endpoints";
 import { CreateBookForm } from "src/common/forms/create-book-form";
 import { AppRoute } from "src/common/routes/app-route";
 

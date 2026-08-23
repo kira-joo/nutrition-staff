@@ -5,7 +5,7 @@ import { InteractionType } from "../enums";
 import type {
   createClientInteractionEndpoint,
   updateClientInteractionEndpoint,
-} from "../../../api/client-interaction.endpoints";
+} from "src/common/api/client-interaction.endpoints";
 import { ClientInteraction, CreateClientInteractionDto } from "../interfaces/client-interaction.interface";
 
 /** `LIFECYCLE_CHANGE` is deliberately excluded — it's only ever auto-logged, never manually chosen. */

@@ -3,7 +3,7 @@
 import { SideNav } from "@kira-joo/frontend-toolkit-tailwind";
 import { usePathname, useRouter } from "next/navigation";
 import { requester } from "@kira-joo/frontend-toolkit-core";
-import { logoutEndpoint } from "../../api/auth.endpoints";
+import { logoutEndpoint } from "src/common/api/auth.endpoints";
 import { sideNavFooterItems, sideNavSections } from "src/common/navigation/side-nav.config";
 import { AppRoute } from "../common/routes/app-route";
 import { queryClient } from "../providers/app-provider";

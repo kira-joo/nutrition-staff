@@ -13,7 +13,7 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { BookOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { deleteBookEndpoint, getBooksEndpoint } from "../../../api/book.endpoints";
+import { deleteBookEndpoint, getBooksEndpoint } from "src/common/api/book.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

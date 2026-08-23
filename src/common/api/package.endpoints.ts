@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Package, PackageFormValues } from "../src/common/interfaces/package.interface";
+import type { Package, PackageFormValues } from "src/common/interfaces/package.interface";
 
 export const getPackagesEndpoint: Endpoint<{
   query: PaginationQuery & Record<string, unknown>;

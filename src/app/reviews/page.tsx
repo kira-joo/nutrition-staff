@@ -20,7 +20,7 @@ import { ContentStatus } from "src/common/enums";
 import { Review } from "src/common/interfaces/review.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { deleteReviewEndpoint, getReviewsEndpoint } from "../../../api/review.endpoints";
+import { deleteReviewEndpoint, getReviewsEndpoint } from "src/common/api/review.endpoints";
 
 export default function ReviewsPage() {
   const navigate = useNavigate();

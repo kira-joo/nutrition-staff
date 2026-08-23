@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { Megaphone } from "lucide-react";
-import { createCampaignEndpoint } from "../../../../api/campaign.endpoints";
+import { createCampaignEndpoint } from "src/common/api/campaign.endpoints";
 import { CampaignForm } from "src/common/forms/campaign-form";
 import { AppRoute } from "src/common/routes/app-route";
 

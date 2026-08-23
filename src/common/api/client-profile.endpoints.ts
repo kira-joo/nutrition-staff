@@ -1,5 +1,5 @@
 import { MethodType, type Endpoint } from "@kira-joo/frontend-toolkit-core";
-import type { AttachClientProfileFormValues, Client } from "../src/common/interfaces/client.interface";
+import type { AttachClientProfileFormValues, Client } from "src/common/interfaces/client.interface";
 
 // Backed by the MongoDB-backed route handlers under src/app/api/client-profiles/[userId].
 

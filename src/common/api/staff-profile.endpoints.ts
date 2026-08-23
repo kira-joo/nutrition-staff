@@ -1,5 +1,5 @@
 import { MethodType, type Endpoint } from "@kira-joo/frontend-toolkit-core";
-import type { StaffProfile, UpsertStaffProfileDto } from "../src/common/interfaces/staff-profile.interface";
+import type { StaffProfile, UpsertStaffProfileDto } from "src/common/interfaces/staff-profile.interface";
 
 // Backed by src/app/api/staff-profiles/[userId]/route.ts.
 

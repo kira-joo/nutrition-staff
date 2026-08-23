@@ -6,7 +6,7 @@ import { ActivityLevel, AlcoholUse, Gender, NutritionGoal, SleepQuality, Smoking
 import type {
   createNutritionAssessmentEndpoint,
   updateNutritionAssessmentEndpoint,
-} from "../../../api/nutrition-assessment.endpoints";
+} from "src/common/api/nutrition-assessment.endpoints";
 import { CreateNutritionAssessmentDto, NutritionAssessment } from "../interfaces/nutrition-assessment.interface";
 
 /** The 7 string-list fields are edited as comma-separated text and split/joined on load/submit — matches the same convention already used for ClientProfile.tags. */

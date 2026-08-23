@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { ListTree } from "lucide-react";
-import { createRecipeCategoryEndpoint } from "../../../../api/recipe-category.endpoints";
+import { createRecipeCategoryEndpoint } from "src/common/api/recipe-category.endpoints";
 import { RecipeCategoryForm } from "src/common/forms/recipe-category-form";
 import { AppRoute } from "src/common/routes/app-route";
 

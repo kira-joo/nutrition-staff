@@ -6,7 +6,7 @@ import { BodyCompositionMethod } from "../enums";
 import type {
   createClientMeasurementEndpoint,
   updateClientMeasurementEndpoint,
-} from "../../../api/client-measurement.endpoints";
+} from "src/common/api/client-measurement.endpoints";
 import { ClientMeasurement, CreateClientMeasurementDto } from "../interfaces/client-measurement.interface";
 
 export interface ClientMeasurementFormProps {

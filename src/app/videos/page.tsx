@@ -12,7 +12,7 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Pencil, Plus, Trash2, Video as VideoIcon } from "lucide-react";
 import { useRef } from "react";
-import { deleteVideoEndpoint, getVideosEndpoint } from "../../../api/video.endpoints";
+import { deleteVideoEndpoint, getVideosEndpoint } from "src/common/api/video.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

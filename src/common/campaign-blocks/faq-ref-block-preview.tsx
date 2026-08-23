@@ -1,7 +1,7 @@
 "use client";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { getFaqSectionByIdEndpoint } from "../../../api/faq-section.endpoints";
+import { getFaqSectionByIdEndpoint } from "src/common/api/faq-section.endpoints";
 import type { FaqRefBlock } from "../interfaces/campaign-block.interface";
 
 export interface FaqRefBlockPreviewProps {

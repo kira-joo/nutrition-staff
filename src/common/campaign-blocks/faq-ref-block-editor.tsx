@@ -1,8 +1,8 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { getFaqSectionsEndpoint } from "../../../api/faq-section.endpoints";
-import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "../../../api/campaign.endpoints";
+import { getFaqSectionsEndpoint } from "src/common/api/faq-section.endpoints";
+import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "src/common/api/campaign.endpoints";
 import { CampaignBlockType } from "../enums";
 import type { FaqRefBlock, FaqRefBlockFormValues } from "../interfaces/campaign-block.interface";
 import { FaqSection } from "../interfaces/faq-section.interface";

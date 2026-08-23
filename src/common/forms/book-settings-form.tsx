@@ -5,8 +5,8 @@ import { CustomButton, CustomForm, FieldType, toast, type FormFieldConfig } from
 import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { BookMarked, Contact, Image as ImageIcon, Printer } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { getDoctorProfileEndpoint } from "../../../api/doctor-profile.endpoints";
-import type { updateBookSettingsEndpoint } from "../../../api/book-settings.endpoints";
+import { getDoctorProfileEndpoint } from "src/common/api/doctor-profile.endpoints";
+import type { updateBookSettingsEndpoint } from "src/common/api/book-settings.endpoints";
 import { BookMarginPreset, BookPageSize } from "../enums";
 import { BookSettings, BookSettingsFormValues } from "../interfaces/book-settings.interface";
 import { bookLogoPolicy, bookPortraitPolicy } from "../upload-policies";

@@ -12,7 +12,7 @@ import { KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AppRoute } from "src/common/routes/app-route";
 import { PasswordInput } from "src/components/auth/password-input";
-import { updateOwnPasswordEndpoint } from "../../../../api/auth.endpoints";
+import { updateOwnPasswordEndpoint } from "src/common/api/auth.endpoints";
 
 interface PasswordFormValues {
   currentPassword: string;

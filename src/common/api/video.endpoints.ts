@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Video } from "../src/common/interfaces/video.interface";
+import type { Video } from "src/common/interfaces/video.interface";
 
 export const getVideosEndpoint: Endpoint<{
   query: PaginationQuery & Record<string, unknown>;

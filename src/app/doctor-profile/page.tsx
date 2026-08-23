@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { UserRound } from "lucide-react";
-import { getDoctorProfileEndpoint, updateDoctorProfileEndpoint } from "../../../api/doctor-profile.endpoints";
+import { getDoctorProfileEndpoint, updateDoctorProfileEndpoint } from "src/common/api/doctor-profile.endpoints";
 import { DoctorProfileForm } from "src/common/forms/doctor-profile-form";
 import { DoctorProfileGallery } from "src/common/forms/doctor-profile/doctor-profile-gallery";
 import { EntityName } from "src/common/authorization/entity-name.enum";

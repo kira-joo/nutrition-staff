@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Settings } from "lucide-react";
-import { getBookSettingsEndpoint, updateBookSettingsEndpoint } from "../../../api/book-settings.endpoints";
+import { getBookSettingsEndpoint, updateBookSettingsEndpoint } from "src/common/api/book-settings.endpoints";
 import { BookSettingsForm } from "src/common/forms/book-settings-form";
 
 export default function BookSettingsPage() {
