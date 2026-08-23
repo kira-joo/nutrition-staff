@@ -7,7 +7,7 @@ import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getNutritionAssessmentsEndpoint } from "../../../../../api/nutrition-assessment.endpoints";
+import { getNutritionAssessmentsEndpoint } from "src/common/api/nutrition-assessment.endpoints";
 
 export default function ClientAssessmentsPage({ params }: { params: { id: string } }) {
   const navigate = useNavigate();

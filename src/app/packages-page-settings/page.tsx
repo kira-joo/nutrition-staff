@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { SlidersHorizontal } from "lucide-react";
-import { getPackagesPageSettingsEndpoint, updatePackagesPageSettingsEndpoint } from "../../../api/packages-page-settings.endpoints";
+import { getPackagesPageSettingsEndpoint, updatePackagesPageSettingsEndpoint } from "src/common/api/packages-page-settings.endpoints";
 import { PackagesPageSettingsForm } from "src/common/forms/packages-page-settings-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 

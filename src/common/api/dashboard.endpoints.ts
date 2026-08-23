@@ -7,7 +7,7 @@ import type {
   DashboardKpis,
   DashboardLifecycleChart,
   DashboardSourceChart,
-} from "../src/common/interfaces/dashboard.interface";
+} from "src/common/interfaces/dashboard.interface";
 
 // Backed by the MongoDB-backed route handlers under src/app/api/dashboard.
 

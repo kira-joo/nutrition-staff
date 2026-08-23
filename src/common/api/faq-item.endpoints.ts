@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { FaqItem, FaqItemFormValues } from "../src/common/interfaces/faq-item.interface";
+import type { FaqItem, FaqItemFormValues } from "src/common/interfaces/faq-item.interface";
 
 export const getFaqItemsEndpoint: Endpoint<{
   query: PaginationQuery & Record<string, unknown>;

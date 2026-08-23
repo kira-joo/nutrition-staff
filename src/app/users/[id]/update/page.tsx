@@ -6,7 +6,7 @@ import { UserCog } from "lucide-react";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { UserForm } from "src/common/forms/user-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { getUserByIdEndpoint, updateUserEndpoint } from "../../../../../api/user.endpoints";
+import { getUserByIdEndpoint, updateUserEndpoint } from "src/common/api/user.endpoints";
 
 export default function UserUpdatePage({ params }: { params: { id: string } }) {
   const userQuery = useRequesterQuery({

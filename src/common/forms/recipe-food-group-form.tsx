@@ -2,7 +2,7 @@
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { useRouter } from "next/navigation";
-import type { createRecipeFoodGroupEndpoint, updateRecipeFoodGroupEndpoint } from "../../../api/recipe-food-group.endpoints";
+import type { createRecipeFoodGroupEndpoint, updateRecipeFoodGroupEndpoint } from "src/common/api/recipe-food-group.endpoints";
 import { ContentStatus } from "../enums";
 import { RecipeFoodGroup, RecipeFoodGroupFormValues } from "../interfaces/recipe-food-group.interface";
 import { AppRoute } from "../routes/app-route";

@@ -8,7 +8,7 @@ import type {
   ClientInteraction,
   CreateClientInteractionDto,
   UpdateClientInteractionDto,
-} from "../src/common/interfaces/client-interaction.interface";
+} from "src/common/interfaces/client-interaction.interface";
 
 // Backed by the route handlers under src/app/api/client-interactions.
 

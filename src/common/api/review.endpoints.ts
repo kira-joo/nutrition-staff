@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Review } from "../src/common/interfaces/review.interface";
+import type { Review } from "src/common/interfaces/review.interface";
 
 // Backed by the multipart-upload-on-submit route handlers under src/app/api/reviews.
 // create/update bodies are typed loosely (Record<string, unknown>) rather than as

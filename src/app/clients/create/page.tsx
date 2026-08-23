@@ -4,7 +4,7 @@ import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { UserRoundCog } from "lucide-react";
 import { ClientForm } from "src/common/forms/client-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { createClientEndpoint } from "../../../../api/client.endpoints";
+import { createClientEndpoint } from "src/common/api/client.endpoints";
 
 export default function ClientCreatePage() {
   return (

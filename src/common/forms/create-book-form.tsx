@@ -5,7 +5,7 @@ import { CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-
 import { useRouter } from "next/navigation";
 import { CreateBookFormValues } from "../interfaces/book.interface";
 import { AppRoute } from "../routes/app-route";
-import type { createBookEndpoint } from "../../../api/book.endpoints";
+import type { createBookEndpoint } from "src/common/api/book.endpoints";
 
 /**
  * Deliberately minimal — a Book is created essentially empty and the

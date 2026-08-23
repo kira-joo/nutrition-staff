@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { Salad } from "lucide-react";
-import { createRecipeFoodGroupEndpoint } from "../../../../api/recipe-food-group.endpoints";
+import { createRecipeFoodGroupEndpoint } from "src/common/api/recipe-food-group.endpoints";
 import { RecipeFoodGroupForm } from "src/common/forms/recipe-food-group-form";
 import { AppRoute } from "src/common/routes/app-route";
 

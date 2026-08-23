@@ -12,7 +12,7 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Pencil, Plus, Salad, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { deleteRecipeFoodGroupEndpoint, getRecipeFoodGroupsEndpoint } from "../../../api/recipe-food-group.endpoints";
+import { deleteRecipeFoodGroupEndpoint, getRecipeFoodGroupsEndpoint } from "src/common/api/recipe-food-group.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

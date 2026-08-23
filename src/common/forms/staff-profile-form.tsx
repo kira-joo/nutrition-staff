@@ -1,7 +1,7 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { upsertStaffProfileEndpoint } from "../../../api/staff-profile.endpoints";
+import { upsertStaffProfileEndpoint } from "src/common/api/staff-profile.endpoints";
 import { UpsertStaffProfileDto } from "../interfaces/staff-profile.interface";
 
 export interface StaffProfileFormProps {

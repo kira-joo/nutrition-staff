@@ -2,7 +2,7 @@
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { useMounted } from "@kira-joo/frontend-toolkit-tailwind";
-import { getCurrentUserEndpoint } from "../../../api/auth.endpoints";
+import { getCurrentUserEndpoint } from "src/common/api/auth.endpoints";
 import { getAccessToken } from "./token-storage";
 
 /**

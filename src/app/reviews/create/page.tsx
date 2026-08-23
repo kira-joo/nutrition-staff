@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { MessageSquarePlus } from "lucide-react";
-import { createReviewEndpoint } from "../../../../api/review.endpoints";
+import { createReviewEndpoint } from "src/common/api/review.endpoints";
 import { ReviewForm } from "src/common/forms/review-form";
 import { AppRoute } from "src/common/routes/app-route";
 

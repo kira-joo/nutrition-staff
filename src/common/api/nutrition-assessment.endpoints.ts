@@ -8,7 +8,7 @@ import type {
   CreateNutritionAssessmentDto,
   NutritionAssessment,
   UpdateNutritionAssessmentDto,
-} from "../src/common/interfaces/nutrition-assessment.interface";
+} from "src/common/interfaces/nutrition-assessment.interface";
 
 // Backed by the route handlers under src/app/api/nutrition-assessments.
 

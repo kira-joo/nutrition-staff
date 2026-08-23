@@ -21,9 +21,9 @@ import { Status } from "src/common/enums";
 import { ClientProfileForm } from "src/common/forms/client-profile-form";
 import { StaffProfileForm } from "src/common/forms/staff-profile-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { getClientByUserIdEndpoint } from "../../../../api/client-profile.endpoints";
-import { getStaffProfileByUserIdEndpoint } from "../../../../api/staff-profile.endpoints";
-import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
+import { getClientByUserIdEndpoint } from "src/common/api/client-profile.endpoints";
+import { getStaffProfileByUserIdEndpoint } from "src/common/api/staff-profile.endpoints";
+import { getUserByIdEndpoint } from "src/common/api/user.endpoints";
 
 export default function UserDetailsPage({ params }: { params: { id: string } }) {
   const { can } = usePermissions();

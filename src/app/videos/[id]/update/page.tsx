@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Video as VideoIcon } from "lucide-react";
-import { getVideoByIdEndpoint, updateVideoEndpoint } from "../../../../../api/video.endpoints";
+import { getVideoByIdEndpoint, updateVideoEndpoint } from "src/common/api/video.endpoints";
 import { VideoForm } from "src/common/forms/video-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";

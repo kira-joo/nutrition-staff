@@ -22,7 +22,7 @@ import { ClientMeasurement } from "src/common/interfaces/client-measurement.inte
 import {
   getClientMeasurementsEndpoint,
   updateClientMeasurementEndpoint,
-} from "../../../../../api/client-measurement.endpoints";
+} from "src/common/api/client-measurement.endpoints";
 
 export default function ClientMeasurementsPage({ params }: { params: { id: string } }) {
   const navigate = useNavigate();

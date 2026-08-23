@@ -4,8 +4,8 @@ import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { CustomButton, CustomSelect, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { getBookPrintPreviewEndpoint } from "../../../../../api/book-preview.endpoints";
-import { getBookByIdEndpoint } from "../../../../../api/book.endpoints";
+import { getBookPrintPreviewEndpoint } from "src/common/api/book-preview.endpoints";
+import { getBookByIdEndpoint } from "src/common/api/book.endpoints";
 
 /**
  * Renders the SAME self-contained HTML the (future) PDF renderer would

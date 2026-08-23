@@ -35,7 +35,7 @@ import {
   deleteClientInteractionEndpoint,
   getClientInteractionsEndpoint,
   updateClientInteractionEndpoint,
-} from "../../../../../api/client-interaction.endpoints";
+} from "src/common/api/client-interaction.endpoints";
 
 const TYPE_ICONS: Record<InteractionType, typeof Phone> = {
   [InteractionType.CALL]: Phone,

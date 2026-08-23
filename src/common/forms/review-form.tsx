@@ -3,7 +3,7 @@
 import { CustomForm, FieldType, FormFieldWrapper, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Image as ImageIcon, MessageSquareText, Settings2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { createReviewEndpoint, updateReviewEndpoint } from "../../../api/review.endpoints";
+import type { createReviewEndpoint, updateReviewEndpoint } from "src/common/api/review.endpoints";
 import { ContentStatus } from "../enums";
 import { Review, ReviewFormValues } from "../interfaces/review.interface";
 import { AppRoute } from "../routes/app-route";

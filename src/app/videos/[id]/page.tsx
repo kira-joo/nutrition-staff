@@ -12,7 +12,7 @@ import {
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Pencil, Video as VideoIcon } from "lucide-react";
-import { getVideoByIdEndpoint } from "../../../../api/video.endpoints";
+import { getVideoByIdEndpoint } from "src/common/api/video.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";

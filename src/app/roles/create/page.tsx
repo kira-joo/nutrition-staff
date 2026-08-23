@@ -4,7 +4,7 @@ import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { ShieldPlus } from "lucide-react";
 import { RoleForm } from "src/common/forms/role-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { createRoleEndpoint } from "../../../../api/role.endpoints";
+import { createRoleEndpoint } from "src/common/api/role.endpoints";
 
 export default function RoleCreatePage() {
   return (

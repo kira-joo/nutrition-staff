@@ -12,7 +12,7 @@ import {
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, BookOpen, ChefHat, Image as ImageIcon, ListChecks, Pencil } from "lucide-react";
-import { getRecipeByIdEndpoint } from "../../../../api/recipe.endpoints";
+import { getRecipeByIdEndpoint } from "src/common/api/recipe.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";

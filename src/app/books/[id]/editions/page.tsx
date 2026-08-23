@@ -3,9 +3,9 @@
 import { downloadRequester, useRequesterMutation, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, CustomButton, Modal, QueryState, toast } from "@kira-joo/frontend-toolkit-tailwind";
 import { useState } from "react";
-import { getBookByIdEndpoint } from "../../../../../api/book.endpoints";
-import { getBookEditionsEndpoint, getBookPublishCheckEndpoint, publishBookEditionEndpoint, type PublishValidationIssue } from "../../../../../api/book-edition.endpoints";
-import { downloadBookArtifactPdfEndpoint, generateBookArtifactEndpoint, getBookArtifactEndpoint, type BookArtifact } from "../../../../../api/book-artifact.endpoints";
+import { getBookByIdEndpoint } from "src/common/api/book.endpoints";
+import { getBookEditionsEndpoint, getBookPublishCheckEndpoint, publishBookEditionEndpoint, type PublishValidationIssue } from "src/common/api/book-edition.endpoints";
+import { downloadBookArtifactPdfEndpoint, generateBookArtifactEndpoint, getBookArtifactEndpoint, type BookArtifact } from "src/common/api/book-artifact.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookEdition } from "src/common/interfaces/book-edition.interface";
 import { BookStatus } from "src/common/enums";

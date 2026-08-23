@@ -5,7 +5,7 @@ import { Badge, PageShell, QueryState, RouteTabs, type RouteTabItem } from "@kir
 import { BookOpen } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { getBookByIdEndpoint } from "../../../../api/book.endpoints";
+import { getBookByIdEndpoint } from "src/common/api/book.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { BOOK_STATUS_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { AppRoute } from "src/common/routes/app-route";

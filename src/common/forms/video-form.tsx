@@ -3,7 +3,7 @@
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Settings2, Video as VideoIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { createVideoEndpoint, updateVideoEndpoint } from "../../../api/video.endpoints";
+import type { createVideoEndpoint, updateVideoEndpoint } from "src/common/api/video.endpoints";
 import { ContentStatus } from "../enums";
 import { Video, VideoFormValues } from "../interfaces/video.interface";
 import { AppRoute } from "../routes/app-route";

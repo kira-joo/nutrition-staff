@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Globe } from "lucide-react";
-import { getSiteSettingsEndpoint, updateSiteSettingsEndpoint } from "../../../api/site-settings.endpoints";
+import { getSiteSettingsEndpoint, updateSiteSettingsEndpoint } from "src/common/api/site-settings.endpoints";
 import { SiteSettingsForm } from "src/common/forms/site-settings-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 

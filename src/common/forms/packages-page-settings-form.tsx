@@ -2,7 +2,7 @@
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Layout } from "lucide-react";
-import type { updatePackagesPageSettingsEndpoint } from "../../../api/packages-page-settings.endpoints";
+import type { updatePackagesPageSettingsEndpoint } from "src/common/api/packages-page-settings.endpoints";
 import type { PackagesPageSettings, PackagesPageSettingsFormValues } from "../interfaces/packages-page-settings.interface";
 
 export interface PackagesPageSettingsFormProps {

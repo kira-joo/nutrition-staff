@@ -2,7 +2,7 @@
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { ClientLifecycle } from "src/common/enums";
-import { updateClientEndpoint } from "../../../api/client.endpoints";
+import { updateClientEndpoint } from "src/common/api/client.endpoints";
 
 export interface ClientLifecycleFormValues {
   lifecycle: ClientLifecycle;

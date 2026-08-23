@@ -6,11 +6,11 @@ import { History, NotebookPen } from "lucide-react";
 import { NutritionAssessmentForm } from "src/common/forms/nutrition-assessment-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getClientByIdEndpoint } from "../../../../../../api/client.endpoints";
+import { getClientByIdEndpoint } from "src/common/api/client.endpoints";
 import {
   getNutritionAssessmentByIdEndpoint,
   updateNutritionAssessmentEndpoint,
-} from "../../../../../../api/nutrition-assessment.endpoints";
+} from "src/common/api/nutrition-assessment.endpoints";
 
 export default function ClientAssessmentDetailsPage({ params }: { params: { id: string; assessmentId: string } }) {
   const navigate = useNavigate();

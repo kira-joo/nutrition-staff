@@ -2,7 +2,7 @@
 
 import { CustomForm, CustomInput, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Globe, Image as ImageIcon, Phone, Share2 } from "lucide-react";
-import type { updateSiteSettingsEndpoint } from "../../../api/site-settings.endpoints";
+import type { updateSiteSettingsEndpoint } from "src/common/api/site-settings.endpoints";
 import { Currency } from "../enums";
 import type { SiteSettings, SiteSettingsFormValues, SocialLink } from "../interfaces/site-settings.interface";
 import { faviconImagePolicy, logoImagePolicy, ogImagePolicy } from "../upload-policies";

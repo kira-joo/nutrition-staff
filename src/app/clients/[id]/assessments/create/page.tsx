@@ -6,8 +6,8 @@ import { NotebookPen } from "lucide-react";
 import { NutritionAssessmentForm } from "src/common/forms/nutrition-assessment-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getClientByIdEndpoint } from "../../../../../../api/client.endpoints";
-import { createNutritionAssessmentEndpoint } from "../../../../../../api/nutrition-assessment.endpoints";
+import { getClientByIdEndpoint } from "src/common/api/client.endpoints";
+import { createNutritionAssessmentEndpoint } from "src/common/api/nutrition-assessment.endpoints";
 
 export default function ClientAssessmentCreatePage({ params }: { params: { id: string } }) {
   const navigate = useNavigate();

@@ -9,7 +9,7 @@ import type { SignupDto } from "src/common/interfaces/auth.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { GuestGuard } from "src/components/auth/guest-guard";
 import { PasswordInput } from "src/components/auth/password-input";
-import { signupEndpoint } from "../../../api/auth.endpoints";
+import { signupEndpoint } from "src/common/api/auth.endpoints";
 
 interface SignupFormValues extends SignupDto {
   confirmPassword: string;

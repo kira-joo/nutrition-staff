@@ -18,7 +18,7 @@ import {
   removeCampaignBlockEndpoint,
   reorderCampaignBlocksEndpoint,
   replaceCampaignBlockEndpoint,
-} from "../../../api/campaign.endpoints";
+} from "src/common/api/campaign.endpoints";
 import { CampaignBlockType } from "../enums";
 import type { CampaignBlock } from "../interfaces/campaign-block.interface";
 import { campaignBlockRegistry } from "./campaign-block-registry";

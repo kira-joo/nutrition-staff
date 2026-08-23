@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Package as PackageIcon } from "lucide-react";
-import { getPackageByIdEndpoint, updatePackageEndpoint } from "../../../../../api/package.endpoints";
+import { getPackageByIdEndpoint, updatePackageEndpoint } from "src/common/api/package.endpoints";
 import { PackageForm } from "src/common/forms/package-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";

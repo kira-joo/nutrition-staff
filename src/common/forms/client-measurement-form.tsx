@@ -3,7 +3,7 @@
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Ruler, Scale, StickyNote } from "lucide-react";
 import { BodyCompositionMethod } from "../enums";
-import type { createClientMeasurementEndpoint, updateClientMeasurementEndpoint } from "../../../api/client-measurement.endpoints";
+import type { createClientMeasurementEndpoint, updateClientMeasurementEndpoint } from "src/common/api/client-measurement.endpoints";
 import { ClientMeasurement, CreateClientMeasurementDto } from "../interfaces/client-measurement.interface";
 
 export interface ClientMeasurementFormProps {

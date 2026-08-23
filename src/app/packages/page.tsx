@@ -12,7 +12,7 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Package as PackageIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { deletePackageEndpoint, getPackagesEndpoint } from "../../../api/package.endpoints";
+import { deletePackageEndpoint, getPackagesEndpoint } from "src/common/api/package.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

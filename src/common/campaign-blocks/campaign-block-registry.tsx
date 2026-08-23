@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "../../../api/campaign.endpoints";
+import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "src/common/api/campaign.endpoints";
 import { CampaignBlockType } from "../enums";
 import type { CampaignBlock } from "../interfaces/campaign-block.interface";
 import { CountdownBlockEditor } from "./countdown-block-editor";

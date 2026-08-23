@@ -2,7 +2,7 @@
 
 import { PageShell } from "@kira-joo/frontend-toolkit-tailwind";
 import { HelpCircle } from "lucide-react";
-import { createFaqItemEndpoint } from "../../../../api/faq-item.endpoints";
+import { createFaqItemEndpoint } from "src/common/api/faq-item.endpoints";
 import { FaqItemForm } from "src/common/forms/faq-item-form";
 import { AppRoute } from "src/common/routes/app-route";
 

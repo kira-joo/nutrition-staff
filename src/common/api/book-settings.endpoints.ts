@@ -1,5 +1,5 @@
 import { MethodType, type Endpoint } from "@kira-joo/frontend-toolkit-core";
-import type { BookSettings } from "../src/common/interfaces/book-settings.interface";
+import type { BookSettings } from "src/common/interfaces/book-settings.interface";
 
 // Backed by the multipart-upload-on-submit route handler under
 // src/app/api/book-settings — see site-settings.endpoints.ts for why the

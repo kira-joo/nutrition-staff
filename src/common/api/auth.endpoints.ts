@@ -5,7 +5,7 @@ import type {
   SignupDto,
   CurrentUser,
   UpdateOwnPasswordDto,
-} from "../src/common/interfaces/auth.interface";
+} from "src/common/interfaces/auth.interface";
 
 // Backed by the route handlers under src/app/api/auth.
 

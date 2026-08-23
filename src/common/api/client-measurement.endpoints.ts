@@ -8,7 +8,7 @@ import type {
   ClientMeasurement,
   CreateClientMeasurementDto,
   UpdateClientMeasurementDto,
-} from "../src/common/interfaces/client-measurement.interface";
+} from "src/common/interfaces/client-measurement.interface";
 
 // Backed by the route handlers under src/app/api/client-measurements.
 

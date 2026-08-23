@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { AppRoute } from "src/common/routes/app-route";
-import { getClientByIdEndpoint } from "../../../../api/client.endpoints";
+import { getClientByIdEndpoint } from "src/common/api/client.endpoints";
 
 /**
  * Single source of truth for the Client Details workspace's tabs — id,

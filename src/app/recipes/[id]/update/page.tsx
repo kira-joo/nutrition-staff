@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { ChefHat } from "lucide-react";
-import { getRecipeByIdEndpoint, updateRecipeEndpoint } from "../../../../../api/recipe.endpoints";
+import { getRecipeByIdEndpoint, updateRecipeEndpoint } from "src/common/api/recipe.endpoints";
 import { RecipeForm } from "src/common/forms/recipe-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";

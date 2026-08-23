@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { RoleForm } from "src/common/forms/role-form";
 import { AppRoute } from "src/common/routes/app-route";
-import { getRoleByIdEndpoint, updateRoleEndpoint } from "../../../../../api/role.endpoints";
+import { getRoleByIdEndpoint, updateRoleEndpoint } from "src/common/api/role.endpoints";
 
 export default function RoleUpdatePage({ params }: { params: { id: string } }) {
   const roleQuery = useRequesterQuery({

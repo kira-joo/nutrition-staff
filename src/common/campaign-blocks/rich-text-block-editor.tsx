@@ -1,7 +1,7 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "../../../api/campaign.endpoints";
+import type { addCampaignBlockEndpoint, replaceCampaignBlockEndpoint } from "src/common/api/campaign.endpoints";
 import { CampaignBlockType } from "../enums";
 import type { RichTextBlock, RichTextBlockFormValues } from "../interfaces/campaign-block.interface";
 

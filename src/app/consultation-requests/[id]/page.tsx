@@ -15,7 +15,7 @@ import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ConsultationRequestIntent } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
-import { getConsultationRequestByIdEndpoint } from "../../../../api/consultation-request.endpoints";
+import { getConsultationRequestByIdEndpoint } from "src/common/api/consultation-request.endpoints";
 
 const INTENT_LABEL: Record<ConsultationRequestIntent, string> = {
   [ConsultationRequestIntent.CONSULTATION]: "Consultation",

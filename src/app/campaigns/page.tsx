@@ -13,7 +13,7 @@ import {
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Megaphone, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { deleteCampaignEndpoint, getCampaignsEndpoint } from "../../../api/campaign.endpoints";
+import { deleteCampaignEndpoint, getCampaignsEndpoint } from "src/common/api/campaign.endpoints";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ENTITY_PLURAL_LABELS } from "src/common/authorization/entity-labels";

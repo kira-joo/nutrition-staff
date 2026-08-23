@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Permission } from "../src/common/interfaces/permission.interface";
+import type { Permission } from "src/common/interfaces/permission.interface";
 
 // Backed by the route handler under src/app/api/permissions.
 

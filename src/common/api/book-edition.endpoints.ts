@@ -1,5 +1,5 @@
 import { MethodType, type Endpoint } from "@kira-joo/frontend-toolkit-core";
-import type { BookEdition } from "../src/common/interfaces/book-edition.interface";
+import type { BookEdition } from "src/common/interfaces/book-edition.interface";
 
 export interface PublishValidationIssue {
   code: string;

@@ -2,7 +2,7 @@
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { QueryState } from "@kira-joo/frontend-toolkit-tailwind";
-import { getBookByIdEndpoint } from "../../../../../api/book.endpoints";
+import { getBookByIdEndpoint } from "src/common/api/book.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import { ReferencesEditor } from "src/common/book-blocks/references-editor";
 import { useBookContentQueue } from "src/common/books/use-book-content-queue";

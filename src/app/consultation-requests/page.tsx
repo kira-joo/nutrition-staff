@@ -15,7 +15,7 @@ import { ConsultationRequestIntent } from "src/common/enums";
 import { ConsultationRequest } from "src/common/interfaces/consultation-request.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getConsultationRequestsEndpoint } from "../../../api/consultation-request.endpoints";
+import { getConsultationRequestsEndpoint } from "src/common/api/consultation-request.endpoints";
 
 const INTENT_LABEL: Record<ConsultationRequestIntent, string> = {
   [ConsultationRequestIntent.CONSULTATION]: "Consultation",

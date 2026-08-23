@@ -1,7 +1,7 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { updateClientEndpoint } from "../../../api/client.endpoints";
+import { updateClientEndpoint } from "src/common/api/client.endpoints";
 
 interface ScheduleFollowUpFormValues {
   nextFollowUpAt?: string;

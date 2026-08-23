@@ -2,7 +2,7 @@
 
 import { CustomForm, CustomInput, CustomSwitch, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Award, BarChart3, BookOpen, UserRound } from "lucide-react";
-import type { updateDoctorProfileEndpoint } from "../../../api/doctor-profile.endpoints";
+import type { updateDoctorProfileEndpoint } from "src/common/api/doctor-profile.endpoints";
 import type { BioSection, DoctorProfile, DoctorProfileFormValues, LabeledOrderedItem, StatItem } from "../interfaces/doctor-profile.interface";
 import { doctorPhotoPolicy } from "../upload-policies";
 import { ArrayFieldEditor } from "./array-field-editor";

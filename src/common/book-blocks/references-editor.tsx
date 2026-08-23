@@ -5,7 +5,7 @@ import { CustomButton, CustomInput, Modal, toast } from "@kira-joo/frontend-tool
 import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { addReferenceEndpoint, removeReferenceEndpoint, reorderReferencesEndpoint, updateReferenceEndpoint } from "../../../api/book-content.endpoints";
+import { addReferenceEndpoint, removeReferenceEndpoint, reorderReferencesEndpoint, updateReferenceEndpoint } from "src/common/api/book-content.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
 import { SortableList } from "src/common/books/sortable-list";

@@ -14,7 +14,7 @@ import { Activity, Pencil, ShieldCheck } from "lucide-react";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
-import { getRoleByIdEndpoint } from "../../../../api/role.endpoints";
+import { getRoleByIdEndpoint } from "src/common/api/role.endpoints";
 
 export default function RoleDetailsPage({ params }: { params: { id: string } }) {
   const roleQuery = useRequesterQuery({

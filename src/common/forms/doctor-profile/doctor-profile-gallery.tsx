@@ -17,7 +17,7 @@ import {
   removeGalleryItemEndpoint,
   reorderGalleryEndpoint,
   replaceGalleryItemEndpoint,
-} from "../../../../api/doctor-profile.endpoints";
+} from "src/common/api/doctor-profile.endpoints";
 import type { GalleryItem } from "../../interfaces/doctor-profile.interface";
 import { GalleryItemModal } from "./gallery-item-modal";
 

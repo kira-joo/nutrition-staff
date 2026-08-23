@@ -8,12 +8,12 @@ import { AppPermission } from "src/common/authorization/app-permission";
 import { NutritionCalculationResultsView } from "src/common/forms/nutrition-calculation-results";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getClientMeasurementByIdEndpoint } from "../../../../../../api/client-measurement.endpoints";
-import { getNutritionAssessmentByIdEndpoint } from "../../../../../../api/nutrition-assessment.endpoints";
+import { getClientMeasurementByIdEndpoint } from "src/common/api/client-measurement.endpoints";
+import { getNutritionAssessmentByIdEndpoint } from "src/common/api/nutrition-assessment.endpoints";
 import {
   getNutritionCalculationByIdEndpoint,
   updateNutritionCalculationEndpoint,
-} from "../../../../../../api/nutrition-calculation.endpoints";
+} from "src/common/api/nutrition-calculation.endpoints";
 
 interface NotesFormValues {
   notes?: string;

@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Recipe } from "../src/common/interfaces/recipe.interface";
+import type { Recipe } from "src/common/interfaces/recipe.interface";
 
 // Backed by the multipart-upload-on-submit route handlers under src/app/api/recipes.
 // create/update bodies are typed loosely (Record<string, unknown>) — see review.endpoints.ts.

@@ -3,8 +3,8 @@
 import { useRequesterMutation, useRequesterQuery, type ImageAsset, type UploadPolicy } from "@kira-joo/frontend-toolkit-core";
 import { CustomButton, CustomImageAssetUpload, CustomInput, PageSection, QueryState, toast } from "@kira-joo/frontend-toolkit-tailwind";
 import { useState } from "react";
-import { getBookSettingsEndpoint } from "../../../../../api/book-settings.endpoints";
-import { getBookByIdEndpoint, updateBookEndpoint } from "../../../../../api/book.endpoints";
+import { getBookSettingsEndpoint } from "src/common/api/book-settings.endpoints";
+import { getBookByIdEndpoint, updateBookEndpoint } from "src/common/api/book.endpoints";
 import { ArrayFieldEditor } from "src/common/forms/array-field-editor";
 import { OverrideField } from "src/common/forms/books/override-field";
 import { BookMarginPreset, BookOverrideKey, BookPageSize } from "src/common/enums";

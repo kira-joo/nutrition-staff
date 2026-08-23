@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { CustomSelect, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import type { FieldValues, Path } from "react-hook-form";
-import { getRecipesEndpoint } from "../../../../api/recipe.endpoints";
+import { getRecipesEndpoint } from "src/common/api/recipe.endpoints";
 import { ContentStatus } from "src/common/enums";
 import type { Recipe } from "src/common/interfaces/recipe.interface";
 

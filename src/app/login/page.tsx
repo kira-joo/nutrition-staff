@@ -8,7 +8,7 @@ import type { LoginDto } from "src/common/interfaces/auth.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { GuestGuard } from "src/components/auth/guest-guard";
 import { PasswordInput } from "src/components/auth/password-input";
-import { loginEndpoint } from "../../../api/auth.endpoints";
+import { loginEndpoint } from "src/common/api/auth.endpoints";
 
 const fields: FormFieldConfig<LoginDto>[] = [
   { type: FieldType.INPUT, name: "email", label: "Email", inputType: "email", rules: { required: true } },

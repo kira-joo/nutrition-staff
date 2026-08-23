@@ -4,7 +4,7 @@ import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, CustomButton, PageSection, PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Blocks, Eye, EyeOff, Megaphone } from "lucide-react";
 import { useState } from "react";
-import { getCampaignByIdEndpoint, updateCampaignEndpoint } from "../../../../api/campaign.endpoints";
+import { getCampaignByIdEndpoint, updateCampaignEndpoint } from "src/common/api/campaign.endpoints";
 import { CampaignBlockManager } from "src/common/campaign-blocks/campaign-block-manager";
 import { campaignBlockRegistry } from "src/common/campaign-blocks/campaign-block-registry";
 import { CampaignForm } from "src/common/forms/campaign-form";

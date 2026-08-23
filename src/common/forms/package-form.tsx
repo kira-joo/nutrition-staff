@@ -4,7 +4,7 @@ import type { LocalizedString } from "@kira-joo/frontend-toolkit-core";
 import { CustomForm, CustomInput, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { DollarSign, ListChecks, Package as PackageIcon, Settings2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { createPackageEndpoint, updatePackageEndpoint } from "../../../api/package.endpoints";
+import type { createPackageEndpoint, updatePackageEndpoint } from "src/common/api/package.endpoints";
 import { ContentStatus, IconKey, PackageVariant } from "../enums";
 import { Package, PackageFormValues, PricingTiers } from "../interfaces/package.interface";
 import { AppRoute } from "../routes/app-route";

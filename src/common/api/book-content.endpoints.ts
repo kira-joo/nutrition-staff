@@ -1,5 +1,5 @@
 import { MethodType, type Endpoint } from "@kira-joo/frontend-toolkit-core";
-import type { Book } from "../src/common/interfaces/book.interface";
+import type { Book } from "src/common/interfaces/book.interface";
 
 // Chapter/block/reference bodies are typed loosely (`Record<string, unknown>`)
 // for the multipart-backed routes (add/replace chapter, add/replace block —

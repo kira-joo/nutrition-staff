@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { Client, CreateClientDto, UpdateClientDto } from "../src/common/interfaces/client.interface";
+import type { Client, CreateClientDto, UpdateClientDto } from "src/common/interfaces/client.interface";
 
 // Backed by the MongoDB-backed route handlers under src/app/api/clients.
 

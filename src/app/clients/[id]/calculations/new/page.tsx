@@ -10,9 +10,9 @@ import { SaveNutritionCalculationForm } from "src/common/forms/save-nutrition-ca
 import { ComputeNutritionCalculationResponse } from "src/common/interfaces/nutrition-calculation.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getClientByIdEndpoint } from "../../../../../../api/client.endpoints";
-import { getClientMeasurementsEndpoint } from "../../../../../../api/client-measurement.endpoints";
-import { getNutritionAssessmentsEndpoint } from "../../../../../../api/nutrition-assessment.endpoints";
+import { getClientByIdEndpoint } from "src/common/api/client.endpoints";
+import { getClientMeasurementsEndpoint } from "src/common/api/client-measurement.endpoints";
+import { getNutritionAssessmentsEndpoint } from "src/common/api/nutrition-assessment.endpoints";
 
 export default function ClientCalculationNewPage({ params }: { params: { id: string } }) {
   const navigate = useNavigate();

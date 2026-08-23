@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { HelpCircle } from "lucide-react";
-import { getFaqItemByIdEndpoint, updateFaqItemEndpoint } from "../../../../../api/faq-item.endpoints";
+import { getFaqItemByIdEndpoint, updateFaqItemEndpoint } from "src/common/api/faq-item.endpoints";
 import { FaqItemForm } from "src/common/forms/faq-item-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";

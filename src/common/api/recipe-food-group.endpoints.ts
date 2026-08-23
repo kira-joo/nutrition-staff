@@ -4,7 +4,7 @@ import {
   type PaginatedResponse,
   type PaginationQuery,
 } from "@kira-joo/frontend-toolkit-core";
-import type { RecipeFoodGroup, RecipeFoodGroupFormValues } from "../src/common/interfaces/recipe-food-group.interface";
+import type { RecipeFoodGroup, RecipeFoodGroupFormValues } from "src/common/interfaces/recipe-food-group.interface";
 
 export const getRecipeFoodGroupsEndpoint: Endpoint<{
   query: PaginationQuery & Record<string, unknown>;

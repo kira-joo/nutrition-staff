@@ -41,8 +41,8 @@ import {
   getDashboardKpisEndpoint,
   getDashboardLifecycleChartEndpoint,
   getDashboardSourceChartEndpoint,
-} from "../../../api/dashboard.endpoints";
-import { getUsersEndpoint } from "../../../api/user.endpoints";
+} from "src/common/api/dashboard.endpoints";
+import { getUsersEndpoint } from "src/common/api/user.endpoints";
 
 const RANGE_PRESETS = [
   { id: "7d", label: "Last 7 days" },

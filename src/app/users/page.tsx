@@ -23,8 +23,8 @@ import { ProfileType, Status } from "src/common/enums";
 import { User } from "src/common/interfaces/user.interface";
 import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
-import { getRolesEndpoint } from "../../../api/role.endpoints";
-import { deleteUserEndpoint, getUsersEndpoint } from "../../../api/user.endpoints";
+import { getRolesEndpoint } from "src/common/api/role.endpoints";
+import { deleteUserEndpoint, getUsersEndpoint } from "src/common/api/user.endpoints";
 
 export default function UsersPage() {
   const navigate = useNavigate();
