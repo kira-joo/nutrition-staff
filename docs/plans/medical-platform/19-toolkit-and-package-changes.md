@@ -3,6 +3,16 @@
 **Status: APPROVED 2026-08-22.** Release wave A gates Phases
 2–6; wave B gates Phase 11.
 
+> **AMENDMENT 2026-08-28 — the `Money` design in this document was superseded
+> before it was built.** `toolkit-common` shipped a different `Money` than the
+> one approved here, driven by the e-commerce work rather than by this plan. The
+> approved specification below is left intact as the record of what was agreed;
+> this block records what actually exists and why it diverged. See
+> **`Money` — amended** under Wave A-backend §1, and the corresponding
+> acceptance criterion.
+>
+> Nothing else in this document is affected.
+
 **Every publish in this document requires its own explicit approval.** Per
 `.claude/skills/release-and-publish/SKILL.md` that authorisation is per-instance,
 never standing. Verification before any publish is `npm run build && npm pack`
@@ -70,6 +80,7 @@ order, and which app work each release unblocks.
 | Addition | Detail |
 |---|---|
 | `Money` | `{ amountMinor: bigint; currency: string }` + `addMoney`, `subtractMoney`, `multiplyMoney(m, factor, rounding)`, `allocateMoney(m, weights)` (remainder-safe), `compareMoney`, `zeroMoney`. Currency mismatch throws. **Amended after review:** `bigint` rather than `number` (a `number` silently loses precision past 2^53, which a lifetime of minor units can reach); an **ISO 4217 exponent table** so JOD/KWD (3 decimals) and JPY (0) are correct rather than assumed-2; and an explicit `RoundingMode` on every lossy operation. Serialization to/from JSON is an explicit `toMoneyJson`/`fromMoneyJson` pair, since `bigint` is not JSON-native. |
+| `Money` — **AMENDED 2026-08-28, superseded before implementation** | **What shipped is not this.** `toolkit-common` 0.4.0 defines `Money` as `Decimal` (decimal.js) in **major units** at a single `MONEY_SCALE = 2`, with `toMoney`, `roundMoney`, `sum`, `compare`, `allocate`, and `moneyView(currency, locale)`. **Currency is not part of the type.** Three of this row's decisions were reversed and one was dropped — see the amendment note below. |
 | **not** `formatMoney` / `parseMoney` | **Removed from `toolkit-common` after review.** `formatMoney` mixes `Intl` presentation with domain arithmetic and belongs next to the UI; `parseMoney` on free text is actively dangerous as a generic API (locale decimal separators, grouping, currency symbols). Formatting lives in `frontend-toolkit-tailwind`'s `MoneyText`; parsing lives in the app's form layer where the locale is known. |
 | `ResolvedRole`, `hasPermission`, `PermissionMode` | **Moved here** from their two current homes (`backend-toolkit-core/src/authorization/` and `frontend-toolkit-core/src/auth/permission.utils.ts`), which define them independently today. Both packages re-export from here, so no consumer import changes. This is the fix for a real duplication. |
 | Interval math | `Interval {start: Date; end: Date}` + `intervalsOverlap`, `intervalContains`, `mergeIntervals`, `subtractIntervals`, `splitIntervalIntoSlots(interval, minutes)`, `durationMinutes`. Pure, timezone-agnostic — it operates on instants. |
@@ -81,6 +92,57 @@ Semver: minor (additive; the `hasPermission` move is source-compatible via
 re-export). **Consumer check: `nutrition-client` uses `toolkit-common` in 33
 files** and is pinned at 0.3.1 — it does not need this release, but the peer
 ranges must stay coherent.
+
+#### Amendment — why `Money` diverged from this plan
+
+The approved design here was written for the medical platform in isolation. The
+e-commerce build reached `Money` first and needed a shape this specification
+could not give it, so `toolkit-common` 0.4.0 shipped a different one. Recorded
+rather than quietly reconciled, because an approved plan contradicting the code
+is worse than either.
+
+**`Decimal` in major units, not `bigint` minor units.** Minor-unit integers are
+exact for addition, and every rate — tax, a percentage service fee, a percentage
+discount — reintroduces a division that no integer type can hold. The plan's
+answer was a `RoundingMode` on each lossy operation, which is correct and puts
+a rounding decision at every call site. `Decimal` carries the digits exactly
+through the whole calculation instead, so rounding happens once, deliberately,
+where a value becomes an amount someone pays or a row that is stored.
+
+`bigint`'s stated reason — precision past 2^53 — is answered more completely by
+`Decimal`, which is arbitrary-precision in both directions. The practical cost
+of `bigint` was JSON: it is not serialisable, which is why this plan needed a
+`toMoneyJson`/`fromMoneyJson` pair. `Decimal` serialises as its own string.
+
+**Currency left the type.** A deployment serves one currency and the store
+profile carries it. Pairing a code with every amount repeats one configuration
+value across every price, fee, line total and discount, and invites two of them
+to disagree — the "currency mismatch throws" rule above exists precisely because
+that state is representable. Removing currency from the amount makes it
+unrepresentable. `moneyView(currency, locale)` binds it once, for display.
+
+**No ISO 4217 exponent table.** This is the one place the shipped design is
+narrower than the approved one, and it is a real limitation rather than an
+improvement. `MONEY_SCALE` is the constant 2, which is correct for every
+currency either product serves today and wrong for JPY (0 decimals) and
+KWD/BHD/OMR/TND (3). The constant documents this. Supporting them means making
+scale a property of the deployment's currency and revisiting every `roundMoney`
+and `allocate` call that defaults to it. **If the medical platform must serve a
+0- or 3-decimal currency, that work is a prerequisite and is not done.**
+
+**Formatting came back into `toolkit-common`.** This plan removed it, on the
+grounds that `formatMoney` mixes `Intl` presentation with domain arithmetic.
+`moneyView` is the compromise: it lives here because dropping currency from the
+type left nowhere else for the binding to go, and it is a view object rather
+than a bare function — `moneyView(currency, locale).format(amount)` — so the
+presentation concern is named rather than smuggled into an arithmetic module.
+**Free-text parsing was NOT reinstated**; the objection to `parseMoney` stands
+and nothing like it ships.
+
+**Consequence for this plan:** the acceptance criterion requiring `bigint`, the
+exponent table, and no formatting cannot be met as written and has been struck
+below. `nutrition-client` is pinned at 0.3.1 and is unaffected until it upgrades;
+`nutrition-staff` will need its money call sites migrated when it does.
 
 ### 2. `backend-toolkit-core` 0.4.1 → 0.5.0
 
@@ -366,7 +428,11 @@ and ships once, first.
 - [ ] `syncPermissions` is still insert-only.
 - [ ] `aggregate()` is documented as unscoped and is unavailable on the scoped
       repository.
-- [ ] `Money` uses `bigint` with an ISO 4217 exponent table; no formatting or
+- [x] ~~`Money` uses `bigint` with an ISO 4217 exponent table; no formatting or
+      free-text parsing ships in `toolkit-common`.~~ **Struck 2026-08-28 —
+      superseded.** `Money` shipped as `Decimal` in major units, with no exponent
+      table and with `moneyView` formatting. See the amendment under Wave
+      A-backend §1. The surviving half of the original intent holds: no
       free-text parsing ships in `toolkit-common`.
 - [ ] Staff's root-barrel imports migrated; the First Load JS reduction measured
       and recorded.
