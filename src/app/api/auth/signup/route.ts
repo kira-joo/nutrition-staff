@@ -1,4 +1,8 @@
-import { hashPassword, signAuthToken } from "@kira-joo/backend-toolkit-next";
+import { hashPassword, signAuthToken, writeTokenCookie } from "@kira-joo/backend-toolkit-next";
+import {
+  STAFF_SESSION_COOKIE,
+  STAFF_SESSION_MAX_AGE_SECONDS,
+} from "src/common/auth/session-cookie.constant";
 import { Status } from "src/common/enums";
 import { SignupDto } from "src/server/core/auth/dto/signup.dto";
 import { resolveUser } from "src/server/core/auth/resolve-user";
@@ -15,8 +19,8 @@ export const dynamic = "force-dynamic";
 // toolkit capability — nothing below this comment is toolkit-specific.
 // Switching to email verification / admin approval / invite-based
 // onboarding later only requires editing this one handler (e.g. skip the
-// signAuthToken call and return `{ user, pendingVerification: true }`
-// instead) — no change needed anywhere else in the auth layer.
+// signAuthToken call and skip the cookie) — no change needed anywhere else in
+// the auth layer.
 export const POST = createPostRoute({
   body: SignupDto,
   auth: false,
@@ -33,8 +37,15 @@ export const POST = createPostRoute({
     });
 
     const user = await resolveUser(String(created._id));
-    const accessToken = await signAuthToken({ sub: String(created._id), tokenVersion: 1 });
+    const token = await signAuthToken({ sub: String(created._id), tokenVersion: 1 });
 
-    return { accessToken, user };
+    // Set as an HttpOnly cookie, never returned in the body — see the login
+    // route for why.
+    await writeTokenCookie(token, {
+      name: STAFF_SESSION_COOKIE,
+      maxAge: STAFF_SESSION_MAX_AGE_SECONDS,
+    });
+
+    return { user };
   },
 });

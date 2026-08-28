@@ -3,8 +3,8 @@
 import { AppLink, Card, CustomForm, FieldType, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { setAccessToken } from "src/common/auth/token-storage";
 import type { LoginDto } from "src/common/interfaces/auth.interface";
+import { queryClient } from "src/providers/app-provider";
 import { AppRoute } from "src/common/routes/app-route";
 import { GuestGuard } from "src/components/auth/guest-guard";
 import { PasswordInput } from "src/components/auth/password-input";
@@ -41,8 +41,14 @@ export default function LoginPage() {
               fields={fields}
               submitEndpoint={loginEndpoint}
               submitButtonText="Sign in"
-              onSuccess={(data) => {
-                setAccessToken(data.accessToken);
+              onSuccess={() => {
+                /*
+                 * Nothing to store — the backend already set the session
+                 * cookie. The cached `/auth/me` result is from before the
+                 * session existed, so it is invalidated rather than trusted;
+                 * without this the guards would still see the pre-login 401.
+                 */
+                void queryClient.invalidateQueries();
                 router.push(AppRoute.home);
               }}
             />

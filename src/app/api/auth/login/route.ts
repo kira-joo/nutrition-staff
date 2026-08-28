@@ -1,5 +1,9 @@
 import { UnauthorizedError } from "@kira-joo/backend-toolkit-core";
-import { comparePassword, signAuthToken } from "@kira-joo/backend-toolkit-next";
+import { comparePassword, signAuthToken, writeTokenCookie } from "@kira-joo/backend-toolkit-next";
+import {
+  STAFF_SESSION_COOKIE,
+  STAFF_SESSION_MAX_AGE_SECONDS,
+} from "src/common/auth/session-cookie.constant";
 import { LoginDto } from "src/server/core/auth/dto/login.dto";
 import { resolveUser } from "src/server/core/auth/resolve-user";
 import { createPostRoute } from "src/server/core/route-factories";
@@ -31,8 +35,24 @@ export const POST = createPostRoute({
       throw new UnauthorizedError("Invalid email or password");
     }
 
-    const accessToken = await signAuthToken({ sub: String(record._id), tokenVersion: record.tokenVersion });
+    const token = await signAuthToken({
+      sub: String(record._id),
+      tokenVersion: record.tokenVersion,
+    });
 
-    return { accessToken, user };
+    /*
+     * Set as an HttpOnly cookie, and deliberately NOT returned in the body.
+     * A token the browser's JavaScript can read is a token any injected script
+     * can steal, and it is invisible to the server, so nothing rendered on the
+     * server can tell whether anyone is signed in. The client never needs to
+     * see it: the browser returns the cookie on every same-origin request by
+     * itself.
+     */
+    await writeTokenCookie(token, {
+      name: STAFF_SESSION_COOKIE,
+      maxAge: STAFF_SESSION_MAX_AGE_SECONDS,
+    });
+
+    return { user };
   },
 });

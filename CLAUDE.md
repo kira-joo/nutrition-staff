@@ -104,3 +104,13 @@ The Books system has its own invariants and its own skill —
 `src/server/books/**`, `src/server/book-settings/**`, `src/common/books/**`, or
 `src/common/book-blocks/**`. `BOOK_PLAN.md` is the architectural plan;
 `PLAN.md` is the approved backoffice/backend implementation plan.
+
+## Authentication (migrated 2026-08-28)
+
+This app now uses the workspace-standard **backend-set HttpOnly cookie**
+architecture — see `../docs/authentication-architecture.md`.
+
+`src/common/auth/token-storage.ts` and every `localStorage` token read are gone.
+The client cannot see the session at all; `useCurrentUser()` (`GET /api/auth/me`)
+is the only thing that can answer whether anyone is signed in, and a 401 is that
+answer. Do not reintroduce a client-side token store.

@@ -35,8 +35,15 @@ class PrintPreviewQueryDto {
  * the recipe PDF export route already does for the same reason.
  *
  * The staff app injects this into an `<iframe srcdoc>` rather than
- * `<iframe src>` — the staff bearer token lives in `localStorage`, not a
- * cookie, so a direct `src` request would be unauthenticated.
+ * `<iframe src>`. That was originally forced: the session was a bearer token in
+ * `localStorage`, so a direct `src` request carried no credentials. Since the
+ * move to an HttpOnly session cookie a plain `src` WOULD authenticate — the
+ * browser attaches the cookie to a same-origin iframe request by itself.
+ *
+ * `srcdoc` is kept anyway, now by choice rather than necessity: fetching through
+ * the normal request path means a failure surfaces as a handled error state
+ * instead of a broken frame, and the loading and refresh affordances stay in
+ * React's hands.
  */
 export async function GET(request: NextRequest, context: { params: { id: string } }) {
   try {

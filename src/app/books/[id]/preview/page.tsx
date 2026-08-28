@@ -9,12 +9,16 @@ import { getBookByIdEndpoint } from "../../../../../api/book.endpoints";
 
 /**
  * Renders the SAME self-contained HTML the (future) PDF renderer would
- * consume, injected via `<iframe srcDoc>` rather than `<iframe src>` —
- * the staff bearer token lives in `localStorage`, not a cookie, so a
- * direct `src` request to the print-preview route would be
- * unauthenticated. Preview fidelity is guaranteed by construction: same
- * template, same paginator, same fonts as whatever eventually generates
- * the PDF in Phase F.
+ * consume, injected via `<iframe srcDoc>` rather than `<iframe src>`.
+ *
+ * That used to be forced — the session was a bearer token in `localStorage`, so
+ * a direct `src` request would have been unauthenticated. With an HttpOnly
+ * session cookie it would now work, and `srcDoc` is kept by choice: fetching
+ * through the normal request path keeps failures as handled error states rather
+ * than a broken frame.
+ *
+ * Preview fidelity is guaranteed by construction: same template, same
+ * paginator, same fonts as whatever eventually generates the PDF in Phase F.
  *
  * Page numbers here are PROVISIONAL — this staff browser's own
  * line-breaking can differ by a line or two from whatever engine
