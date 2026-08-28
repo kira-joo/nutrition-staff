@@ -105,6 +105,24 @@ The Books system has its own invariants and its own skill —
 `src/common/book-blocks/**`. `BOOK_PLAN.md` is the architectural plan;
 `PLAN.md` is the approved backoffice/backend implementation plan.
 
+## Plans and reference documents
+
+- `BOOK_PLAN.md` — the Books/Arabic-publishing system plan.
+- `PLAN.md` — the approved backoffice/backend implementation plan.
+- `docs/plans/medical-platform/` — the approved Medical Platform plan (26
+  documents). `05-transactions-and-data-integrity.md` is the authoritative
+  transaction and data-integrity design, and it is **already implemented** in
+  `@kira-joo/backend-toolkit-mongoose`: ambient `withTransaction`,
+  `getActiveTransaction`, rollback-only marking, and the four-layer
+  partial-commit protection. Read it before touching transactional code.
+
+## This app is outside any client redesign
+
+`nutrition-staff` must not inherit the public site's visual identity and keeps
+its own conventions. Its UI/toolkit cleanup travels with the shared-package and
+refactor work instead.
+
+
 ## Authentication (migrated 2026-08-28)
 
 This app now uses the workspace-standard **backend-set HttpOnly cookie**
