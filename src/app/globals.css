@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Control density.
+ *
+ * The toolkit's default control height is 44px — the touch-target floor —
+ * because it is shared with applications that run on tablets, where a mis-tap
+ * costs real time. This is a DESKTOP admin tool: it is used with a mouse, at a
+ * desk, on dense tables of staff records, and 40px is the right height for it.
+ *
+ * Pinning the token keeps every control at exactly the size it has always been
+ * — 32/40/44 across the button scale, 40px inputs, selects and date pickers —
+ * so this is a no-op in appearance and a change in provenance. It was 40px
+ * because that was the fixed value the library happened to ship; it is 40px
+ * now because this product chose it.
+ *
+ * One line, because the whole scale reads this token. If a screen here ever
+ * becomes touch-first, delete this and it inherits the floor.
+ */
+:root {
+  --ftk-control-height: 2.5rem;
+}
