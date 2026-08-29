@@ -60,10 +60,43 @@ APIConfig.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 APIConfig.onUnauthorized = () => {
   /*
    * Nothing local to remove — the cookie is HttpOnly and only the backend can
-   * clear it. A 401 means it is already invalid, expired, or gone, so clearing
-   * the cache and redirecting is the whole job.
+   * clear it. A 401 means it is already invalid, expired, or gone, so dropping
+   * cached data and redirecting is the whole job.
+   *
+   * ## Never remove a query that is still in flight
+   *
+   * This handler runs while the response that triggered it is still being
+   * processed, so the rejection has not reached its own query yet. A plain
+   * `queryClient.clear()` removes that query mid-flight, the 401 is never
+   * applied to it, and it never reaches `error` — any component gating on
+   * `isLoading` then waits forever. Observed, not deduced:
+   *
+   *   cache:added     status=pending  fetchStatus=idle
+   *   cache:updated   status=pending  fetchStatus=fetching
+   *   onUnauthorized  FIRED
+   *   cache:removed   status=pending  fetchStatus=fetching   <-- mid-flight
+   *
+   * `/login` hit it first because `GuestGuard` gates on exactly that, and a 401
+   * there is the expected answer rather than a session ending — so nothing
+   * navigated away and the spinner stayed forever.
+   *
+   * Two fixes were tried and rejected before this one, both recorded in
+   * `unauthorized-handler.test.tsx` so they are not tried again:
+   *
+   *   - Skipping the clear on `/login`. Closes that route and no other; the
+   *     test proves it by failing on `/account`.
+   *   - Deferring the clear to a later task. The query settles, is then
+   *     removed, its observer refetches, that request 401s, and the handler
+   *     fires again — a loop instead of a hang.
+   *
+   * Skipping only the in-flight queries needs no route knowledge and holds
+   * everywhere: the request that just failed settles normally, and every stale
+   * authenticated query is still dropped, which is what clearing was for.
    */
-  queryClient.clear();
+  queryClient.removeQueries({
+    predicate: (query) => query.state.fetchStatus !== "fetching",
+  });
+
   // Avoid a redirect loop when the failing request originates from the
   // login page itself (e.g. a wrong-password attempt is also a 401).
   if (typeof window !== "undefined" && window.location.pathname !== AppRoute.login) {
