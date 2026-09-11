@@ -20,7 +20,7 @@ jobs:
       - name: Configure npm for GitHub Packages
         run: |
           echo "@kira-joo:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.PACKAGES_READ_TOKEN }}" >> .npmrc
 
       - run: npm ci
 
