@@ -28,12 +28,13 @@
  * Run:
  *   node --env-file=.env --import tsx scripts/migrate-staff-profiles.ts
  */
+import mongoose from "mongoose";
 import { connectToDatabase } from "../src/server/core/db/connect";
 import { StaffProfileModel } from "../src/server/staff/staff-profile.schema";
 import { UserModel } from "../src/server/users/user.schema";
 
 interface LegacyUserDoc {
-  _id: unknown;
+  _id: mongoose.Types.ObjectId;
   name: string;
   salary?: number;
   joinedAt?: string;
