@@ -38,5 +38,9 @@ export const POST = createPostRoute({
 export const GET = createGetRoute({
   params: FindEditionParamsDto,
   auth: { permissions: [AppPermission.BOOK_ARTIFACT.READ] },
-  handler: async ({ params }) => bookArtifactRepository.findOne({ where: { editionId: params.editionId, type: BookArtifactType.PDF }, skipThrowError: true }),
+  handler: async ({ params }) =>
+    bookArtifactRepository.findOne({
+      where: { editionId: params.editionId, type: BookArtifactType.PDF },
+      skipThrowError: true,
+    }),
 });

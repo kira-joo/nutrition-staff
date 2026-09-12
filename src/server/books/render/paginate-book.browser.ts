@@ -20,7 +20,12 @@
  * render — one builder, one algorithm, no possible divergence.
  */
 
-import type { PaginationInput, PaginationResult, StreamFragmentParagraph, StreamFragmentRun } from "./page-model.interface";
+import type {
+  PaginationInput,
+  PaginationResult,
+  StreamFragmentParagraph,
+  StreamFragmentRun,
+} from "./page-model.interface";
 
 export async function paginateAndRenderBook(input: PaginationInput): Promise<PaginationResult> {
   const warnings: { code: string; message: string }[] = [];
@@ -28,7 +33,9 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   // ---- 1. Font readiness (explicit Arabic sample, never trust the family name alone) ----
   async function ensureFontsReady(): Promise<void> {
     const probes = input.fontProbes;
-    await Promise.all(probes.map((probe) => document.fonts.load(`${probe.weight} 16px "${probe.family}"`, probe.sampleText)));
+    await Promise.all(
+      probes.map((probe) => document.fonts.load(`${probe.weight} 16px "${probe.family}"`, probe.sampleText)),
+    );
     await document.fonts.ready;
   }
 
@@ -66,7 +73,12 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   }
 
   function escapeHtmlLocal(text: string): string {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   const SAFE_HREF_PATTERN_LOCAL = /^(https?:\/\/|\/)/;
@@ -84,9 +96,9 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   // exactly how `fontSize`/`textColor` vanished from Staff Preview and the
   // PDF while rendering correctly in the client Flipbook, which uses the
   // shared renderer directly. Token lists are inlined for the same reason.
-  const SIZE_TOKENS_LOCAL = ["size-10","size-11","size-12","size-14","size-16","size-18","size-20","size-24"];
-  const COLOR_TOKENS_LOCAL = ["ink","primary","primary-dark","muted","accent"];
-  const HIGHLIGHT_TOKENS_LOCAL = ["yellow","green","blue","pink"];
+  const SIZE_TOKENS_LOCAL = ["size-10", "size-11", "size-12", "size-14", "size-16", "size-18", "size-20", "size-24"];
+  const COLOR_TOKENS_LOCAL = ["ink", "primary", "primary-dark", "muted", "accent"];
+  const HIGHLIGHT_TOKENS_LOCAL = ["yellow", "green", "blue", "pink"];
 
   function renderMarksOpenLocal(marks: FlatPiece["marks"]): string {
     return marks
@@ -99,13 +111,19 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           case "highlight": {
             // Absent/unknown colour keeps the historical yellow, so marks
             // from Editions published before colours existed are unchanged.
-            const color = HIGHLIGHT_TOKENS_LOCAL.includes(String(mark.attrs?.color)) ? String(mark.attrs?.color) : "yellow";
+            const color = HIGHLIGHT_TOKENS_LOCAL.includes(String(mark.attrs?.color))
+              ? String(mark.attrs?.color)
+              : "yellow";
             return `<mark class="book-highlight book-highlight--${color}">`;
           }
           case "fontSize":
-            return SIZE_TOKENS_LOCAL.includes(String(mark.attrs?.size)) ? `<span class="book-text-${String(mark.attrs?.size)}">` : "<span>";
+            return SIZE_TOKENS_LOCAL.includes(String(mark.attrs?.size))
+              ? `<span class="book-text-${String(mark.attrs?.size)}">`
+              : "<span>";
           case "textColor":
-            return COLOR_TOKENS_LOCAL.includes(String(mark.attrs?.color)) ? `<span class="book-text-color-${String(mark.attrs?.color)}">` : "<span>";
+            return COLOR_TOKENS_LOCAL.includes(String(mark.attrs?.color))
+              ? `<span class="book-text-color-${String(mark.attrs?.color)}">`
+              : "<span>";
           case "link": {
             const href = mark.attrs?.href && SAFE_HREF_PATTERN_LOCAL.test(mark.attrs.href) ? mark.attrs.href : "";
             return href ? `<a href="${escapeHtmlLocal(href)}">` : "<span>";
@@ -147,7 +165,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
 
   function marksEqual(a: FlatPiece["marks"], b: FlatPiece["marks"]): boolean {
     if (a.length !== b.length) return false;
-    return a.every((mark, index) => mark.type === b[index].type && JSON.stringify(mark.attrs ?? null) === JSON.stringify(b[index].attrs ?? null));
+    return a.every(
+      (mark, index) =>
+        mark.type === b[index].type && JSON.stringify(mark.attrs ?? null) === JSON.stringify(b[index].attrs ?? null),
+    );
   }
 
   function flattenParagraphsToPieces(paragraphs: StreamFragmentParagraph[]): FlatPiece[] {
@@ -224,11 +245,17 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
   /** Full (uncut) render of paragraphs straight from runs — no piece-level tokenizing needed since nothing is being measured/cut here. Used for a continuation fragment's `html` field. */
   function renderParagraphsHtml(paragraphs: StreamFragmentParagraph[]): string {
     return paragraphs
-      .map((paragraph) => `<p>${paragraph.runs.map((run) => renderMarksOpenLocal(run.marks) + escapeHtmlLocal(run.text) + renderMarksCloseLocal(run.marks)).join("")}</p>`)
+      .map(
+        (paragraph) =>
+          `<p>${paragraph.runs.map((run) => renderMarksOpenLocal(run.marks) + escapeHtmlLocal(run.text) + renderMarksCloseLocal(run.marks)).join("")}</p>`,
+      )
       .join("");
   }
 
-  function splitRichParagraphsToFit(paragraphs: StreamFragmentParagraph[], remainingHeightPx: number): { fitHtml: string; remainderParagraphs: StreamFragmentParagraph[] } | null {
+  function splitRichParagraphsToFit(
+    paragraphs: StreamFragmentParagraph[],
+    remainingHeightPx: number,
+  ): { fitHtml: string; remainderParagraphs: StreamFragmentParagraph[] } | null {
     const pieces = flattenParagraphsToPieces(paragraphs);
     if (pieces.length <= 1) return null;
 
@@ -251,7 +278,8 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     // always fine — same as a break between any two blocks — so the
     // line-boundary snap and widow policy below only apply when the cut
     // falls strictly inside one paragraph.
-    const splitsMidParagraph = bestCount < pieces.length && pieces[bestCount - 1].paragraphIndex === pieces[bestCount].paragraphIndex;
+    const splitsMidParagraph =
+      bestCount < pieces.length && pieces[bestCount - 1].paragraphIndex === pieces[bestCount].paragraphIndex;
 
     if (splitsMidParagraph) {
       // Snap backwards to a real rendered line boundary via
@@ -293,11 +321,18 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     const remainderPieces = pieces.slice(bestCount);
     if (remainderPieces.length === 0) return null;
 
-    return { fitHtml: renderParagraphPrefixHtml(pieces, bestCount), remainderParagraphs: piecesToParagraphs(remainderPieces) };
+    return {
+      fitHtml: renderParagraphPrefixHtml(pieces, bestCount),
+      remainderParagraphs: piecesToParagraphs(remainderPieces),
+    };
   }
 
   // ---- 4. Table splitting with repeated headers ----
-  function splitTableToFit(headerHtml: string, rowsHtml: string[], remainingHeightPx: number): { fitRows: string[]; remainderRows: string[] } | null {
+  function splitTableToFit(
+    headerHtml: string,
+    rowsHtml: string[],
+    remainingHeightPx: number,
+  ): { fitRows: string[]; remainderRows: string[] } | null {
     const headerHeight = measureHtmlHeight(`<table class="book-table">${headerHtml}<tbody></tbody></table>`);
     let fitCount = 0;
     for (let count = 1; count <= rowsHtml.length; count++) {
@@ -319,7 +354,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     isContinuation?: boolean;
   }
 
-  function layoutPass(tocPageCount: number): { pages: { kind: string; chapterId: string | null; html: string; numbered: boolean }[]; chapterPageIndex: Map<string, number> } {
+  function layoutPass(tocPageCount: number): {
+    pages: { kind: string; chapterId: string | null; html: string; numbered: boolean }[];
+    chapterPageIndex: Map<string, number>;
+  } {
     const pages: { kind: string; chapterId: string | null; html: string; numbered: boolean }[] = [];
     const chapterPageIndex = new Map<string, number>();
     // Placed pieces for the page currently being packed — kept as parts
@@ -352,7 +390,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     // uses, reserving the footer's real height instead of overlaying it.
     function closePage(numbered: boolean, footerNoteHtml?: string): void {
       const bodyHtml = currentPageHtml();
-      const html = footerNoteHtml !== undefined ? `<div class="book-page-content-body">${bodyHtml}</div>${footerNoteHtml}` : bodyHtml;
+      const html =
+        footerNoteHtml !== undefined
+          ? `<div class="book-page-content-body">${bodyHtml}</div>${footerNoteHtml}`
+          : bodyHtml;
       pages.push({ kind: currentKind, chapterId: currentChapterId, html, numbered });
     }
 
@@ -367,7 +408,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
     while (queue.length > 0) {
       guard += 1;
       if (guard > 20000) {
-        warnings.push({ code: "PAGINATION_GUARD", message: "Pagination safety guard triggered — stopping to avoid an infinite loop." });
+        warnings.push({
+          code: "PAGINATION_GUARD",
+          message: "Pagination safety guard triggered — stopping to avoid an infinite loop.",
+        });
         break;
       }
       const item = queue.shift()!;
@@ -427,7 +471,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
             openPage("content", currentChapterId);
           }
           closePage(true, html);
-          warnings.push({ code: "FOOTER_NOTE_OVERFLOW", message: `Fragment ${fragment.id} does not fit within a single page even alone — it will overflow visually.` });
+          warnings.push({
+            code: "FOOTER_NOTE_OVERFLOW",
+            message: `Fragment ${fragment.id} does not fit within a single page even alone — it will overflow visually.`,
+          });
           openPage("content", currentChapterId);
           continue;
         }
@@ -437,10 +484,14 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         // the footer note fits together — moving preceding content to the
         // next page rather than letting it overlap the footer.
         const popped: { item: WorkItem | null; html: string }[] = [];
-        let fits = measureHtmlHeight(`<div class="book-page-content-body">${currentPageHtml()}</div>${html}`) <= input.contentBoxHeightPx;
+        let fits =
+          measureHtmlHeight(`<div class="book-page-content-body">${currentPageHtml()}</div>${html}`) <=
+          input.contentBoxHeightPx;
         while (!fits && currentPageParts.length > 0 && currentPageParts[currentPageParts.length - 1].item) {
           popped.push(currentPageParts.pop()!);
-          fits = measureHtmlHeight(`<div class="book-page-content-body">${currentPageHtml()}</div>${html}`) <= input.contentBoxHeightPx;
+          fits =
+            measureHtmlHeight(`<div class="book-page-content-body">${currentPageHtml()}</div>${html}`) <=
+            input.contentBoxHeightPx;
         }
 
         if (!fits) {
@@ -508,10 +559,16 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           const scaled = scaleImageFragmentToFit(html, input.contentBoxHeightPx);
           currentPageParts.push({ item, html: scaled });
           usedHeight = measureHtmlHeight(currentPageHtml());
-          warnings.push({ code: "IMAGE_SCALED_DOWN", message: `An oversized image/caption was scaled down to fit the page (fragment ${fragment.id}).` });
+          warnings.push({
+            code: "IMAGE_SCALED_DOWN",
+            message: `An oversized image/caption was scaled down to fit the page (fragment ${fragment.id}).`,
+          });
           continue;
         }
-        warnings.push({ code: "ATOMIC_OVERFLOW", message: `Fragment ${fragment.id} does not fit on an empty page and could not be split or scaled — it will overflow visually.` });
+        warnings.push({
+          code: "ATOMIC_OVERFLOW",
+          message: `Fragment ${fragment.id} does not fit on an empty page and could not be split or scaled — it will overflow visually.`,
+        });
         currentPageParts.push({ item, html });
         usedHeight = measureHtmlHeight(currentPageHtml());
         continue;
@@ -520,7 +577,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
       if (fragment.splittable === "paragraph") {
         if (usedHeight === 0) {
           // Doesn't even fit alone on an empty page — let it overflow rather than loop forever.
-          warnings.push({ code: "PARAGRAPH_OVERFLOW", message: `Fragment ${fragment.id} could not be split to fit an empty page.` });
+          warnings.push({
+            code: "PARAGRAPH_OVERFLOW",
+            message: `Fragment ${fragment.id} could not be split to fit an empty page.`,
+          });
           currentPageParts.push({ item, html });
           usedHeight = measureHtmlHeight(currentPageHtml());
           continue;
@@ -535,15 +595,27 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         currentPageParts.push({ item: null, html: split.fitHtml });
         usedHeight = measureHtmlHeight(currentPageHtml());
         queue.unshift({
-          fragment: { ...fragment, html: renderParagraphsHtml(split.remainderParagraphs), richTextParagraphs: split.remainderParagraphs },
+          fragment: {
+            ...fragment,
+            html: renderParagraphsHtml(split.remainderParagraphs),
+            richTextParagraphs: split.remainderParagraphs,
+          },
           isContinuation: true,
         });
         continue;
       }
 
       if (fragment.splittable === "table" && fragment.tableHeaderHtml && fragment.tableRowsHtml) {
-        if (usedHeight === 0 && measureHtmlHeight(`<table class="book-table">${fragment.tableHeaderHtml}<tbody>${fragment.tableRowsHtml[0] ?? ""}</tbody></table>`) > input.contentBoxHeightPx) {
-          warnings.push({ code: "TABLE_ROW_OVERFLOW", message: `A single row of table ${fragment.id} is taller than one page.` });
+        if (
+          usedHeight === 0 &&
+          measureHtmlHeight(
+            `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${fragment.tableRowsHtml[0] ?? ""}</tbody></table>`,
+          ) > input.contentBoxHeightPx
+        ) {
+          warnings.push({
+            code: "TABLE_ROW_OVERFLOW",
+            message: `A single row of table ${fragment.id} is taller than one page.`,
+          });
           currentPageParts.push({ item, html });
           usedHeight = measureHtmlHeight(currentPageHtml());
           continue;
@@ -555,11 +627,18 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
           queue.unshift(item);
           continue;
         }
-        currentPageParts.push({ item: null, html: `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.fitRows.join("")}</tbody></table>` });
+        currentPageParts.push({
+          item: null,
+          html: `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.fitRows.join("")}</tbody></table>`,
+        });
         usedHeight = measureHtmlHeight(currentPageHtml());
         if (split.remainderRows.length > 0) {
           queue.unshift({
-            fragment: { ...fragment, tableRowsHtml: split.remainderRows, html: `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.remainderRows.join("")}</tbody></table>` },
+            fragment: {
+              ...fragment,
+              tableRowsHtml: split.remainderRows,
+              html: `<table class="book-table">${fragment.tableHeaderHtml}<tbody>${split.remainderRows.join("")}</tbody></table>`,
+            },
             isContinuation: true,
           });
         }
@@ -584,7 +663,11 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         usedHeight = measureHtmlHeight(currentPageHtml());
         if (fitCount < items.length) {
           queue.unshift({
-            fragment: { ...fragment, listItemsHtml: items.slice(fitCount), html: wrapListItems(fragment.listTag ?? "ul", items.slice(fitCount)) },
+            fragment: {
+              ...fragment,
+              listItemsHtml: items.slice(fitCount),
+              html: wrapListItems(fragment.listTag ?? "ul", items.slice(fitCount)),
+            },
             isContinuation: true,
           });
         }
@@ -598,7 +681,10 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
         queue.unshift(item);
         continue;
       }
-      warnings.push({ code: "UNSPLITTABLE_OVERFLOW", message: `Fragment ${fragment.id} does not fit and has no split/degrade strategy.` });
+      warnings.push({
+        code: "UNSPLITTABLE_OVERFLOW",
+        message: `Fragment ${fragment.id} does not fit and has no split/degrade strategy.`,
+      });
       currentPageParts.push({ item: null, html });
       usedHeight = measureHtmlHeight(currentPageHtml());
     }
@@ -639,7 +725,7 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
       const targetImageWidth = targetImageHeight * aspectRatio;
       const candidate = html.replace(
         /<img /,
-        `<img style="height:${Math.floor(targetImageHeight)}px;width:${Math.floor(targetImageWidth)}px;max-width:100%;" `
+        `<img style="height:${Math.floor(targetImageHeight)}px;width:${Math.floor(targetImageWidth)}px;max-width:100%;" `,
       );
       const totalHeight = measureHtmlHeight(candidate);
       const overflow = totalHeight - pageHeightPx;
@@ -647,16 +733,21 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
       targetImageHeight = Math.max(1, targetImageHeight - overflow - 1);
     }
     const finalWidth = targetImageHeight * aspectRatio;
-    return html.replace(/<img /, `<img style="height:${Math.floor(targetImageHeight)}px;width:${Math.floor(finalWidth)}px;max-width:100%;" `);
+    return html.replace(
+      /<img /,
+      `<img style="height:${Math.floor(targetImageHeight)}px;width:${Math.floor(finalWidth)}px;max-width:100%;" `,
+    );
   }
 
   // ---- 6. TOC fixpoint (bounded at 3 passes) ----
   await ensureFontsReady();
 
-  let tocPageCount = input.tocEligibleCount > 0 ? Math.max(1, Math.ceil(input.tocEligibleCount / input.tocEntriesPerPage)) : 0;
+  let tocPageCount =
+    input.tocEligibleCount > 0 ? Math.max(1, Math.ceil(input.tocEligibleCount / input.tocEntriesPerPage)) : 0;
   let lastResult = layoutPass(tocPageCount);
   for (let pass = 0; pass < 2; pass++) {
-    const nextTocPageCount = input.tocEligibleCount > 0 ? Math.max(1, Math.ceil(input.tocEligibleCount / input.tocEntriesPerPage)) : 0;
+    const nextTocPageCount =
+      input.tocEligibleCount > 0 ? Math.max(1, Math.ceil(input.tocEligibleCount / input.tocEntriesPerPage)) : 0;
     if (nextTocPageCount === tocPageCount) break;
     tocPageCount = nextTocPageCount;
     lastResult = layoutPass(tocPageCount);
@@ -676,7 +767,7 @@ export async function paginateAndRenderBook(input: PaginationInput): Promise<Pag
 
   const toc = input.tocChapters.map((chapter) => {
     const pageIndex = lastResult.chapterPageIndex.get(chapter.chapterId);
-    const pageNumber = pageIndex !== undefined ? numberedPages[pageIndex]?.pageNumber ?? null : null;
+    const pageNumber = pageIndex !== undefined ? (numberedPages[pageIndex]?.pageNumber ?? null) : null;
     return { chapterId: chapter.chapterId, title: chapter.tocTitle || chapter.title, label: chapter.label, pageNumber };
   });
 

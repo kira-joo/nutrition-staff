@@ -29,7 +29,9 @@ async function main() {
   console.log(`Acting as admin user ${actor.email ?? actor._id}`);
 
   let book = await bookRepository.findOne({ where: { _id: BOOK_ID } });
-  console.log(`Publishing "${book.title}" — revision ${book.revision}, contentRevision ${book.contentRevision}, currently ${book.status}`);
+  console.log(
+    `Publishing "${book.title}" — revision ${book.revision}, contentRevision ${book.contentRevision}, currently ${book.status}`,
+  );
 
   // The content script bumped contentRevision but left the Book's own
   // `status` at PUBLISHED (its previous edition is still live and
@@ -40,7 +42,10 @@ async function main() {
   // real book-header PUT route runs.
   if (book.status === BookStatus.PUBLISHED) {
     assertBookStatusTransition(book.status, BookStatus.DRAFT);
-    book = await bookRepository.update({ where: { _id: BOOK_ID, revision: book.revision } }, { status: BookStatus.DRAFT, revision: book.revision + 1 });
+    book = await bookRepository.update(
+      { where: { _id: BOOK_ID, revision: book.revision } },
+      { status: BookStatus.DRAFT, revision: book.revision + 1 },
+    );
     console.log(`Moved book to DRAFT (revision ${book.revision}) so it can be republished.`);
   }
 
@@ -50,10 +55,14 @@ async function main() {
     acknowledgedWarningCodes: [],
     notes: "QA content refresh — full manuscript rewrite for manual review.",
   });
-  console.log(`Published edition ${edition.editionNumber} (${edition._id}). Book status: ${updatedBook.status}, currentEditionId: ${updatedBook.currentEditionId}`);
+  console.log(
+    `Published edition ${edition.editionNumber} (${edition._id}). Book status: ${updatedBook.status}, currentEditionId: ${updatedBook.currentEditionId}`,
+  );
 
   const artifact = await generateBookArtifact(BOOK_ID, edition._id.toString(), actor._id.toString());
-  console.log(`PDF artifact status: ${artifact.status} (${artifact.pageCount ?? "?"} pages, ${artifact.fileSize ?? "?"} bytes)`);
+  console.log(
+    `PDF artifact status: ${artifact.status} (${artifact.pageCount ?? "?"} pages, ${artifact.fileSize ?? "?"} bytes)`,
+  );
   if (artifact.status !== BookArtifactStatus.READY) {
     console.error("PDF artifact did not reach READY:", artifact);
   }

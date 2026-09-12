@@ -1,8 +1,5 @@
 import { hashPassword, signAuthToken, writeTokenCookie } from "@kira-joo/backend-toolkit-next";
-import {
-  STAFF_SESSION_COOKIE,
-  STAFF_SESSION_MAX_AGE_SECONDS,
-} from "src/common/auth/session-cookie.constant";
+import { STAFF_SESSION_COOKIE, STAFF_SESSION_MAX_AGE_SECONDS } from "src/common/auth/session-cookie.constant";
 import { Status } from "src/common/enums";
 import { SignupDto } from "src/server/core/auth/dto/signup.dto";
 import { resolveUser } from "src/server/core/auth/resolve-user";

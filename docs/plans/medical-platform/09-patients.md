@@ -18,7 +18,7 @@ a **required** `lifecycle` of `lead/prospect/active/paused/completed/lost`,
 What is missing for medicine: no MRN or any human-readable identifier; no
 emergency contacts (and `User.phone` is sparse-unique, so a mother and child
 sharing a phone **cannot both exist**); no allergy or alert surface — allergies,
-conditions and medications are `string[]` on a *point-in-time*
+conditions and medications are `string[]` on a _point-in-time_
 `NutritionAssessment`, so a penicillin allergy recorded in assessment #1 shows
 nothing on the profile; no clinical status distinct from the sales funnel;
 `heightCm` and `targetWeightKg` are attributes rather than measurements; and the
@@ -45,23 +45,23 @@ with untamperable system entries.
 
 Key changes and why each one:
 
-| Change | Why |
-|---|---|
-| `mrn`, unique per organization, searchable | Clinics identify patients by number. Reception says it on the phone. |
-| `clinicalStatus` separate from `crmLifecycle` | A patient can be a *lost lead* commercially and still have a medical record that must never be treated as inactive. Conflating them is the single worst modelling error in the current schema. |
-| `PatientAlert` as current state, denormalised into `Patient.alertSummary` | So the clinical banner is one read and an allergy is impossible to miss. |
-| `PatientContact` as its own entity | Emergency contacts, and a contact is often itself a patient. Also the shared-phone fix. |
-| `User.phone` uniqueness dropped | L10. The 409 flow becomes an advisory duplicate warning rather than a hard block. |
-| `heightCm` → `Observation` | Height is measured, changes in children, and belongs on a timeline. |
-| `assignedPractitionerId` + `assignedStaffUserId` | The clinician and the CRM owner are different people. Also the key `ownPatientsOnly` scoping reads. |
-| `outstandingBalance`, `lastVisitAt`, `nextAppointmentAt` denormalised | The banner and the worklists need them without four extra queries; maintained transactionally. |
-| `mergedIntoPatientId` | Duplicates get merged, not deleted. |
+| Change                                                                    | Why                                                                                                                                                                                            |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mrn`, unique per organization, searchable                                | Clinics identify patients by number. Reception says it on the phone.                                                                                                                           |
+| `clinicalStatus` separate from `crmLifecycle`                             | A patient can be a _lost lead_ commercially and still have a medical record that must never be treated as inactive. Conflating them is the single worst modelling error in the current schema. |
+| `PatientAlert` as current state, denormalised into `Patient.alertSummary` | So the clinical banner is one read and an allergy is impossible to miss.                                                                                                                       |
+| `PatientContact` as its own entity                                        | Emergency contacts, and a contact is often itself a patient. Also the shared-phone fix.                                                                                                        |
+| `User.phone` uniqueness dropped                                           | L10. The 409 flow becomes an advisory duplicate warning rather than a hard block.                                                                                                              |
+| `heightCm` → `Observation`                                                | Height is measured, changes in children, and belongs on a timeline.                                                                                                                            |
+| `assignedPractitionerId` + `assignedStaffUserId`                          | The clinician and the CRM owner are different people. Also the key `ownPatientsOnly` scoping reads.                                                                                            |
+| `outstandingBalance`, `lastVisitAt`, `nextAppointmentAt` denormalised     | The banner and the worklists need them without four extra queries; maintained transactionally.                                                                                                 |
+| `mergedIntoPatientId`                                                     | Duplicates get merged, not deleted.                                                                                                                                                            |
 
 ## Workflows
 
 **Register a patient.** Reception captures name + phone in seconds (the existing
 `CreateClientDto` comment says exactly this and it stays true). MRN is allocated
-inside the transaction. A duplicate phone or name produces a *warning* with a
+inside the transaction. A duplicate phone or name produces a _warning_ with a
 "this might be…" list and an attach-to-existing action — the current 409 flow,
 made non-blocking. Transactional: [05](05-transactions-and-data-integrity.md)
 workflow 1.
@@ -99,7 +99,7 @@ balance · phone with a click-to-call/WhatsApp action.
 
 The unverified-history line reads `ImportedClinicalHistoryCandidate`
 ([04](04-domain-model.md) §8), not `PatientAlert`. It exists because historical
-allergies imported from old nutrition assessments are *not* clinician-confirmed
+allergies imported from old nutrition assessments are _not_ clinician-confirmed
 but may still be real. It is
 rendered differently from a confirmed alert and worded as such — but it is on the
 banner, not behind a count chip, because the banner must never be able to imply

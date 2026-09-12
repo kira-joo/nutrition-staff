@@ -11,14 +11,16 @@ export async function removeChapter(bookId: string, chapterId: string, expectedR
   const book = await bookRepository.findOne({ where: { _id: bookId } });
   const removedChapter = findChapterOrThrow(book, chapterId);
 
-  const nextChapters = book.chapters.filter((chapter) => chapter.id !== chapterId).map((chapter, order) => ({ ...chapter, order }));
+  const nextChapters = book.chapters
+    .filter((chapter) => chapter.id !== chapterId)
+    .map((chapter, order) => ({ ...chapter, order }));
   assertBookSizeBudget({ ...book, chapters: nextChapters } as unknown as Record<string, unknown>);
 
   let saved;
   try {
     saved = await bookRepository.update(
       { where: { _id: bookId, contentRevision: expectedRevision } },
-      { chapters: nextChapters, contentRevision: expectedRevision + 1 }
+      { chapters: nextChapters, contentRevision: expectedRevision + 1 },
     );
   } catch (error) {
     if (error instanceof NotFoundError) {

@@ -39,7 +39,10 @@ export async function createClient(body: CreateClientDto) {
 
   if (existingUser) {
     const field = existingUser.phone === normalizedPhone ? "phone" : "email";
-    const existingClientProfile = await clientProfileRepository.findOne({ where: { userId: existingUser._id }, skipThrowError: true });
+    const existingClientProfile = await clientProfileRepository.findOne({
+      where: { userId: existingUser._id },
+      skipThrowError: true,
+    });
 
     throw new ConflictError(`A person with this ${field} already exists: "${existingUser.name}".`, {
       field,

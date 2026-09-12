@@ -28,10 +28,11 @@ export function FaqRefBlockPreview({ block }: FaqRefBlockPreviewProps) {
       {sectionQuery.loading ? (
         <p className="text-sm text-slate-500">Loading FAQ section…</p>
       ) : sectionQuery.isError || !sectionQuery.data ? (
-        <p className="text-sm text-red-600">This block's referenced FAQ section is no longer available.</p>
+        <p className="text-sm text-red-600">This block&apos;s referenced FAQ section is no longer available.</p>
       ) : (
         <p className="text-sm text-slate-700">
-          Shows FAQs from: <span className="font-medium">{sectionQuery.data.title.en || sectionQuery.data.title.ar}</span>
+          Shows FAQs from:{" "}
+          <span className="font-medium">{sectionQuery.data.title.en || sectionQuery.data.title.ar}</span>
         </p>
       )}
     </div>

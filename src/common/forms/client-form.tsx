@@ -1,7 +1,15 @@
 "use client";
 
 import { type ApiError } from "@kira-joo/frontend-toolkit-core";
-import { CenteredSpinner, Card, CustomButton, CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  CenteredSpinner,
+  Card,
+  CustomButton,
+  CustomForm,
+  FieldType,
+  toast,
+  type FormFieldConfig,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Contact, IdCard } from "lucide-react";
 import { useState } from "react";
 import { useCurrentUser } from "src/common/auth/use-current-user";
@@ -65,7 +73,9 @@ export function ClientForm({ endpoint }: ClientFormProps) {
                 This identity already has a client profile — open it instead of creating a new one.
               </p>
               <div className="flex gap-2">
-                <CustomButton onClick={() => navigate(AppRoute.clientOverview, { id: details.clientProfileId as string })}>
+                <CustomButton
+                  onClick={() => navigate(AppRoute.clientOverview, { id: details.clientProfileId as string })}
+                >
                   Open existing client
                 </CustomButton>
                 <CustomButton variant="outline" onClick={() => setConflict(null)}>
@@ -164,7 +174,11 @@ export function ClientForm({ endpoint }: ClientFormProps) {
         if (!details) return;
         setConflict({
           details,
-          initialValues: { source: values.source, sourceNote: values.sourceNote, assignedToUserId: values.assignedToUserId },
+          initialValues: {
+            source: values.source,
+            sourceNote: values.sourceNote,
+            assignedToUserId: values.assignedToUserId,
+          },
         });
       }}
       layout="grid"

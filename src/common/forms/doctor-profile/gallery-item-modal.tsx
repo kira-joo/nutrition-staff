@@ -40,13 +40,22 @@ export function GalleryItemModal({
   return (
     <Modal open={open} onOpenChange={onOpenChange} title={title} size="lg">
       <div className="flex flex-col gap-4">
-        <CustomImageAssetUpload value={file} onChange={(value) => setFile(value instanceof File ? value : null)} policy={doctorPhotoPolicy} />
+        <CustomImageAssetUpload
+          value={file}
+          onChange={(value) => setFile(value instanceof File ? value : null)}
+          policy={doctorPhotoPolicy}
+        />
         <LocalizedTextPair label="Alt text" value={altText} onChange={setAltText} />
         <div className="flex justify-end gap-2">
           <CustomButton type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </CustomButton>
-          <CustomButton type="button" disabled={!canSubmit} loading={loading} onClick={() => onSubmit({ file, altText })}>
+          <CustomButton
+            type="button"
+            disabled={!canSubmit}
+            loading={loading}
+            onClick={() => onSubmit({ file, altText })}
+          >
             Save
           </CustomButton>
         </div>

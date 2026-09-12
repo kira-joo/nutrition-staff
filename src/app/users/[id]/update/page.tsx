@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -8,7 +9,8 @@ import { UserForm } from "src/common/forms/user-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { getUserByIdEndpoint, updateUserEndpoint } from "../../../../../api/user.endpoints";
 
-export default function UserUpdatePage({ params }: { params: { id: string } }) {
+export default function UserUpdatePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const userQuery = useRequesterQuery({
     endpoint: getUserByIdEndpoint,
     options: { params: { id: params.id } },

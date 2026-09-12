@@ -7,7 +7,15 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { Bold, Italic, Highlighter, Link as LinkIcon, Quote } from "lucide-react";
 import { useEffect } from "react";
 import { EMPTY_RICH_TEXT_DOC, type RichTextDoc } from "./rich-text-doc.interface";
-import { BoldMark, CitationMark, FontSizeMark, HighlightMark, ItalicMark, LinkMark, TextColorMark } from "./tiptap-extensions";
+import {
+  BoldMark,
+  CitationMark,
+  FontSizeMark,
+  HighlightMark,
+  ItalicMark,
+  LinkMark,
+  TextColorMark,
+} from "./tiptap-extensions";
 import {
   DEFAULT_HIGHLIGHT_COLOR,
   FONT_SIZE_VALUES,
@@ -38,11 +46,26 @@ export interface RichTextEditorProps {
  */
 export function RichTextEditor({ value, onChange, referenceOptions = [], error }: RichTextEditorProps) {
   const editor = useEditor({
-    extensions: [Document, Paragraph, Text, BoldMark, ItalicMark, HighlightMark, LinkMark, CitationMark, FontSizeMark, TextColorMark],
+    extensions: [
+      Document,
+      Paragraph,
+      Text,
+      BoldMark,
+      ItalicMark,
+      HighlightMark,
+      LinkMark,
+      CitationMark,
+      FontSizeMark,
+      TextColorMark,
+    ],
     content: value ?? EMPTY_RICH_TEXT_DOC,
     onUpdate: ({ editor }) => onChange(editor.getJSON() as RichTextDoc),
     editorProps: {
-      attributes: { dir: "rtl", class: "book-rich-text-editor min-h-[6rem] rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none" },
+      attributes: {
+        dir: "rtl",
+        class:
+          "book-rich-text-editor min-h-[6rem] rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none",
+      },
     },
     immediatelyRender: false,
   });
@@ -53,7 +76,6 @@ export function RichTextEditor({ value, onChange, referenceOptions = [], error }
     const current = JSON.stringify(editor.getJSON());
     const next = JSON.stringify(value ?? EMPTY_RICH_TEXT_DOC);
     if (current !== next) editor.commands.setContent(value ?? EMPTY_RICH_TEXT_DOC);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, value]);
 
   if (!editor) return null;
@@ -83,13 +105,25 @@ export function RichTextEditor({ value, onChange, referenceOptions = [], error }
   return (
     <div className="flex flex-col gap-1">
       <div className="flex gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
-        <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleMark("bold").run()} label="Bold">
+        <ToolbarButton
+          active={editor.isActive("bold")}
+          onClick={() => editor.chain().focus().toggleMark("bold").run()}
+          label="Bold"
+        >
           <Bold className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleMark("italic").run()} label="Italic">
+        <ToolbarButton
+          active={editor.isActive("italic")}
+          onClick={() => editor.chain().focus().toggleMark("italic").run()}
+          label="Italic"
+        >
           <Italic className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton active={editor.isActive("highlight")} onClick={() => editor.chain().focus().toggleMark("highlight").run()} label="Highlight">
+        <ToolbarButton
+          active={editor.isActive("highlight")}
+          onClick={() => editor.chain().focus().toggleMark("highlight").run()}
+          label="Highlight"
+        >
           <Highlighter className="h-4 w-4" />
         </ToolbarButton>
 
@@ -102,9 +136,7 @@ export function RichTextEditor({ value, onChange, referenceOptions = [], error }
           aria-label="Highlight color"
           className="h-8 rounded border border-slate-300 bg-white px-1 text-xs"
           value={(editor.getAttributes("highlight").color as string) ?? DEFAULT_HIGHLIGHT_COLOR}
-          onChange={(event) =>
-            editor.chain().focus().setMark("highlight", { color: event.target.value }).run()
-          }
+          onChange={(event) => editor.chain().focus().setMark("highlight", { color: event.target.value }).run()}
         >
           {HIGHLIGHT_COLOR_TOKENS.map((token) => (
             <option key={token} value={token}>
@@ -138,7 +170,12 @@ export function RichTextEditor({ value, onChange, referenceOptions = [], error }
           onChange={(event) => {
             const value = event.target.value;
             if (!value) editor.chain().focus().unsetMark("fontSize").run();
-            else editor.chain().focus().setMark("fontSize", { size: value as FontSizeToken }).run();
+            else
+              editor
+                .chain()
+                .focus()
+                .setMark("fontSize", { size: value as FontSizeToken })
+                .run();
           }}
         >
           <option value="">size</option>

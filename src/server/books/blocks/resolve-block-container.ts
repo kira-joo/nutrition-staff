@@ -17,7 +17,11 @@ export type BlockContainerRef =
   | { kind: "frontMatter"; slot: "aboutBook" | "introduction" }
   | { kind: "backMatter"; slot: "conclusion" };
 
-export function containerRefFromParams(params: { chapterId?: string; section?: string; slot?: string }): BlockContainerRef {
+export function containerRefFromParams(params: {
+  chapterId?: string;
+  section?: string;
+  slot?: string;
+}): BlockContainerRef {
   if (params.chapterId) return { kind: "chapter", chapterId: params.chapterId };
   if (params.section === "front-matter") return { kind: "frontMatter", slot: assertFrontMatterSlot(params.slot) };
   if (params.section === "back-matter") return { kind: "backMatter", slot: assertBackMatterSlot(params.slot) };
@@ -42,7 +46,8 @@ function assertBackMatterSlot(slot: string | undefined): "conclusion" {
 export function getContainerBlocks(book: BookSchema, ref: BlockContainerRef): BookBlock[] {
   if (ref.kind === "chapter") {
     const chapter = book.chapters.find((chapter) => chapter.id === ref.chapterId);
-    if (!chapter) throw new NotFoundError(`No chapter exists with id "${ref.chapterId}".`, { chapterId: ref.chapterId });
+    if (!chapter)
+      throw new NotFoundError(`No chapter exists with id "${ref.chapterId}".`, { chapterId: ref.chapterId });
     return chapter.blocks ?? [];
   }
   if (ref.kind === "frontMatter") {
@@ -52,11 +57,18 @@ export function getContainerBlocks(book: BookSchema, ref: BlockContainerRef): Bo
 }
 
 /** Returns the whole-Book patch to persist (the specific field that changed) — the caller passes this straight to `bookRepository.update()`. */
-export function withContainerBlocks(book: BookSchema, ref: BlockContainerRef, nextBlocks: BookBlock[]): Partial<BookSchema> {
+export function withContainerBlocks(
+  book: BookSchema,
+  ref: BlockContainerRef,
+  nextBlocks: BookBlock[],
+): Partial<BookSchema> {
   if (ref.kind === "chapter") {
     const chapterIndex = book.chapters.findIndex((chapter) => chapter.id === ref.chapterId);
-    if (chapterIndex === -1) throw new NotFoundError(`No chapter exists with id "${ref.chapterId}".`, { chapterId: ref.chapterId });
-    const nextChapters = book.chapters.map((chapter, index) => (index === chapterIndex ? { ...chapter, blocks: nextBlocks } : chapter));
+    if (chapterIndex === -1)
+      throw new NotFoundError(`No chapter exists with id "${ref.chapterId}".`, { chapterId: ref.chapterId });
+    const nextChapters = book.chapters.map((chapter, index) =>
+      index === chapterIndex ? { ...chapter, blocks: nextBlocks } : chapter,
+    );
     return { chapters: nextChapters };
   }
   if (ref.kind === "frontMatter") {

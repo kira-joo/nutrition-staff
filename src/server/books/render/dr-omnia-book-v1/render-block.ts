@@ -26,7 +26,11 @@ import type { StreamFragment } from "../page-model.interface";
  * inside a renderer (see BOOK_PLAN §15). A `RECIPE_REF` with no matching
  * snapshot falls back to the same generic placeholder it always has.
  */
-export async function renderBlockToFragment(block: BookBlock, references: BookReference[], recipeSnapshots?: Record<string, RecipeSnapshot>): Promise<StreamFragment> {
+export async function renderBlockToFragment(
+  block: BookBlock,
+  references: BookReference[],
+  recipeSnapshots?: Record<string, RecipeSnapshot>,
+): Promise<StreamFragment> {
   const base = {
     id: block.id,
     chapterId: null,
@@ -36,9 +40,23 @@ export async function renderBlockToFragment(block: BookBlock, references: BookRe
 
   switch (block.type) {
     case BookBlockType.HEADING:
-      return { ...base, kind: "content", html: `<h2 class="book-heading">${escapeHtml(block.text)}</h2>`, atomic: true, splittable: false, keepWithNext: block.keepWithNext ?? true };
+      return {
+        ...base,
+        kind: "content",
+        html: `<h2 class="book-heading">${escapeHtml(block.text)}</h2>`,
+        atomic: true,
+        splittable: false,
+        keepWithNext: block.keepWithNext ?? true,
+      };
     case BookBlockType.SUBHEADING:
-      return { ...base, kind: "content", html: `<h3 class="book-subheading">${escapeHtml(block.text)}</h3>`, atomic: true, splittable: false, keepWithNext: block.keepWithNext ?? true };
+      return {
+        ...base,
+        kind: "content",
+        html: `<h3 class="book-subheading">${escapeHtml(block.text)}</h3>`,
+        atomic: true,
+        splittable: false,
+        keepWithNext: block.keepWithNext ?? true,
+      };
     case BookBlockType.PARAGRAPH:
       return {
         ...base,
@@ -79,7 +97,8 @@ export async function renderBlockToFragment(block: BookBlock, references: BookRe
       };
     case BookBlockType.CHECKLIST: {
       const itemsHtml = block.items.map(
-        (item) => `<li><span class="book-checkbox${item.checked ? " checked" : ""}"></span><span>${escapeHtml(item.text)}</span></li>`
+        (item) =>
+          `<li><span class="book-checkbox${item.checked ? " checked" : ""}"></span><span>${escapeHtml(item.text)}</span></li>`,
       );
       return {
         ...base,
@@ -88,7 +107,7 @@ export async function renderBlockToFragment(block: BookBlock, references: BookRe
         atomic: false,
         splittable: "list",
         listTag: "ul",
-        listItemsHtml: itemsHtml.map((html) => html.replace("<ul class=\"book-checklist\">", "").replace("</ul>", "")),
+        listItemsHtml: itemsHtml.map((html) => html.replace('<ul class="book-checklist">', "").replace("</ul>", "")),
       };
     }
     case BookBlockType.QUOTE: {
@@ -116,7 +135,9 @@ export async function renderBlockToFragment(block: BookBlock, references: BookRe
     }
     case BookBlockType.TABLE: {
       const headerHtml = `<thead><tr>${block.headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>`;
-      const rowsHtml = block.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`);
+      const rowsHtml = block.rows.map(
+        (row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`,
+      );
       return {
         ...base,
         kind: "content",
@@ -204,7 +225,11 @@ function renderRecipeRefBlock(block: RecipeRefBlock, snapshot: RecipeSnapshot | 
   }
   const image = snapshot.image;
   const dimensionAttrs = image?.width && image?.height ? ` width="${image.width}" height="${image.height}"` : "";
-  const imageHtml = image ? `<img class="book-recipe-ref-image" src="${escapeHtml(image.secureUrl)}" alt=""${dimensionAttrs} />` : "";
-  const descriptionHtml = snapshot.description?.ar ? `<div class="book-recipe-ref-description">${escapeHtml(snapshot.description.ar)}</div>` : "";
+  const imageHtml = image
+    ? `<img class="book-recipe-ref-image" src="${escapeHtml(image.secureUrl)}" alt=""${dimensionAttrs} />`
+    : "";
+  const descriptionHtml = snapshot.description?.ar
+    ? `<div class="book-recipe-ref-description">${escapeHtml(snapshot.description.ar)}</div>`
+    : "";
   return `<div class="book-recipe-ref">${imageHtml}<div class="book-recipe-ref-body"><div class="book-recipe-ref-title">${escapeHtml(snapshot.title.ar)}</div>${descriptionHtml}</div></div>`;
 }

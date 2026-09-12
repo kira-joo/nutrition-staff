@@ -33,7 +33,10 @@ export const getDashboardGrowthChartEndpoint: Endpoint<{ query: DashboardQuery; 
   methodType: MethodType.GET,
 };
 
-export const getDashboardLifecycleChartEndpoint: Endpoint<{ query: DashboardQuery; returnType: DashboardLifecycleChart }> = {
+export const getDashboardLifecycleChartEndpoint: Endpoint<{
+  query: DashboardQuery;
+  returnType: DashboardLifecycleChart;
+}> = {
   url: "/dashboard/charts/lifecycle",
   methodType: MethodType.GET,
 };

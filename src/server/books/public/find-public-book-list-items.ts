@@ -34,15 +34,23 @@ const PUBLIC_BOOK_LIST_EDITION_PROJECTION = {
  * sets `currentEditionId`, by `publish-book-edition.ts`) is dropped from
  * the page rather than shown with blank presentation fields.
  */
-export async function findPublicBookListItems(query: PublicListBooksQueryDto): Promise<PaginatedResponse<PublicBookListItem>> {
+export async function findPublicBookListItems(
+  query: PublicListBooksQueryDto,
+): Promise<PaginatedResponse<PublicBookListItem>> {
   const result = await bookRepository.findAllAndCountPublic({
     query,
     where: { status: BookStatus.PUBLISHED, visibility: BookVisibility.PUBLIC, showOnWebsite: true },
     select: PUBLIC_BOOK_LIST_PROJECTION,
   });
 
-  const editionIds = result.data.map((book) => book.currentEditionId).filter((id): id is NonNullable<typeof id> => Boolean(id)).map((id) => String(id));
-  const editions = editionIds.length > 0 ? await bookEditionRepository.findByIds(editionIds, { select: PUBLIC_BOOK_LIST_EDITION_PROJECTION }) : [];
+  const editionIds = result.data
+    .map((book) => book.currentEditionId)
+    .filter((id): id is NonNullable<typeof id> => Boolean(id))
+    .map((id) => String(id));
+  const editions =
+    editionIds.length > 0
+      ? await bookEditionRepository.findByIds(editionIds, { select: PUBLIC_BOOK_LIST_EDITION_PROJECTION })
+      : [];
   const editionById = new Map(editions.map((edition) => [String(edition._id), edition]));
 
   const data: PublicBookListItem[] = [];

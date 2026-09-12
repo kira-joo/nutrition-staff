@@ -37,12 +37,12 @@ export const dynamic = "force-dynamic";
  * `createPdfResponse` pair the staff route uses — `storageUrl`/
  * `storagePublicId` are read here and nowhere else in the response.
  */
-export async function GET(request: NextRequest, context: { params: { slug: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ slug: string }> }) {
   try {
     const config = getNextBackendToolkitConfig();
     await config.database.connect();
 
-    const params = await validateDto(FindBookBySlugParamsDto, context.params);
+    const params = await validateDto(FindBookBySlugParamsDto, await context.params);
 
     const book = await bookRepository.findOne({
       where: { slug: params.slug, status: BookStatus.PUBLISHED, showOnWebsite: true },
@@ -54,7 +54,10 @@ export async function GET(request: NextRequest, context: { params: { slug: strin
     }
 
     const edition = await bookEditionRepository.findOne({ where: { _id: book.currentEditionId } });
-    const artifact = await bookArtifactRepository.findOne({ where: { editionId: edition._id, type: BookArtifactType.PDF }, skipThrowError: true });
+    const artifact = await bookArtifactRepository.findOne({
+      where: { editionId: edition._id, type: BookArtifactType.PDF },
+      skipThrowError: true,
+    });
 
     const state = artifact ? resolveArtifactState(artifact, artifact.templateVersion) : "NOT_GENERATED";
     if ((state !== "READY" && state !== "OUTDATED") || !artifact?.storageUrl) {

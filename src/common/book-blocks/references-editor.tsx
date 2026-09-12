@@ -5,7 +5,12 @@ import { CustomButton, CustomInput, Modal, toast } from "@kira-joo/frontend-tool
 import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { addReferenceEndpoint, removeReferenceEndpoint, reorderReferencesEndpoint, updateReferenceEndpoint } from "../../../api/book-content.endpoints";
+import {
+  addReferenceEndpoint,
+  removeReferenceEndpoint,
+  reorderReferencesEndpoint,
+  updateReferenceEndpoint,
+} from "../../../api/book-content.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
 import { SortableList } from "src/common/books/sortable-list";
@@ -24,17 +29,22 @@ export function ReferencesEditor({ bookId, book, enqueue }: ReferencesEditorProp
   const removeMutation = useRequesterMutation({ endpoint: removeReferenceEndpoint });
 
   function handleReorder(orderedIds: string[]): void {
-    enqueue((expectedRevision) => reorderMutation.mutateAsync({ params: { bookId }, body: { referenceIds: orderedIds, expectedRevision } })).catch(
-      (error: { message?: string }) => toast.error(error.message ?? "Failed to reorder references")
-    );
+    enqueue((expectedRevision) =>
+      reorderMutation.mutateAsync({ params: { bookId }, body: { referenceIds: orderedIds, expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to reorder references"));
   }
 
   async function handleRemove(reference: BookReference): Promise<void> {
-    const confirmed = await confirm({ title: "Remove reference?", description: "Any block citing this reference must be updated first.", confirmLabel: "Remove", destructive: true });
+    const confirmed = await confirm({
+      title: "Remove reference?",
+      description: "Any block citing this reference must be updated first.",
+      confirmLabel: "Remove",
+      destructive: true,
+    });
     if (!confirmed) return;
-    enqueue((expectedRevision) => removeMutation.mutateAsync({ params: { bookId, referenceId: reference.id }, body: { expectedRevision } })).catch(
-      (error: { message?: string }) => toast.error(error.message ?? "Failed to remove reference")
-    );
+    enqueue((expectedRevision) =>
+      removeMutation.mutateAsync({ params: { bookId, referenceId: reference.id }, body: { expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to remove reference"));
   }
 
   return (
@@ -48,13 +58,29 @@ export function ReferencesEditor({ bookId, book, enqueue }: ReferencesEditorProp
             <div>
               <p className="font-medium">{reference.label}</p>
               <p className="text-sm text-slate-600">{reference.text}</p>
-              {reference.url ? <p className="text-xs text-slate-400" dir="ltr">{reference.url}</p> : null}
+              {reference.url ? (
+                <p className="text-xs text-slate-400" dir="ltr">
+                  {reference.url}
+                </p>
+              ) : null}
             </div>
             <div className="flex gap-1">
-              <CustomButton type="button" size="icon" variant="ghost" aria-label="Edit" onClick={() => setEditing(reference)}>
+              <CustomButton
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Edit"
+                onClick={() => setEditing(reference)}
+              >
                 <Pencil className="h-4 w-4" />
               </CustomButton>
-              <CustomButton type="button" size="icon" variant="ghost" aria-label="Remove" onClick={() => handleRemove(reference)}>
+              <CustomButton
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Remove"
+                onClick={() => handleRemove(reference)}
+              >
                 <Trash2 className="h-4 w-4 text-red-600" />
               </CustomButton>
             </div>
@@ -67,8 +93,18 @@ export function ReferencesEditor({ bookId, book, enqueue }: ReferencesEditorProp
       </CustomButton>
 
       {editing ? (
-        <Modal open onOpenChange={() => setEditing(null)} title={editing === "new" ? "Add reference" : "Edit reference"} size="md">
-          <ReferenceForm bookId={bookId} reference={editing === "new" ? undefined : editing} enqueue={enqueue} onSuccess={() => setEditing(null)} />
+        <Modal
+          open
+          onOpenChange={() => setEditing(null)}
+          title={editing === "new" ? "Add reference" : "Edit reference"}
+          size="md"
+        >
+          <ReferenceForm
+            bookId={bookId}
+            reference={editing === "new" ? undefined : editing}
+            enqueue={enqueue}
+            onSuccess={() => setEditing(null)}
+          />
         </Modal>
       ) : null}
     </div>
@@ -97,8 +133,14 @@ function ReferenceForm({
     try {
       await enqueue((rev) =>
         reference
-          ? updateMutation.mutateAsync({ params: { bookId, referenceId: reference.id }, body: { label, text, url: url || undefined, expectedRevision: rev } })
-          : addMutation.mutateAsync({ params: { bookId }, body: { label, text, url: url || undefined, expectedRevision: rev } })
+          ? updateMutation.mutateAsync({
+              params: { bookId, referenceId: reference.id },
+              body: { label, text, url: url || undefined, expectedRevision: rev },
+            })
+          : addMutation.mutateAsync({
+              params: { bookId },
+              body: { label, text, url: url || undefined, expectedRevision: rev },
+            }),
       );
       onSuccess();
     } catch (error) {
@@ -108,7 +150,13 @@ function ReferenceForm({
 
   return (
     <div className="flex flex-col gap-3">
-      <CustomInput name="label" label="Label" value={label} onChange={(event) => setLabel(event.target.value)} dir="rtl" />
+      <CustomInput
+        name="label"
+        label="Label"
+        value={label}
+        onChange={(event) => setLabel(event.target.value)}
+        dir="rtl"
+      />
       <CustomInput name="text" label="Text" value={text} onChange={(event) => setText(event.target.value)} dir="rtl" />
       <CustomInput name="url" label="URL (optional)" value={url} onChange={(event) => setUrl(event.target.value)} />
       <CustomButton type="button" onClick={handleSubmit}>

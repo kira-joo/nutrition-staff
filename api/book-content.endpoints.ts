@@ -9,17 +9,29 @@ import type { Book } from "../src/common/interfaces/book.interface";
 
 // ---- Chapters ----
 
-export const addChapterEndpoint: Endpoint<{ params: { bookId: string }; body: Record<string, unknown>; returnType: Book }> = {
+export const addChapterEndpoint: Endpoint<{
+  params: { bookId: string };
+  body: Record<string, unknown>;
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters",
   methodType: MethodType.POST,
 };
 
-export const updateChapterEndpoint: Endpoint<{ params: { bookId: string; chapterId: string }; body: Record<string, unknown>; returnType: Book }> = {
+export const updateChapterEndpoint: Endpoint<{
+  params: { bookId: string; chapterId: string };
+  body: Record<string, unknown>;
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters/:chapterId",
   methodType: MethodType.PUT,
 };
 
-export const removeChapterEndpoint: Endpoint<{ params: { bookId: string; chapterId: string }; body: { expectedRevision: number }; returnType: Book }> = {
+export const removeChapterEndpoint: Endpoint<{
+  params: { bookId: string; chapterId: string };
+  body: { expectedRevision: number };
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters/:chapterId",
   methodType: MethodType.DELETE,
 };
@@ -47,17 +59,29 @@ export const duplicateChapterEndpoint: Endpoint<{
 // route handlers themselves still validate the real params strictly via
 // `FindChapterBlockParamsDto`/`FindSectionBlockParamsDto`.
 
-export const addChapterBlockEndpoint: Endpoint<{ params: Record<string, string>; body: Record<string, unknown>; returnType: Book }> = {
+export const addChapterBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: Record<string, unknown>;
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters/:chapterId/blocks",
   methodType: MethodType.POST,
 };
 
-export const replaceChapterBlockEndpoint: Endpoint<{ params: Record<string, string>; body: Record<string, unknown>; returnType: Book }> = {
+export const replaceChapterBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: Record<string, unknown>;
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters/:chapterId/blocks/:blockId",
   methodType: MethodType.PUT,
 };
 
-export const removeChapterBlockEndpoint: Endpoint<{ params: Record<string, string>; body: { expectedRevision: number }; returnType: Book }> = {
+export const removeChapterBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: { expectedRevision: number };
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters/:chapterId/blocks/:blockId",
   methodType: MethodType.DELETE,
 };
@@ -68,24 +92,40 @@ export const reorderChapterBlocksEndpoint: Endpoint<{
   returnType: Book;
 }> = { url: "/books/:bookId/chapters/:chapterId/blocks/reorder", methodType: MethodType.PUT };
 
-export const duplicateChapterBlockEndpoint: Endpoint<{ params: Record<string, string>; body: { expectedRevision: number }; returnType: Book }> = {
+export const duplicateChapterBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: { expectedRevision: number };
+  returnType: Book;
+}> = {
   url: "/books/:bookId/chapters/:chapterId/blocks/:blockId/duplicate",
   methodType: MethodType.POST,
 };
 
 // ---- Front-matter / back-matter section blocks (identical registry/DTO dispatch, different container) ----
 
-export const addSectionBlockEndpoint: Endpoint<{ params: Record<string, string>; body: Record<string, unknown>; returnType: Book }> = {
+export const addSectionBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: Record<string, unknown>;
+  returnType: Book;
+}> = {
   url: "/books/:bookId/sections/:section/:slot/blocks",
   methodType: MethodType.POST,
 };
 
-export const replaceSectionBlockEndpoint: Endpoint<{ params: Record<string, string>; body: Record<string, unknown>; returnType: Book }> = {
+export const replaceSectionBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: Record<string, unknown>;
+  returnType: Book;
+}> = {
   url: "/books/:bookId/sections/:section/:slot/blocks/:blockId",
   methodType: MethodType.PUT,
 };
 
-export const removeSectionBlockEndpoint: Endpoint<{ params: Record<string, string>; body: { expectedRevision: number }; returnType: Book }> = {
+export const removeSectionBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: { expectedRevision: number };
+  returnType: Book;
+}> = {
   url: "/books/:bookId/sections/:section/:slot/blocks/:blockId",
   methodType: MethodType.DELETE,
 };
@@ -96,7 +136,11 @@ export const reorderSectionBlocksEndpoint: Endpoint<{
   returnType: Book;
 }> = { url: "/books/:bookId/sections/:section/:slot/blocks/reorder", methodType: MethodType.PUT };
 
-export const duplicateSectionBlockEndpoint: Endpoint<{ params: Record<string, string>; body: { expectedRevision: number }; returnType: Book }> = {
+export const duplicateSectionBlockEndpoint: Endpoint<{
+  params: Record<string, string>;
+  body: { expectedRevision: number };
+  returnType: Book;
+}> = {
   url: "/books/:bookId/sections/:section/:slot/blocks/:blockId/duplicate",
   methodType: MethodType.POST,
 };

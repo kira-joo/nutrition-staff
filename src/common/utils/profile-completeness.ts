@@ -46,7 +46,10 @@ const COMPLETENESS_CHECKS: CompletenessCheck[] = [
 ];
 
 export function calculateProfileCompleteness(input: ProfileCompletenessInput): ProfileCompletenessResult {
-  const missing = COMPLETENESS_CHECKS.filter((check) => !check.isComplete(input)).map(({ key, label }) => ({ key, label }));
+  const missing = COMPLETENESS_CHECKS.filter((check) => !check.isComplete(input)).map(({ key, label }) => ({
+    key,
+    label,
+  }));
   const total = COMPLETENESS_CHECKS.length;
   const completed = total - missing.length;
   return { completed, total, percentage: Math.round((completed / total) * 100), missing };

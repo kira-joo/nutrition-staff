@@ -25,25 +25,42 @@ import { resolveArtifactState } from "src/common/books/artifacts/resolve-artifac
  * Either path means two overlapping "Generate" clicks can never both
  * proceed to render a competing PDF for the same edition.
  */
-export async function generateBookArtifact(bookId: string, editionId: string, generatedByUserId: string): Promise<BookArtifactSchema> {
+export async function generateBookArtifact(
+  bookId: string,
+  editionId: string,
+  generatedByUserId: string,
+): Promise<BookArtifactSchema> {
   const edition = await bookEditionRepository.findOne({ where: { _id: editionId, bookId } });
 
-  const existing = await bookArtifactRepository.findOne({ where: { editionId, type: BookArtifactType.PDF }, skipThrowError: true });
-  const row = existing ? await claimExistingRow(existing) : await claimNewRow(bookId, editionId, edition.templateVersion, generatedByUserId);
+  const existing = await bookArtifactRepository.findOne({
+    where: { editionId, type: BookArtifactType.PDF },
+    skipThrowError: true,
+  });
+  const row = existing
+    ? await claimExistingRow(existing)
+    : await claimNewRow(bookId, editionId, edition.templateVersion, generatedByUserId);
   if (!row) {
     throw new ConflictError("A PDF generation for this edition is already in progress.");
   }
 
   let rendered;
   try {
-    rendered = await renderBookPdf({ content: edition.content, resolvedSettings: edition.resolvedSettings, templateVersion: edition.templateVersion, recipeSnapshots: edition.recipeSnapshots });
+    rendered = await renderBookPdf({
+      content: edition.content,
+      resolvedSettings: edition.resolvedSettings,
+      templateVersion: edition.templateVersion,
+      recipeSnapshots: edition.recipeSnapshots,
+    });
   } catch (error) {
     await markFailed(row._id.toString(), error);
     throw error;
   }
 
   if (rendered.warnings.length > 0) {
-    console.warn(`generateBookArtifact: edition ${editionId} produced ${rendered.warnings.length} pagination warning(s):`, rendered.warnings);
+    console.warn(
+      `generateBookArtifact: edition ${editionId} produced ${rendered.warnings.length} pagination warning(s):`,
+      rendered.warnings,
+    );
   }
 
   let uploaded;
@@ -55,19 +72,16 @@ export async function generateBookArtifact(bookId: string, editionId: string, ge
   }
 
   try {
-    return await bookArtifactRepository.update(
-      { where: { _id: row._id } },
-      {
-        status: BookArtifactStatus.READY,
-        finishedAt: new Date(),
-        pageCount: rendered.pageCount,
-        fileSize: uploaded.bytes,
-        storageProvider: "cloudinary",
-        storagePublicId: uploaded.publicId,
-        storageUrl: uploaded.url,
-        errorMessage: null,
-      } as unknown as Partial<BookArtifactSchema>
-    );
+    return await bookArtifactRepository.update({ where: { _id: row._id } }, {
+      status: BookArtifactStatus.READY,
+      finishedAt: new Date(),
+      pageCount: rendered.pageCount,
+      fileSize: uploaded.bytes,
+      storageProvider: "cloudinary",
+      storagePublicId: uploaded.publicId,
+      storageUrl: uploaded.url,
+      errorMessage: null,
+    } as unknown as Partial<BookArtifactSchema>);
   } catch (error) {
     // The render + upload succeeded but persisting that fact failed —
     // the uploaded PDF is now orphaned (no row points at it), so clean
@@ -79,7 +93,12 @@ export async function generateBookArtifact(bookId: string, editionId: string, ge
   }
 }
 
-async function claimNewRow(bookId: string, editionId: string, templateVersion: string, generatedByUserId: string): Promise<BookArtifactSchema | null> {
+async function claimNewRow(
+  bookId: string,
+  editionId: string,
+  templateVersion: string,
+  generatedByUserId: string,
+): Promise<BookArtifactSchema | null> {
   try {
     return await bookArtifactRepository.save({
       editionId,
@@ -119,7 +138,7 @@ async function claimExistingRow(existing: BookArtifactSchema): Promise<BookArtif
         startedAt: new Date(),
         finishedAt: null,
         errorMessage: null,
-      } as unknown as Partial<BookArtifactSchema>
+      } as unknown as Partial<BookArtifactSchema>,
     );
   } catch (error) {
     if (error instanceof NotFoundError) return null; // someone else flipped it to GENERATING first
@@ -130,15 +149,23 @@ async function claimExistingRow(existing: BookArtifactSchema): Promise<BookArtif
 /** Not every thrown value is a real `Error` instance — caught live: the Cloudinary SDK rejects with a plain `{message, name, http_code}` object, which `instanceof Error` misses, so the old `String(error)` fallback persisted the literal text "[object Object]" as the error message. */
 function describeError(error: unknown): string {
   if (error instanceof Error) return error.message;
-  if (typeof error === "object" && error !== null && "message" in error) return String((error as { message: unknown }).message);
+  if (typeof error === "object" && error !== null && "message" in error)
+    return String((error as { message: unknown }).message);
   return String(error);
 }
 
 async function markFailed(artifactId: string, error: unknown): Promise<void> {
   const errorMessage = describeError(error);
   try {
-    await bookArtifactRepository.update({ where: { _id: artifactId } }, { status: BookArtifactStatus.FAILED, finishedAt: new Date(), errorMessage } as unknown as Partial<BookArtifactSchema>);
+    await bookArtifactRepository.update({ where: { _id: artifactId } }, {
+      status: BookArtifactStatus.FAILED,
+      finishedAt: new Date(),
+      errorMessage,
+    } as unknown as Partial<BookArtifactSchema>);
   } catch (updateError) {
-    console.error(`generateBookArtifact: failed to persist FAILED status for artifact ${artifactId} (original error: ${errorMessage}).`, updateError);
+    console.error(
+      `generateBookArtifact: failed to persist FAILED status for artifact ${artifactId} (original error: ${errorMessage}).`,
+      updateError,
+    );
   }
 }

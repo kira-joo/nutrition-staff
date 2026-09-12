@@ -20,7 +20,11 @@ export interface ArtifactStateInput {
  * Editions UI derive the exact same state from the exact same row —
  * mirroring `resolveBookIdentity`'s reasoning.
  */
-export function resolveArtifactState(row: ArtifactStateInput | null, currentTemplateVersion: string, now: Date = new Date()): ArtifactUiState {
+export function resolveArtifactState(
+  row: ArtifactStateInput | null,
+  currentTemplateVersion: string,
+  now: Date = new Date(),
+): ArtifactUiState {
   if (!row) return "NOT_GENERATED";
 
   if (row.status === BookArtifactStatus.FAILED) return "FAILED";

@@ -82,7 +82,7 @@ Public responses use narrower shapes than the admin CRUD shapes — they omit
 ## This app is not localized; its content is
 
 There is no `[locale]` segment, no i18n library, and no locale middleware. The
-admin UI is single-locale. What *is* bilingual is the CMS content it authors —
+admin UI is single-locale. What _is_ bilingual is the CMS content it authors —
 so Arabic content rendering, RTL text inside editors and previews, and
 long-Arabic overflow are all still real concerns.
 
@@ -121,7 +121,6 @@ The Books system has its own invariants and its own skill —
 `nutrition-staff` must not inherit the public site's visual identity and keeps
 its own conventions. Its UI/toolkit cleanup travels with the shared-package and
 refactor work instead.
-
 
 ## Authentication (migrated 2026-08-28)
 

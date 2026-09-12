@@ -15,7 +15,12 @@ const USER_FIELDS = ["name", "phone", "email"] as const;
  * identity) — needed to attribute an auto-logged lifecycle-change
  * interaction to whoever actually made the change.
  */
-export async function updateClient(clientProfileId: string, userId: string, body: UpdateClientDto, actingUserId: string) {
+export async function updateClient(
+  clientProfileId: string,
+  userId: string,
+  body: UpdateClientDto,
+  actingUserId: string,
+) {
   const userPatch: Partial<Pick<UpdateClientDto, "name" | "phone" | "email">> = {};
   const profilePatch: Record<string, unknown> = {};
 

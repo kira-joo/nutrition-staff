@@ -28,7 +28,9 @@ export function RichTextBlockEditor({ defaultValues, endpoint, submitParams, onS
         heading: defaultValues?.heading ?? EMPTY_LOCALIZED,
         body: defaultValues?.body ?? EMPTY_LOCALIZED,
       }}
-      transformValues={(values) => ({ ...values, type: CampaignBlockType.RICH_TEXT }) as unknown as Record<string, unknown>}
+      transformValues={(values) =>
+        ({ ...values, type: CampaignBlockType.RICH_TEXT }) as unknown as Record<string, unknown>
+      }
       submitEndpoint={endpoint}
       submitParams={submitParams}
       onSuccess={() => {

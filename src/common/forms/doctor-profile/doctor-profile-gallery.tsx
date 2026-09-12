@@ -2,13 +2,7 @@
 
 import type { LocalizedString } from "@kira-joo/frontend-toolkit-core";
 import { useRequesterMutation } from "@kira-joo/frontend-toolkit-core";
-import {
-  AssetLightbox,
-  AssetThumbnail,
-  CustomButton,
-  PageSection,
-  toast,
-} from "@kira-joo/frontend-toolkit-tailwind";
+import { AssetLightbox, AssetThumbnail, CustomButton, PageSection, toast } from "@kira-joo/frontend-toolkit-tailwind";
 import { useConfirm } from "@kira-joo/frontend-toolkit-tailwind/dialog";
 import { ArrowLeft, ArrowRight, Images, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -142,10 +136,22 @@ export function DoctorProfileGallery({ gallery, onChanged }: DoctorProfileGaller
               >
                 <ArrowRight className="h-4 w-4" />
               </CustomButton>
-              <CustomButton type="button" size="icon" variant="ghost" aria-label="Edit" onClick={() => setEditingItem(item)}>
+              <CustomButton
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Edit"
+                onClick={() => setEditingItem(item)}
+              >
                 <Pencil className="h-4 w-4" />
               </CustomButton>
-              <CustomButton type="button" size="icon" variant="ghost" aria-label="Remove" onClick={() => handleRemove(item)}>
+              <CustomButton
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="Remove"
+                onClick={() => handleRemove(item)}
+              >
                 <Trash2 className="h-4 w-4 text-red-600" />
               </CustomButton>
             </div>

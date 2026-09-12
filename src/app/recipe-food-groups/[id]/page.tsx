@@ -1,7 +1,16 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { Badge, DateText, InfoRow, PageSection, PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  Badge,
+  DateText,
+  InfoRow,
+  PageSection,
+  PageShell,
+  QueryState,
+  RouteButton,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Pencil, Salad } from "lucide-react";
 import { getRecipeFoodGroupByIdEndpoint } from "../../../../api/recipe-food-group.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -9,7 +18,8 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function RecipeFoodGroupDetailsPage({ params }: { params: { id: string } }) {
+export default function RecipeFoodGroupDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const foodGroupQuery = useRequesterQuery({
     endpoint: getRecipeFoodGroupByIdEndpoint,
     options: { params: { id: params.id } },

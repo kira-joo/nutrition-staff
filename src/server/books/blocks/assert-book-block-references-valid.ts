@@ -10,12 +10,18 @@ import { recipeRepository } from "src/server/recipes/recipes.repository";
  * after `validateBookBlock` passes structural validation, from every
  * add/replace entry point.
  */
-export async function assertBookBlockReferencesValid(dto: Record<string, unknown>, references: BookReference[]): Promise<void> {
+export async function assertBookBlockReferencesValid(
+  dto: Record<string, unknown>,
+  references: BookReference[],
+): Promise<void> {
   const referenceIds = new Set(references.map((reference) => reference.id));
 
   if (dto.type === BookBlockType.RECIPE_REF) {
     const recipeId = dto.recipeId as string;
-    const recipe = await recipeRepository.findOne({ where: { _id: recipeId, status: ContentStatus.PUBLISHED }, skipThrowError: true });
+    const recipe = await recipeRepository.findOne({
+      where: { _id: recipeId, status: ContentStatus.PUBLISHED },
+      skipThrowError: true,
+    });
     if (!recipe) {
       throw new BadRequestError(`Recipe "${recipeId}" does not exist, is deleted, or is not published.`, { recipeId });
     }
@@ -31,6 +37,8 @@ export async function assertBookBlockReferencesValid(dto: Record<string, unknown
   const citationIds = (dto.citationIds as string[] | undefined) ?? [];
   const unknownCitationIds = citationIds.filter((id) => !referenceIds.has(id));
   if (unknownCitationIds.length > 0) {
-    throw new BadRequestError(`citationIds reference unknown entries: ${unknownCitationIds.join(", ")}.`, { unknownCitationIds });
+    throw new BadRequestError(`citationIds reference unknown entries: ${unknownCitationIds.join(", ")}.`, {
+      unknownCitationIds,
+    });
   }
 }

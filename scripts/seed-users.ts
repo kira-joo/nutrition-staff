@@ -76,11 +76,11 @@ async function seed() {
 
   const insertedUsers = await UserModel.insertMany(sampleUsers.map((sample) => sample.user));
   await StaffProfileModel.insertMany(
-    insertedUsers.map((user, index) => ({ userId: user._id, ...sampleUsers[index].staffProfile }))
+    insertedUsers.map((user, index) => ({ userId: user._id, ...sampleUsers[index].staffProfile })),
   );
 
   console.log(
-    `Seeded ${insertedUsers.length} users, each with a StaffProfile (password for all: "${DEV_PASSWORD}", dev-only)`
+    `Seeded ${insertedUsers.length} users, each with a StaffProfile (password for all: "${DEV_PASSWORD}", dev-only)`,
   );
   await mongoose.disconnect();
 }

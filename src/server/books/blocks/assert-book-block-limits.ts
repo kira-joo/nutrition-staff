@@ -4,8 +4,14 @@ import { MAX_BLOCKS_PER_BOOK, MAX_BLOCKS_PER_CONTAINER } from "src/common/books/
 
 export function countAllBlocks(book: BookSchema): number {
   const chapterBlocks = book.chapters.reduce((sum, chapter) => sum + (chapter.blocks?.length ?? 0), 0);
-  const frontMatterBlocks = Object.values(book.frontMatter ?? {}).reduce((sum, slot) => sum + (slot?.blocks?.length ?? 0), 0);
-  const backMatterBlocks = Object.values(book.backMatter ?? {}).reduce((sum, slot) => sum + (slot?.blocks?.length ?? 0), 0);
+  const frontMatterBlocks = Object.values(book.frontMatter ?? {}).reduce(
+    (sum, slot) => sum + (slot?.blocks?.length ?? 0),
+    0,
+  );
+  const backMatterBlocks = Object.values(book.backMatter ?? {}).reduce(
+    (sum, slot) => sum + (slot?.blocks?.length ?? 0),
+    0,
+  );
   return chapterBlocks + frontMatterBlocks + backMatterBlocks;
 }
 

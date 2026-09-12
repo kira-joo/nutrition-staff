@@ -69,18 +69,26 @@ async function main() {
       joinedAt: user.joinedAt,
     });
     created++;
-    console.log(`  created StaffProfile for "${user.name}" (salary: ${user.salary ?? "—"}, joinedAt: ${user.joinedAt ?? "—"})`);
+    console.log(
+      `  created StaffProfile for "${user.name}" (salary: ${user.salary ?? "—"}, joinedAt: ${user.joinedAt ?? "—"})`,
+    );
   }
 
   // Cleanup: the fields are no longer declared on UserSchema — remove the
   // orphaned raw values so they don't linger as stale, confusing data.
   const cleanup = await db.updateMany(
     { $or: [{ salary: { $exists: true } }, { joinedAt: { $exists: true } }] },
-    { $unset: { salary: "", joinedAt: "" } }
+    { $unset: { salary: "", joinedAt: "" } },
   );
 
   console.log("\n=== Migration report ===");
-  console.log(JSON.stringify({ found: legacyUsers.length, created, alreadyHadProfile: skipped, cleanedUp: cleanup.modifiedCount }, null, 2));
+  console.log(
+    JSON.stringify(
+      { found: legacyUsers.length, created, alreadyHadProfile: skipped, cleanedUp: cleanup.modifiedCount },
+      null,
+      2,
+    ),
+  );
 }
 
 main()

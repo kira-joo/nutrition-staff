@@ -1,6 +1,12 @@
 "use client";
 
-import { CustomInput, CustomTextarea, FieldType, type FormFieldConfig, type SimpleValidationRules } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  CustomInput,
+  CustomTextarea,
+  FieldType,
+  type FormFieldConfig,
+  type SimpleValidationRules,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import type { FieldValues, Path } from "react-hook-form";
 
 /**
@@ -13,7 +19,7 @@ import type { FieldValues, Path } from "react-hook-form";
 export function arabicInput<T extends FieldValues>(
   name: Path<T>,
   label: string,
-  options?: { placeholder?: string; rules?: SimpleValidationRules; description?: string }
+  options?: { placeholder?: string; rules?: SimpleValidationRules; description?: string },
 ): FormFieldConfig<T> {
   return {
     type: FieldType.CUSTOM,
@@ -39,7 +45,7 @@ export function arabicInput<T extends FieldValues>(
 export function arabicTextarea<T extends FieldValues>(
   name: Path<T>,
   label: string,
-  options?: { rows?: number; placeholder?: string; rules?: SimpleValidationRules; description?: string }
+  options?: { rows?: number; placeholder?: string; rules?: SimpleValidationRules; description?: string },
 ): FormFieldConfig<T> {
   return {
     type: FieldType.CUSTOM,

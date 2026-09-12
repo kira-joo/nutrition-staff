@@ -33,7 +33,7 @@ class HasMediaSourceConstraint implements ValidatorConstraintInterface {
  * registered under that same property name.
  */
 export function HasMediaSource(validationOptions?: ValidationOptions): ClassDecorator {
-  return function (target: Function) {
+  return function (target) {
     for (const propertyName of ["image", "__hasMediaSource"]) {
       registerDecorator({
         target,

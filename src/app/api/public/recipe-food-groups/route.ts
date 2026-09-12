@@ -6,6 +6,5 @@ export const dynamic = "force-dynamic";
 
 export const GET = createGetRoute({
   auth: false,
-  handler: async () =>
-    recipeFoodGroupRepository.findAllNoCountPublic({ where: { status: ContentStatus.PUBLISHED } }),
+  handler: async () => recipeFoodGroupRepository.findAllNoCountPublic({ where: { status: ContentStatus.PUBLISHED } }),
 });

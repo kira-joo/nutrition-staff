@@ -58,10 +58,21 @@ export function SortableList<T>({ items, getId, onReorder, renderItem, disabled 
               {({ dragHandleProps }) => (
                 <div className="flex items-start gap-2">
                   <div className="flex flex-col items-center gap-1 pt-1">
-                    <CustomButton type="button" size="icon" variant="ghost" aria-label="Move up" disabled={disabled || index === 0} onClick={() => moveByButton(index, -1)}>
+                    <CustomButton
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Move up"
+                      disabled={disabled || index === 0}
+                      onClick={() => moveByButton(index, -1)}
+                    >
                       <ArrowUp className="h-4 w-4" />
                     </CustomButton>
-                    <span className={`cursor-grab p-1 text-slate-400 ${disabled ? "opacity-40" : ""}`} aria-label="Drag to reorder" {...dragHandleProps}>
+                    <span
+                      className={`cursor-grab p-1 text-slate-400 ${disabled ? "opacity-40" : ""}`}
+                      aria-label="Drag to reorder"
+                      {...dragHandleProps}
+                    >
                       <GripVertical className="h-4 w-4" />
                     </span>
                     <CustomButton

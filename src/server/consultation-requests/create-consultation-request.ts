@@ -32,7 +32,10 @@ function buildTags(body: CreateConsultationRequestDto): string[] {
  * the shared `User`/`ClientProfile` identity — that CRM behavior is
  * unchanged.
  */
-export async function createConsultationRequest(body: CreateConsultationRequestDto, ip: string): Promise<{ success: true }> {
+export async function createConsultationRequest(
+  body: CreateConsultationRequestDto,
+  ip: string,
+): Promise<{ success: true }> {
   // Honeypot: a real visitor never fills this field in. Silently accept
   // without doing anything — never reveal to a bot that it was caught.
   if (body.website) {
@@ -74,13 +77,15 @@ export async function createConsultationRequest(body: CreateConsultationRequestD
     }
 
     const details = error.details as
-      | { existingUserId?: string; hasClientProfile?: boolean; clientProfileId?: string }
-      | undefined;
+      { existingUserId?: string; hasClientProfile?: boolean; clientProfileId?: string } | undefined;
 
     if (details?.hasClientProfile && details.clientProfileId) {
       // Already a known lead/client — append the new tag rather than
       // overwrite whatever staff has already recorded on this profile.
-      const existing = await clientProfileRepository.findOne({ where: { _id: details.clientProfileId }, skipThrowError: true });
+      const existing = await clientProfileRepository.findOne({
+        where: { _id: details.clientProfileId },
+        skipThrowError: true,
+      });
       const mergedTags = Array.from(new Set([...(existing?.tags ?? []), ...tags]));
       await clientProfileRepository.update({ where: { _id: details.clientProfileId } }, { tags: mergedTags });
       userId = details.existingUserId;
@@ -88,7 +93,10 @@ export async function createConsultationRequest(body: CreateConsultationRequestD
     } else if (details?.existingUserId) {
       // A User exists but has no ClientProfile yet (e.g. a signed-up
       // account) — attach one rather than creating a duplicate identity.
-      const attached = await attachClientProfile(details.existingUserId, { source: ClientSource.WEBSITE, sourceNote: body.message });
+      const attached = await attachClientProfile(details.existingUserId, {
+        source: ClientSource.WEBSITE,
+        sourceNote: body.message,
+      });
       await clientProfileRepository.update({ where: { _id: attached._id } }, { tags });
       userId = details.existingUserId;
       clientProfileId = String(attached._id);

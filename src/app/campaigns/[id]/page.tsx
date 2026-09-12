@@ -3,7 +3,7 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, CustomButton, PageSection, PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Blocks, Eye, EyeOff, Megaphone } from "lucide-react";
-import { useState } from "react";
+import { useState, use } from "react";
 import { getCampaignByIdEndpoint, updateCampaignEndpoint } from "../../../../api/campaign.endpoints";
 import { CampaignBlockManager } from "src/common/campaign-blocks/campaign-block-manager";
 import { campaignBlockRegistry } from "src/common/campaign-blocks/campaign-block-registry";
@@ -12,7 +12,8 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function CampaignBuilderPage({ params }: { params: { id: string } }) {
+export default function CampaignBuilderPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const [previewing, setPreviewing] = useState(false);
   const campaignQuery = useRequesterQuery({
     endpoint: getCampaignByIdEndpoint,

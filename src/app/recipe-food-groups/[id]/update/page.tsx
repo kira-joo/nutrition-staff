@@ -1,14 +1,19 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { Salad } from "lucide-react";
-import { getRecipeFoodGroupByIdEndpoint, updateRecipeFoodGroupEndpoint } from "../../../../../api/recipe-food-group.endpoints";
+import {
+  getRecipeFoodGroupByIdEndpoint,
+  updateRecipeFoodGroupEndpoint,
+} from "../../../../../api/recipe-food-group.endpoints";
 import { RecipeFoodGroupForm } from "src/common/forms/recipe-food-group-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function RecipeFoodGroupUpdatePage({ params }: { params: { id: string } }) {
+export default function RecipeFoodGroupUpdatePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const foodGroupQuery = useRequesterQuery({
     endpoint: getRecipeFoodGroupByIdEndpoint,
     options: { params: { id: params.id } },

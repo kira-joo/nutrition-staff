@@ -9,7 +9,10 @@ import type { UploadedAssetRef } from "./process-asset-upload-fields";
  * thrown — the original save-failure error is what the caller actually
  * needs to see.
  */
-export async function destroyUploadedAssets(provider: AssetProvider, uploaded: readonly UploadedAssetRef[]): Promise<void> {
+export async function destroyUploadedAssets(
+  provider: AssetProvider,
+  uploaded: readonly UploadedAssetRef[],
+): Promise<void> {
   for (const asset of uploaded) {
     try {
       await provider.destroyAsset(asset.publicId, asset.resourceType);

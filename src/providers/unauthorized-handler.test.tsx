@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -56,7 +56,7 @@ function renderWithClient(client: QueryClient) {
       <Guard>
         <p>Login form</p>
       </Guard>
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 }
 
@@ -126,7 +126,7 @@ describe("a gating query whose cache is cleared by its own 401 handler", () => {
       expect(rendered).toBe(pathname === "/login");
 
       unsubscribe();
-    }
+    },
   );
 
   it.each(EXPECTED_401_ROUTES)(
@@ -152,41 +152,38 @@ describe("a gating query whose cache is cleared by its own 401 handler", () => {
       expect(screen.queryByText("Login form")).toBeNull();
       void pathname;
       unsubscribe();
-    }
+    },
   );
 
-  it.each(EXPECTED_401_ROUTES)(
-    "clearing everything EXCEPT in-flight queries works on %s",
-    async (pathname) => {
-      const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  it.each(EXPECTED_401_ROUTES)("clearing everything EXCEPT in-flight queries works on %s", async (pathname) => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
-      /*
-       * The class fix. It names no routes, and it is the only one of the three
-       * that holds on every route.
-       *
-       * The handler runs while the response that triggered it is still in
-       * flight. Removing that query destroys the answer before any observer
-       * sees it — so skip anything still fetching and drop the rest. The
-       * in-flight query settles normally (to `error`, which is the correct
-       * answer to "is anyone signed in"), and every stale authenticated query
-       * is still dropped, which is what clearing was for.
-       */
-      const clearSettledOnly = () => {
-        client.removeQueries({
-          predicate: (query) => query.state.fetchStatus !== "fetching",
-        });
-      };
-
-      const unsubscribe = client.getQueryCache().subscribe((event) => {
-        if (event.query.state.fetchStatus === "fetching") clearSettledOnly();
+    /*
+     * The class fix. It names no routes, and it is the only one of the three
+     * that holds on every route.
+     *
+     * The handler runs while the response that triggered it is still in
+     * flight. Removing that query destroys the answer before any observer
+     * sees it — so skip anything still fetching and drop the rest. The
+     * in-flight query settles normally (to `error`, which is the correct
+     * answer to "is anyone signed in"), and every stale authenticated query
+     * is still dropped, which is what clearing was for.
+     */
+    const clearSettledOnly = () => {
+      client.removeQueries({
+        predicate: (query) => query.state.fetchStatus !== "fetching",
       });
+    };
 
-      renderWithClient(client);
-      await waitFor(() => expect(screen.getByText("Login form")).toBeInTheDocument());
-      void pathname;
-      unsubscribe();
-    }
-  );
+    const unsubscribe = client.getQueryCache().subscribe((event) => {
+      if (event.query.state.fetchStatus === "fetching") clearSettledOnly();
+    });
+
+    renderWithClient(client);
+    await waitFor(() => expect(screen.getByText("Login form")).toBeInTheDocument());
+    void pathname;
+    unsubscribe();
+  });
 
   it("renders when the handler leaves the query alone, which is the fix", async () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -236,11 +233,14 @@ describe("a gating query whose cache is cleared by its own 401 handler", () => {
 
     void client.fetchQuery({
       queryKey: ["auth", "me"],
-      queryFn: () => new Promise((r) => { resolve = r; }),
+      queryFn: () =>
+        new Promise((r) => {
+          resolve = r;
+        }),
     });
 
     await waitFor(() =>
-      expect(client.getQueryCache().find({ queryKey: ["auth", "me"] })?.state.fetchStatus).toBe("fetching")
+      expect(client.getQueryCache().find({ queryKey: ["auth", "me"] })?.state.fetchStatus).toBe("fetching"),
     );
 
     client.removeQueries({ predicate: (query) => query.state.fetchStatus !== "fetching" });

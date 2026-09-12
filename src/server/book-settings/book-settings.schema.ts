@@ -1,10 +1,21 @@
-import { createMongoModel, imageAssetField, MongoField, MongoSchema, type MongoFieldOptions } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  imageAssetField,
+  MongoField,
+  MongoSchema,
+  type MongoFieldOptions,
+} from "@kira-joo/backend-toolkit-mongoose";
 import type { ImageAsset } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { BookMarginPreset, BookPageSize } from "src/common/enums";
 import { CURRENT_BOOK_TEMPLATE_VERSION } from "src/common/books/book-template-version";
-import type { BookContactBlock, BookPageWatermark, BookPrintSettings, BookSocialLink } from "src/common/interfaces/book-settings.interface";
+import type {
+  BookContactBlock,
+  BookPageWatermark,
+  BookPrintSettings,
+  BookSocialLink,
+} from "src/common/interfaces/book-settings.interface";
 import { DEFAULT_PAGE_WATERMARK } from "src/common/interfaces/book-settings.interface";
 
 // See doctor-profile.schema.ts for why this cast exists: MongoFieldOptions
@@ -21,7 +32,7 @@ const bookSocialLinkSchema = new mongoose.Schema(
     url: { type: String, required: true },
     order: { type: Number, default: 0 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const bookContactBlockSchema = new mongoose.Schema(
@@ -31,7 +42,7 @@ const bookContactBlockSchema = new mongoose.Schema(
     email: { type: String, required: false },
     address: { type: String, required: false },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Exported for reuse by BookSchema.overrides.print and the Edition
@@ -45,7 +56,7 @@ export const bookPrintSettingsSchema = new mongoose.Schema(
     pageNumberStart: { type: Number, default: 1 },
     doublePageSpread: { type: Boolean, default: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 /**
@@ -59,7 +70,7 @@ export const bookPageWatermarkSchema = new mongoose.Schema(
     opacity: { type: Number, default: DEFAULT_PAGE_WATERMARK.opacity, min: 0, max: 1 },
     scaleMm: { type: Number, default: DEFAULT_PAGE_WATERMARK.scaleMm, min: 1 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 @MongoSchema({ timestamps: true })

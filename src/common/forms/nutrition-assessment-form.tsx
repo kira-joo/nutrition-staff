@@ -1,7 +1,7 @@
 "use client";
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
-import { Activity, Apple, Cigarette, HeartPulse, Moon, Pill, StickyNote } from "lucide-react";
+import { Activity, Apple, HeartPulse, Moon, Pill, StickyNote } from "lucide-react";
 import { ActivityLevel, AlcoholUse, Gender, NutritionGoal, SleepQuality, SmokingStatus } from "../enums";
 import type {
   createNutritionAssessmentEndpoint,
@@ -12,7 +12,13 @@ import { CreateNutritionAssessmentDto, NutritionAssessment } from "../interfaces
 /** The 7 string-list fields are edited as comma-separated text and split/joined on load/submit — matches the same convention already used for ClientProfile.tags. */
 type FormValues = Omit<
   CreateNutritionAssessmentDto,
-  "medicalConditions" | "medications" | "supplements" | "allergies" | "foodIntolerances" | "preferredFoods" | "dislikedFoods"
+  | "medicalConditions"
+  | "medications"
+  | "supplements"
+  | "allergies"
+  | "foodIntolerances"
+  | "preferredFoods"
+  | "dislikedFoods"
 > & {
   medicalConditionsInput?: string;
   medicationsInput?: string;

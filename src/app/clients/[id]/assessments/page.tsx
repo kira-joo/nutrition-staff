@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { SortOrder, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Card, CustomButton, DateText, EmptyState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -9,7 +10,8 @@ import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
 import { getNutritionAssessmentsEndpoint } from "../../../../../api/nutrition-assessment.endpoints";
 
-export default function ClientAssessmentsPage({ params }: { params: { id: string } }) {
+export default function ClientAssessmentsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
   const { can } = usePermissions();
 
@@ -44,7 +46,9 @@ export default function ClientAssessmentsPage({ params }: { params: { id: string
             <Card
               key={assessment._id}
               className="cursor-pointer p-4 hover:bg-slate-50"
-              onClick={() => navigate(AppRoute.clientAssessmentDetails, { id: params.id, assessmentId: assessment._id })}
+              onClick={() =>
+                navigate(AppRoute.clientAssessmentDetails, { id: params.id, assessmentId: assessment._id })
+              }
             >
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">

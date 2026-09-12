@@ -3,7 +3,11 @@
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { getUsersEndpoint } from "../../../api/user.endpoints";
 import { createNutritionCalculationEndpoint } from "../../../api/nutrition-calculation.endpoints";
-import { ComputeNutritionCalculationResponse, CreateNutritionCalculationDto, NutritionCalculation } from "../interfaces/nutrition-calculation.interface";
+import {
+  ComputeNutritionCalculationResponse,
+  CreateNutritionCalculationDto,
+  NutritionCalculation,
+} from "../interfaces/nutrition-calculation.interface";
 
 interface AssignFormValues {
   targetUserId: string;

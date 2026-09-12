@@ -1,5 +1,11 @@
 import { validateDto } from "@kira-joo/backend-toolkit-core";
-import { authenticateRequest, authorizeUser, createErrorResponse, extractQueryObject, getNextBackendToolkitConfig } from "@kira-joo/backend-toolkit-next";
+import {
+  authenticateRequest,
+  authorizeUser,
+  createErrorResponse,
+  extractQueryObject,
+  getNextBackendToolkitConfig,
+} from "@kira-joo/backend-toolkit-next";
 import type { NextRequest } from "next/server";
 import { IsMongoId, IsOptional, IsString } from "class-validator";
 import "reflect-metadata";
@@ -45,7 +51,7 @@ class PrintPreviewQueryDto {
  * instead of a broken frame, and the loading and refresh affordances stay in
  * React's hands.
  */
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const config = getNextBackendToolkitConfig();
     await config.database.connect();
@@ -53,7 +59,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
     const user = await authenticateRequest({ request, config, authOption: AUTH_OPTION });
     authorizeUser(user, AUTH_OPTION);
 
-    const params = await validateDto(PrintPreviewParamsDto, context.params);
+    const params = await validateDto(PrintPreviewParamsDto, await context.params);
     const query = await validateDto(PrintPreviewQueryDto, extractQueryObject(request.nextUrl.searchParams));
 
     const book = await bookRepository.findOne({ where: { _id: params.id } });

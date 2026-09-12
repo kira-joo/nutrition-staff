@@ -16,7 +16,7 @@ The mechanism is good. The configuration is empty.
 `createAuthorizationRegistry({entities: EntityName})` cross-products 27 entities
 × 5 default actions = **135 keys**, all `isSystem: true`.
 `backend-toolkit-next`'s `RouteAuthOption` is `false | true | omitted | {permissions, permissionMode}`,
-where *omitted* means secure-by-default (a `grantsAll` role only).
+where _omitted_ means secure-by-default (a `grantsAll` role only).
 `hasRequiredPermissions` short-circuits on `grantsAll`, keys are
 case-sensitive, default mode is `"any"`. Every route in the app uses the
 explicit form with exactly one key. The frontend mirrors it with
@@ -60,23 +60,23 @@ migration below.
 Seeded, and every one of them actually usable on day one. Roles are seeded per
 organization.
 
-| Role | Can | Cannot |
-|---|---|---|
-| `owner` | `grantsAll` | — |
-| `clinic_admin` | everything operational: org/branch settings, staff, practitioners, roles, services, discounts above threshold, full reporting, audit read | delete the organization; edit a signed encounter |
-| `doctor` | full clinical: read/write patients, encounters (incl. `sign`), observations, diagnoses, prescriptions, documents; own schedule; read own reporting; vertical modules for their specialties | billing beyond reading a balance; staff admin; org settings |
-| `nurse` | patients (read + limited write), observations (create), documents, check-in, waiting board, prescriptions read-only | sign an encounter; diagnose; billing |
-| `receptionist` | appointments (full), check-in, waiting board, patient identity create/update, invoices, payments, contact attempts, tasks | clinical content beyond alerts; encounter bodies; reporting beyond today's operations |
-| `billing_clerk` | services, invoices, payments, discounts (up to threshold), financial reporting | clinical content; scheduling |
-| `assistant` | tasks, contact attempts, patient reads, document upload | clinical writes; billing; scheduling changes |
-| `read_only_auditor` | read across the org, plus `AuditEvent.read` | every write |
+| Role                | Can                                                                                                                                                                                        | Cannot                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `owner`             | `grantsAll`                                                                                                                                                                                | —                                                                                     |
+| `clinic_admin`      | everything operational: org/branch settings, staff, practitioners, roles, services, discounts above threshold, full reporting, audit read                                                  | delete the organization; edit a signed encounter                                      |
+| `doctor`            | full clinical: read/write patients, encounters (incl. `sign`), observations, diagnoses, prescriptions, documents; own schedule; read own reporting; vertical modules for their specialties | billing beyond reading a balance; staff admin; org settings                           |
+| `nurse`             | patients (read + limited write), observations (create), documents, check-in, waiting board, prescriptions read-only                                                                        | sign an encounter; diagnose; billing                                                  |
+| `receptionist`      | appointments (full), check-in, waiting board, patient identity create/update, invoices, payments, contact attempts, tasks                                                                  | clinical content beyond alerts; encounter bodies; reporting beyond today's operations |
+| `billing_clerk`     | services, invoices, payments, discounts (up to threshold), financial reporting                                                                                                             | clinical content; scheduling                                                          |
+| `assistant`         | tasks, contact attempts, patient reads, document upload                                                                                                                                    | clinical writes; billing; scheduling changes                                          |
+| `read_only_auditor` | read across the org, plus `AuditEvent.read`                                                                                                                                                | every write                                                                           |
 
 `hr`, `manager` and `employee` are retained as-is for backward compatibility and
 marked deprecated in the seed, since existing users hold them.
 
 ### Resource-scoped authorization — the toolkit change
 
-`RouteAuthOption` gains a third variant. The design question is *where* the
+`RouteAuthOption` gains a third variant. The design question is _where_ the
 check runs, and the current 9-step sequence forces the answer:
 `authorizeUser` runs at **step 4**, before params/body validation at **step 6**.
 A record-scoped check needs validated params and usually a database read, so it
@@ -121,8 +121,8 @@ write itself fails if ownership changed.
 
 **The ordering claim was imprecise.** With a post-validation guard, a user who
 holds the coarse permission but fails the scope check receives **400** for
-malformed input before the guard can return 403. So the guarantee is *coarse
-403 before 400*, not a universal 401 → 403 → 400. That is the correct trade —
+malformed input before the guard can return 403. So the guarantee is _coarse
+403 before 400_, not a universal 401 → 403 → 400. That is the correct trade —
 validating identifiers before a database read is what stops the guard becoming a
 probe oracle — and the deliberate decision on disclosure is: **a well-formed
 identifier the actor may not see returns 404, not 403**, so existence is not
@@ -130,11 +130,11 @@ leaked.
 
 Why a throwing guard rather than a `where`-fragment resolver:
 
-| Option | Verdict |
-|---|---|
-| A post-validation guard **plus** the ownership predicate in the query ✅ | The guard gives a fast, specific 403 for the common case; the query predicate is what actually enforces it, with no TOCTOU window. Both are testable and greppable. Neither alone is sufficient, and the plan now says so. |
-| A resolver returning a `where` fragment | Elegant for list routes, useless for `GET /:id` (a scoped miss becomes a 404, leaking nothing but also masking a genuine permission error), and it pushes authorization logic into query building where it is invisible. |
-| Both | Chosen in effect: single-record routes use `scope`; **list** routes get their narrowing from an explicit, named scope resolver the handler calls (`resolveVisiblePatientIds(actor)`), which is testable in isolation and impossible to forget silently because the handler will not compile without it. |
+| Option                                                                   | Verdict                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A post-validation guard **plus** the ownership predicate in the query ✅ | The guard gives a fast, specific 403 for the common case; the query predicate is what actually enforces it, with no TOCTOU window. Both are testable and greppable. Neither alone is sufficient, and the plan now says so.                                                                              |
+| A resolver returning a `where` fragment                                  | Elegant for list routes, useless for `GET /:id` (a scoped miss becomes a 404, leaking nothing but also masking a genuine permission error), and it pushes authorization logic into query building where it is invisible.                                                                                |
+| Both                                                                     | Chosen in effect: single-record routes use `scope`; **list** routes get their narrowing from an explicit, named scope resolver the handler calls (`resolveVisiblePatientIds(actor)`), which is testable in isolation and impossible to forget silently because the handler will not compile without it. |
 
 Organization scoping is deliberately **not** this mechanism. Org scoping is
 ambient, automatic and applies to every query
@@ -166,7 +166,7 @@ context, and a repository write hook. What stays app-local: **which** entities
 are audited, what the actions mean, retention, and the redaction list. Split
 detailed in [19](19-toolkit-and-package-changes.md).
 
-Audited from day one: every patient read of a *clinical* surface (encounters,
+Audited from day one: every patient read of a _clinical_ surface (encounters,
 documents, observations — not list pages), every clinical write, every billing
 write, every permission or role change, every login, every document download,
 every scope-check denial. Denials matter as much as successes.
@@ -202,7 +202,7 @@ needs a grouped matrix), and `GET /api/audit-events` with filters
 ## Edge cases
 
 - **A user with two roles, one scoped and one not.** Permissions union, so the
-  broader key wins. Scope rules therefore key off *keys* (`Patient.readAll`
+  broader key wins. Scope rules therefore key off _keys_ (`Patient.readAll`
   present ⇒ no narrowing), never off role names.
 - **A doctor covering for a colleague.** `ownPatientsOnly` includes "has an
   encounter with this patient", which covers it without a delegation feature.
@@ -251,13 +251,13 @@ needs a grouped matrix), and `GET /api/audit-events` with filters
 
 **Reviewed 2026-08-22. Verdict: FLAWED. Amended.**
 
-| # | Finding | Sev | Analysis | Resolution |
-|---|---|---|---|---|
-| 1 | The scope callback is a **preflight check, not secure mutation authorization** — ownership can change between the guard's read and the handler's write. | CRITICAL | Correct, and the first draft presented the guard as the answer. A factory-level throwing callback cannot guarantee it. | **Accepted.** Guard demoted to defence-in-depth; the binding rule is that ownership must be in the query filter or re-checked in the mutation's transaction. TOCTOU tests added. |
-| 2 | The "401 → 403 → 400" claim is imprecise — only coarse-permission 403 precedes 400. | MAJOR | Correct. | **Accepted.** Documented precisely, and the 404-vs-403 disclosure decision is now explicit. |
-| 3 | Putting `scope` in the ODM-agnostic core auth type couples it to Next's validation timing. | MAJOR | Correct. | **Accepted.** The hook moves to `backend-toolkit-next` as a generic `postValidationGuard`, not a member of the shared auth type. |
-| 4 | Audit writes must not rely on ambient actor state alone — jobs, migrations and impersonation have no request actor or two. | MAJOR | Correct. | **Accepted** in [19](19-toolkit-and-package-changes.md); explicit actor on the command, ambient as default. |
-| 5 | Field/projection-level authorization is missing entirely — a role may see demographics but not clinical notes, billing or IDs. | MAJOR | Correct, and a real gap: the plan had only route-level and row-level. | **Accepted as a known gap for v1, scoped rather than solved.** Entity-level omission (the existing `dashboard-permissions.util.ts` pattern) plus response-shape variants per role cover the concrete v1 cases (receptionist cannot read an encounter body; billing clerk cannot read a diagnosis). A general projection-authorization mechanism is deferred and recorded in [25](25-risks-and-open-decisions.md). |
+| #   | Finding                                                                                                                                                 | Sev      | Analysis                                                                                                               | Resolution                                                                                                                                                                                                                                                                                                                                                                                                        |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | The scope callback is a **preflight check, not secure mutation authorization** — ownership can change between the guard's read and the handler's write. | CRITICAL | Correct, and the first draft presented the guard as the answer. A factory-level throwing callback cannot guarantee it. | **Accepted.** Guard demoted to defence-in-depth; the binding rule is that ownership must be in the query filter or re-checked in the mutation's transaction. TOCTOU tests added.                                                                                                                                                                                                                                  |
+| 2   | The "401 → 403 → 400" claim is imprecise — only coarse-permission 403 precedes 400.                                                                     | MAJOR    | Correct.                                                                                                               | **Accepted.** Documented precisely, and the 404-vs-403 disclosure decision is now explicit.                                                                                                                                                                                                                                                                                                                       |
+| 3   | Putting `scope` in the ODM-agnostic core auth type couples it to Next's validation timing.                                                              | MAJOR    | Correct.                                                                                                               | **Accepted.** The hook moves to `backend-toolkit-next` as a generic `postValidationGuard`, not a member of the shared auth type.                                                                                                                                                                                                                                                                                  |
+| 4   | Audit writes must not rely on ambient actor state alone — jobs, migrations and impersonation have no request actor or two.                              | MAJOR    | Correct.                                                                                                               | **Accepted** in [19](19-toolkit-and-package-changes.md); explicit actor on the command, ambient as default.                                                                                                                                                                                                                                                                                                       |
+| 5   | Field/projection-level authorization is missing entirely — a role may see demographics but not clinical notes, billing or IDs.                          | MAJOR    | Correct, and a real gap: the plan had only route-level and row-level.                                                  | **Accepted as a known gap for v1, scoped rather than solved.** Entity-level omission (the existing `dashboard-permissions.util.ts` pattern) plus response-shape variants per role cover the concrete v1 cases (receptionist cannot read an encounter body; billing clerk cannot read a diagnosis). A general projection-authorization mechanism is deferred and recorded in [25](25-risks-and-open-decisions.md). |
 
 **Still open:** whether `Patient.readAll` scales as a key or inverts into a
 permission explosion; and whether read-auditing volume is sustainable (current

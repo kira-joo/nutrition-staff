@@ -7,7 +7,11 @@ import { clientMeasurementRepository } from "src/server/measurements/client-meas
 import { clientProfileRepository } from "src/server/clients/client-profiles.repository";
 import { RECENT_ACTIVITY_LIMIT } from "src/server/dashboard/dashboard.constants";
 import { resolveDashboardPermissions } from "src/server/dashboard/dashboard-permissions.util";
-import { resolveScopedClientProfileIds, withAssignedStaffWhere, withScopedClientWhere } from "src/server/dashboard/dashboard-scope.util";
+import {
+  resolveScopedClientProfileIds,
+  withAssignedStaffWhere,
+  withScopedClientWhere,
+} from "src/server/dashboard/dashboard-scope.util";
 import { resolveDashboardRange } from "src/server/dashboard/dashboard-time-buckets.util";
 import { DashboardQueryDto } from "src/server/dashboard/dto/dashboard-query.dto";
 import { nutritionAssessmentRepository } from "src/server/assessments/nutrition-assessments.repository";
@@ -28,7 +32,10 @@ interface RawEntry {
  * merely filtered out afterward — when the caller lacks the corresponding
  * read permission.
  */
-export async function getDashboardActivity(query: DashboardQueryDto, user: AuthUser): Promise<DashboardActivityEntry[]> {
+export async function getDashboardActivity(
+  query: DashboardQueryDto,
+  user: AuthUser,
+): Promise<DashboardActivityEntry[]> {
   const { assignedToUserId } = query;
   const range = resolveDashboardRange(query.from, query.to);
   const permissions = resolveDashboardPermissions(user);
@@ -77,35 +84,70 @@ export async function getDashboardActivity(query: DashboardQueryDto, user: AuthU
     rawEntries.push({
       clientProfileId: String(client._id),
       happenedAt: new Date(client.createdAt),
-      build: (clientName) => ({ type: "client_created", happenedAt: client.createdAt, clientProfileId: String(client._id), clientName, summary: "Added as a new client" }),
+      build: (clientName) => ({
+        type: "client_created",
+        happenedAt: client.createdAt,
+        clientProfileId: String(client._id),
+        clientName,
+        summary: "Added as a new client",
+      }),
     });
   }
-  for (const interaction of interactions as unknown as { _id: string; clientProfileId: string; happenedAt: string; summary: string }[]) {
+  for (const interaction of interactions as unknown as {
+    _id: string;
+    clientProfileId: string;
+    happenedAt: string;
+    summary: string;
+  }[]) {
     rawEntries.push({
       clientProfileId: String(interaction.clientProfileId),
       happenedAt: new Date(interaction.happenedAt),
-      build: (clientName) => ({ type: "interaction", happenedAt: interaction.happenedAt, clientProfileId: String(interaction.clientProfileId), clientName, summary: interaction.summary }),
+      build: (clientName) => ({
+        type: "interaction",
+        happenedAt: interaction.happenedAt,
+        clientProfileId: String(interaction.clientProfileId),
+        clientName,
+        summary: interaction.summary,
+      }),
     });
   }
   for (const measurement of measurements as unknown as { clientProfileId: string; measuredAt: string }[]) {
     rawEntries.push({
       clientProfileId: String(measurement.clientProfileId),
       happenedAt: new Date(measurement.measuredAt),
-      build: (clientName) => ({ type: "measurement", happenedAt: measurement.measuredAt, clientProfileId: String(measurement.clientProfileId), clientName, summary: "Measurement recorded" }),
+      build: (clientName) => ({
+        type: "measurement",
+        happenedAt: measurement.measuredAt,
+        clientProfileId: String(measurement.clientProfileId),
+        clientName,
+        summary: "Measurement recorded",
+      }),
     });
   }
   for (const assessment of assessments as unknown as { clientProfileId: string; assessedAt: string }[]) {
     rawEntries.push({
       clientProfileId: String(assessment.clientProfileId),
       happenedAt: new Date(assessment.assessedAt),
-      build: (clientName) => ({ type: "assessment", happenedAt: assessment.assessedAt, clientProfileId: String(assessment.clientProfileId), clientName, summary: "Assessment completed" }),
+      build: (clientName) => ({
+        type: "assessment",
+        happenedAt: assessment.assessedAt,
+        clientProfileId: String(assessment.clientProfileId),
+        clientName,
+        summary: "Assessment completed",
+      }),
     });
   }
   for (const calculation of calculations as unknown as { clientProfileId: string; calculatedAt: string }[]) {
     rawEntries.push({
       clientProfileId: String(calculation.clientProfileId),
       happenedAt: new Date(calculation.calculatedAt),
-      build: (clientName) => ({ type: "calculation", happenedAt: calculation.calculatedAt, clientProfileId: String(calculation.clientProfileId), clientName, summary: "Nutrition calculation saved" }),
+      build: (clientName) => ({
+        type: "calculation",
+        happenedAt: calculation.calculatedAt,
+        clientProfileId: String(calculation.clientProfileId),
+        clientName,
+        summary: "Nutrition calculation saved",
+      }),
     });
   }
 
@@ -116,9 +158,14 @@ export async function getDashboardActivity(query: DashboardQueryDto, user: AuthU
   for (const client of createdClients as unknown as Client[]) {
     nameByClientProfileId.set(String(client._id), client.userId.name);
   }
-  const missingIds = [...new Set(topEntries.map((entry) => entry.clientProfileId))].filter((id) => !nameByClientProfileId.has(id));
+  const missingIds = [...new Set(topEntries.map((entry) => entry.clientProfileId))].filter(
+    (id) => !nameByClientProfileId.has(id),
+  );
   if (missingIds.length > 0) {
-    const missingClients = (await clientProfileRepository.findAll({ where: { _id: { $in: missingIds } }, relations: ["userId"] })) as unknown as Client[];
+    const missingClients = (await clientProfileRepository.findAll({
+      where: { _id: { $in: missingIds } },
+      relations: ["userId"],
+    })) as unknown as Client[];
     for (const client of missingClients) {
       nameByClientProfileId.set(String(client._id), client.userId.name);
     }

@@ -45,7 +45,15 @@ const content: FrozenBookContent = {
           id: "block-1",
           order: 0,
           type: BookBlockType.PARAGRAPH,
-          richText: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "هذا اختبار دخان لإنتاج ملف PDF من طبعة مجمّدة." }] }] },
+          richText: {
+            type: "doc",
+            content: [
+              {
+                type: "paragraph",
+                content: [{ type: "text", text: "هذا اختبار دخان لإنتاج ملف PDF من طبعة مجمّدة." }],
+              },
+            ],
+          },
         },
         { id: "block-2", order: 1, type: BookBlockType.QR_LINK, destination: QR_DESTINATION, label: "امسح هذا الرمز" },
       ],
@@ -69,7 +77,13 @@ const resolvedSettings: ResolvedBookIdentity = {
   backCoverClosingText: "",
   backCoverAudienceText: "",
   qrDestination: QR_DESTINATION,
-  print: { pageSize: BookPageSize.A5, marginPreset: BookMarginPreset.STANDARD, gutterMm: 14, pageNumberStart: 1, doublePageSpread: true },
+  print: {
+    pageSize: BookPageSize.A5,
+    marginPreset: BookMarginPreset.STANDARD,
+    gutterMm: 14,
+    pageNumberStart: 1,
+    doublePageSpread: true,
+  },
   pageWatermark: DEFAULT_PAGE_WATERMARK,
   templateVersion: CURRENT_BOOK_TEMPLATE_VERSION,
   sources: {} as ResolvedBookIdentity["sources"],
@@ -83,7 +97,10 @@ async function main(): Promise<void> {
   assert.ok(Buffer.isBuffer(result.pdf), "expected a Buffer");
   assert.ok(result.pdf.byteLength > 1000, `expected a real PDF, got ${result.pdf.byteLength} bytes`);
   assert.ok(result.pdf.subarray(0, 5).toString("latin1") === "%PDF-", "output does not start with a PDF header");
-  assert.ok(result.pageCount >= 5, `expected at least 5 pages (cover/title/copyright/toc/chapter/back-cover), got ${result.pageCount}`);
+  assert.ok(
+    result.pageCount >= 5,
+    `expected at least 5 pages (cover/title/copyright/toc/chapter/back-cover), got ${result.pageCount}`,
+  );
 
   // The QR must be a real embedded vector image now, not the Phase D
   // text placeholder — the raw destination string should NOT appear as
@@ -92,13 +109,18 @@ async function main(): Promise<void> {
   // the destination to legitimately NOT appear as visible text anywhere
   // else either, since nothing else in this fixture prints it.
   const pdfText = result.pdf.toString("latin1");
-  assert.ok(!pdfText.includes(QR_DESTINATION), "the raw QR destination string appears as literal text in the PDF — QR is still a text placeholder, not a real code");
+  assert.ok(
+    !pdfText.includes(QR_DESTINATION),
+    "the raw QR destination string appears as literal text in the PDF — QR is still a text placeholder, not a real code",
+  );
 
   const outputPath = "/tmp/phase-f-smoke.pdf";
   writeFileSync(outputPath, result.pdf);
 
   // eslint-disable-next-line no-console
-  console.log(`PASS check-pdf-generation-smoke — ${result.pageCount} pages, ${(result.pdf.byteLength / 1024).toFixed(0)}KB, ${elapsedMs}ms, warnings=${JSON.stringify(result.warnings)}`);
+  console.log(
+    `PASS check-pdf-generation-smoke — ${result.pageCount} pages, ${(result.pdf.byteLength / 1024).toFixed(0)}KB, ${elapsedMs}ms, warnings=${JSON.stringify(result.warnings)}`,
+  );
   // eslint-disable-next-line no-console
   console.log(`  saved to ${outputPath} for manual visual inspection`);
 }

@@ -21,7 +21,7 @@ export function useNextQueryParamsRouter(): QueryParamsRouterState {
         router.push(href, { scroll: false });
       }
     },
-    [router, pathname]
+    [router, pathname],
   );
 
   return { searchParams, navigate };

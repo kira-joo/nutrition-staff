@@ -22,7 +22,7 @@ export function resolveCampaignRequiredness(entity: {
 }): (path: string) => boolean {
   const titleResolver = createDtoRequirednessResolver(CreateCampaignDto, { title: entity.title });
   const blockResolvers = entity.blocks.map((block) =>
-    createDtoRequirednessResolver(BLOCK_DTO_BY_TYPE[block.type], block)
+    createDtoRequirednessResolver(BLOCK_DTO_BY_TYPE[block.type], block),
   );
 
   return function isRequired(path: string): boolean {

@@ -27,7 +27,7 @@ const bioSectionSchema = new mongoose.Schema(
     body: asSchemaField(localizedStringField()),
     order: { type: Number, default: 0 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const labeledOrderedItemSchema = new mongoose.Schema(
@@ -35,7 +35,7 @@ const labeledOrderedItemSchema = new mongoose.Schema(
     text: asSchemaField(localizedStringField()),
     order: { type: Number, default: 0 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const statItemSchema = new mongoose.Schema(
@@ -48,7 +48,7 @@ const statItemSchema = new mongoose.Schema(
     /* Lets an editor retire a figure without losing it. */
     enabled: { type: Boolean, default: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const galleryItemSchema = new mongoose.Schema(
@@ -58,7 +58,7 @@ const galleryItemSchema = new mongoose.Schema(
     altText: asSchemaField(localizedStringField()),
     order: { type: Number, default: 0 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 export interface BioSection {

@@ -28,7 +28,13 @@ export const sideNavSections: SideNavSectionConfig[] = [
   {
     key: "general",
     items: [
-      { key: "dashboard", label: "Dashboard", href: AppRoute.dashboard, icon: LayoutDashboard, permission: AppPermission.DASHBOARD.READ },
+      {
+        key: "dashboard",
+        label: "Dashboard",
+        href: AppRoute.dashboard,
+        icon: LayoutDashboard,
+        permission: AppPermission.DASHBOARD.READ,
+      },
       { key: "home", label: "Home", href: AppRoute.home, icon: Home },
     ],
   },

@@ -1,9 +1,6 @@
 import { UnauthorizedError } from "@kira-joo/backend-toolkit-core";
 import { comparePassword, signAuthToken, writeTokenCookie } from "@kira-joo/backend-toolkit-next";
-import {
-  STAFF_SESSION_COOKIE,
-  STAFF_SESSION_MAX_AGE_SECONDS,
-} from "src/common/auth/session-cookie.constant";
+import { STAFF_SESSION_COOKIE, STAFF_SESSION_MAX_AGE_SECONDS } from "src/common/auth/session-cookie.constant";
 import { LoginDto } from "src/server/core/auth/dto/login.dto";
 import { resolveUser } from "src/server/core/auth/resolve-user";
 import { createPostRoute } from "src/server/core/route-factories";

@@ -3,7 +3,7 @@
 import { SortOrder, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { FlaskConical } from "lucide-react";
-import { useState } from "react";
+import { useState, use } from "react";
 import { NutritionCalculationInputForm } from "src/common/forms/nutrition-calculation-input-form";
 import { NutritionCalculationResultsView } from "src/common/forms/nutrition-calculation-results";
 import { SaveNutritionCalculationForm } from "src/common/forms/save-nutrition-calculation-form";
@@ -14,7 +14,8 @@ import { getClientByIdEndpoint } from "../../../../../../api/client.endpoints";
 import { getClientMeasurementsEndpoint } from "../../../../../../api/client-measurement.endpoints";
 import { getNutritionAssessmentsEndpoint } from "../../../../../../api/nutrition-assessment.endpoints";
 
-export default function ClientCalculationNewPage({ params }: { params: { id: string } }) {
+export default function ClientCalculationNewPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
   const [computed, setComputed] = useState<ComputeNutritionCalculationResponse | null>(null);
 
@@ -22,13 +23,17 @@ export default function ClientCalculationNewPage({ params }: { params: { id: str
 
   const latestMeasurementQuery = useRequesterQuery({
     endpoint: getClientMeasurementsEndpoint,
-    options: { query: { clientProfileId: params.id, sortBy: "measuredAt", sortOrder: SortOrder.DESC, limit: 1, page: 1 } },
+    options: {
+      query: { clientProfileId: params.id, sortBy: "measuredAt", sortOrder: SortOrder.DESC, limit: 1, page: 1 },
+    },
   });
   const latestMeasurement = latestMeasurementQuery.data?.data[0];
 
   const latestAssessmentQuery = useRequesterQuery({
     endpoint: getNutritionAssessmentsEndpoint,
-    options: { query: { clientProfileId: params.id, sortBy: "assessedAt", sortOrder: SortOrder.DESC, limit: 1, page: 1 } },
+    options: {
+      query: { clientProfileId: params.id, sortBy: "assessedAt", sortOrder: SortOrder.DESC, limit: 1, page: 1 },
+    },
   });
   const latestAssessment = latestAssessmentQuery.data?.data[0];
 

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -9,7 +10,8 @@ import { useNavigate } from "src/common/routes/use-navigate";
 import { getClientByIdEndpoint } from "../../../../../../api/client.endpoints";
 import { createNutritionAssessmentEndpoint } from "../../../../../../api/nutrition-assessment.endpoints";
 
-export default function ClientAssessmentCreatePage({ params }: { params: { id: string } }) {
+export default function ClientAssessmentCreatePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
 
   const clientQuery = useRequesterQuery({

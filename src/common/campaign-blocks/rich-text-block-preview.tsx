@@ -11,9 +11,7 @@ export function RichTextBlockPreview({ block }: RichTextBlockPreviewProps) {
   return (
     <div className="flex flex-col gap-2 rounded-md border border-slate-200 p-6">
       {heading ? <h2 className="text-xl font-bold text-slate-900">{heading}</h2> : null}
-      <p className="whitespace-pre-wrap text-sm text-slate-700">
-        {block.body.en || block.body.ar || "(no body yet)"}
-      </p>
+      <p className="whitespace-pre-wrap text-sm text-slate-700">{block.body.en || block.body.ar || "(no body yet)"}</p>
     </div>
   );
 }

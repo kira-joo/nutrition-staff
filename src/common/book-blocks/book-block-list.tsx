@@ -35,7 +35,8 @@ import { SortableList } from "src/common/books/sortable-list";
 import { BookBlockForm } from "./book-block-form";
 import { bookBlockRegistry } from "./book-block-registry";
 
-export type ContainerDescriptor = { kind: "chapter"; chapterId: string } | { kind: "frontMatter"; slot: string } | { kind: "backMatter"; slot: string };
+export type ContainerDescriptor =
+  { kind: "chapter"; chapterId: string } | { kind: "frontMatter"; slot: string } | { kind: "backMatter"; slot: string };
 
 export interface BookBlockListProps {
   bookId: string;
@@ -45,7 +46,12 @@ export interface BookBlockListProps {
   enqueue: <T>(run: (expectedRevision: number) => Promise<T & Book>) => Promise<T & Book>;
 }
 
-const GROUP_LABELS: Record<string, string> = { text: "Text", media: "Media", structure: "Structure", reference: "Reference" };
+const GROUP_LABELS: Record<string, string> = {
+  text: "Text",
+  media: "Media",
+  structure: "Structure",
+  reference: "Reference",
+};
 
 function toRouteParams(container: ContainerDescriptor, bookId: string): Record<string, string> {
   if (container.kind === "chapter") return { bookId, chapterId: container.chapterId };
@@ -78,23 +84,28 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
   const moveMutation = useRequesterMutation({ endpoint: moveBlockEndpoint });
 
   function handleReorder(orderedIds: string[]): void {
-    enqueue((expectedRevision) => reorderMutation.mutateAsync({ params: routeParams, body: { blockIds: orderedIds, expectedRevision } })).catch(
-      (error: { message?: string }) => toast.error(error.message ?? "Failed to reorder blocks")
-    );
+    enqueue((expectedRevision) =>
+      reorderMutation.mutateAsync({ params: routeParams, body: { blockIds: orderedIds, expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to reorder blocks"));
   }
 
   async function handleRemove(block: BookBlock): Promise<void> {
-    const confirmed = await confirm({ title: "Remove block?", description: "This permanently deletes the block and any assets it owns.", confirmLabel: "Remove", destructive: true });
+    const confirmed = await confirm({
+      title: "Remove block?",
+      description: "This permanently deletes the block and any assets it owns.",
+      confirmLabel: "Remove",
+      destructive: true,
+    });
     if (!confirmed) return;
-    enqueue((expectedRevision) => removeMutation.mutateAsync({ params: { ...routeParams, blockId: block.id }, body: { expectedRevision } })).catch((error: { message?: string }) =>
-      toast.error(error.message ?? "Failed to remove block")
-    );
+    enqueue((expectedRevision) =>
+      removeMutation.mutateAsync({ params: { ...routeParams, blockId: block.id }, body: { expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to remove block"));
   }
 
   function handleDuplicate(block: BookBlock): void {
-    enqueue((expectedRevision) => duplicateMutation.mutateAsync({ params: { ...routeParams, blockId: block.id }, body: { expectedRevision } })).catch((error: { message?: string }) =>
-      toast.error(error.message ?? "Failed to duplicate block")
-    );
+    enqueue((expectedRevision) =>
+      duplicateMutation.mutateAsync({ params: { ...routeParams, blockId: block.id }, body: { expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to duplicate block"));
   }
 
   function handleMove(destination: ContainerDescriptor): void {
@@ -102,8 +113,13 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
     enqueue((expectedRevision) =>
       moveMutation.mutateAsync({
         params: { bookId },
-        body: { blockId: movingBlock.id, from: toMoveDescriptor(container), to: toMoveDescriptor(destination), expectedRevision },
-      })
+        body: {
+          blockId: movingBlock.id,
+          from: toMoveDescriptor(container),
+          to: toMoveDescriptor(destination),
+          expectedRevision,
+        },
+      }),
     )
       .then(() => setMovingBlock(null))
       .catch((error: { message?: string }) => toast.error(error.message ?? "Failed to move block"));
@@ -116,7 +132,10 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
     enqueue((expectedRevision) => {
       const formData = new FormData();
       formData.set("payload", JSON.stringify({ type, expectedRevision }));
-      return requester(addEndpoint, { params: routeParams, body: formData as unknown as Record<string, unknown> }) as Promise<Book>;
+      return requester(addEndpoint, {
+        params: routeParams,
+        body: formData as unknown as Record<string, unknown>,
+      }) as Promise<Book>;
     }).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to add block"));
   }
 
@@ -137,17 +156,41 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
                 <span className="text-xs font-medium uppercase text-slate-500">{entry.label}</span>
                 <div className="flex gap-1">
                   {entry.fields({ references: book.references }).length > 0 ? (
-                    <CustomButton type="button" size="icon" variant="ghost" aria-label="Edit" onClick={() => setEditingBlock(block)}>
+                    <CustomButton
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Edit"
+                      onClick={() => setEditingBlock(block)}
+                    >
                       <Pencil className="h-4 w-4" />
                     </CustomButton>
                   ) : null}
-                  <CustomButton type="button" size="icon" variant="ghost" aria-label="Duplicate" onClick={() => handleDuplicate(block)}>
+                  <CustomButton
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Duplicate"
+                    onClick={() => handleDuplicate(block)}
+                  >
                     <Copy className="h-4 w-4" />
                   </CustomButton>
-                  <CustomButton type="button" size="icon" variant="ghost" aria-label="Move to another chapter" onClick={() => setMovingBlock(block)}>
+                  <CustomButton
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Move to another chapter"
+                    onClick={() => setMovingBlock(block)}
+                  >
                     <MoveRight className="h-4 w-4" />
                   </CustomButton>
-                  <CustomButton type="button" size="icon" variant="ghost" aria-label="Remove" onClick={() => handleRemove(block)}>
+                  <CustomButton
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Remove"
+                    onClick={() => handleRemove(block)}
+                  >
                     <Trash2 className="h-4 w-4 text-red-600" />
                   </CustomButton>
                 </div>
@@ -186,11 +229,16 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
           <div className="max-h-[min(70dvh,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto overflow-x-hidden p-1">
             {groups.map(([groupKey, groupLabel]) => (
               <div key={groupKey}>
-                <p className="sticky top-0 z-10 bg-white px-2 pt-2 text-xs font-semibold uppercase text-slate-400">{groupLabel}</p>
+                <p className="sticky top-0 z-10 bg-white px-2 pt-2 text-xs font-semibold uppercase text-slate-400">
+                  {groupLabel}
+                </p>
                 {(Object.entries(bookBlockRegistry) as [BookBlockType, (typeof bookBlockRegistry)[BookBlockType]][])
                   .filter(([, entry]) => entry.group === groupKey)
                   .map(([type, entry]) => (
-                    <DropdownMenuItem key={type} onSelect={() => (entry.immediate ? handleAddImmediate(type) : setAdding(type))}>
+                    <DropdownMenuItem
+                      key={type}
+                      onSelect={() => (entry.immediate ? handleAddImmediate(type) : setAdding(type))}
+                    >
                       {entry.label}
                     </DropdownMenuItem>
                   ))}
@@ -201,7 +249,12 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
       </DropdownMenu>
 
       {adding ? (
-        <Modal open onOpenChange={() => setAdding(null)} title={`Add ${bookBlockRegistry[adding].label} block`} size="lg">
+        <Modal
+          open
+          onOpenChange={() => setAdding(null)}
+          title={`Add ${bookBlockRegistry[adding].label} block`}
+          size="lg"
+        >
           <BookBlockForm
             blockType={adding}
             references={book.references}
@@ -214,7 +267,12 @@ export function BookBlockList({ bookId, book, container, blocks, enqueue }: Book
       ) : null}
 
       {editingBlock ? (
-        <Modal open onOpenChange={() => setEditingBlock(null)} title={`Edit ${bookBlockRegistry[editingBlock.type].label} block`} size="lg">
+        <Modal
+          open
+          onOpenChange={() => setEditingBlock(null)}
+          title={`Edit ${bookBlockRegistry[editingBlock.type].label} block`}
+          size="lg"
+        >
           <BookBlockForm
             blockType={editingBlock.type}
             defaultBlock={editingBlock}
@@ -246,10 +304,26 @@ function MoveBlockDestinationPicker({
   onSelect: (destination: ContainerDescriptor) => void;
 }) {
   const options: { label: string; value: string; descriptor: ContainerDescriptor }[] = [
-    { label: "About the book (front matter)", value: "front:aboutBook", descriptor: { kind: "frontMatter" as const, slot: "aboutBook" } },
-    { label: "Introduction (front matter)", value: "front:introduction", descriptor: { kind: "frontMatter" as const, slot: "introduction" } },
-    ...book.chapters.map((chapter: Chapter) => ({ label: chapter.title, value: `chapter:${chapter.id}`, descriptor: { kind: "chapter" as const, chapterId: chapter.id } })),
-    { label: "Conclusion (back matter)", value: "back:conclusion", descriptor: { kind: "backMatter" as const, slot: "conclusion" } },
+    {
+      label: "About the book (front matter)",
+      value: "front:aboutBook",
+      descriptor: { kind: "frontMatter" as const, slot: "aboutBook" },
+    },
+    {
+      label: "Introduction (front matter)",
+      value: "front:introduction",
+      descriptor: { kind: "frontMatter" as const, slot: "introduction" },
+    },
+    ...book.chapters.map((chapter: Chapter) => ({
+      label: chapter.title,
+      value: `chapter:${chapter.id}`,
+      descriptor: { kind: "chapter" as const, chapterId: chapter.id },
+    })),
+    {
+      label: "Conclusion (back matter)",
+      value: "back:conclusion",
+      descriptor: { kind: "backMatter" as const, slot: "conclusion" },
+    },
   ].filter((option) => JSON.stringify(option.descriptor) !== JSON.stringify(currentContainer));
 
   return (

@@ -18,7 +18,9 @@ export function assertBookStatusTransition(current: BookStatus, next: BookStatus
   if (current === next) return;
 
   if (next === BookStatus.PUBLISHED) {
-    throw new BadRequestError("A book can only be published through the publish action, not by editing its status directly.");
+    throw new BadRequestError(
+      "A book can only be published through the publish action, not by editing its status directly.",
+    );
   }
 
   if (!ALLOWED_TRANSITIONS[current].includes(next)) {

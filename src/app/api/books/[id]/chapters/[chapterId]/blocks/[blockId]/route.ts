@@ -11,7 +11,8 @@ export const dynamic = "force-dynamic";
 export const PUT = createPutRoute({
   params: FindChapterBlockParamsDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
-  handler: async ({ request, params }) => replaceBookBlock(request, params.id, { kind: "chapter", chapterId: params.chapterId }, params.blockId),
+  handler: async ({ request, params }) =>
+    replaceBookBlock(request, params.id, { kind: "chapter", chapterId: params.chapterId }, params.blockId),
 });
 
 export const DELETE = createDeleteRoute({

@@ -25,12 +25,12 @@ importing a Books type, or a nutrition module importing a campaign enum.
 
 ### Decision: evolve in place, four pillars, no new repository
 
-| # | Decision | Rationale |
-|---|---|---|
-| D1 | Evolve `nutrition-staff` in place; create no new repository in this programme | There is no second customer yet. A split now doubles the surface during every feature phase for a benefit that only materialises at the first sale. |
-| D2 | Fence **four** pillars, not the brief's two | The code contains four products: the medical platform, the nutrition specialty, one customer's website CMS, and a bespoke Arabic book publisher. Two of the four are not being sold. |
-| D3 | Enforce the boundary mechanically, not by convention | An unenforced boundary in a repo shared by concurrent sessions decays within weeks. |
-| D4 | Record extraction as a deferred decision with explicit trigger criteria | So the option stays open and cheap without being exercised prematurely. |
+| #   | Decision                                                                      | Rationale                                                                                                                                                                            |
+| --- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | Evolve `nutrition-staff` in place; create no new repository in this programme | There is no second customer yet. A split now doubles the surface during every feature phase for a benefit that only materialises at the first sale.                                  |
+| D2  | Fence **four** pillars, not the brief's two                                   | The code contains four products: the medical platform, the nutrition specialty, one customer's website CMS, and a bespoke Arabic book publisher. Two of the four are not being sold. |
+| D3  | Enforce the boundary mechanically, not by convention                          | An unenforced boundary in a repo shared by concurrent sessions decays within weeks.                                                                                                  |
+| D4  | Record extraction as a deferred decision with explicit trigger criteria       | So the option stays open and cheap without being exercised prematurely.                                                                                                              |
 
 ### The structure
 
@@ -103,7 +103,7 @@ which under the App Router would have changed URLs.
 
 An earlier draft of this document said `src/app/api/**` should "mirror the same
 grouping" while also promising that every API URL stays unchanged. **Those two
-statements are incompatible.** Under the Next App Router the directory path *is*
+statements are incompatible.** Under the Next App Router the directory path _is_
 the URL, so moving
 
 ```
@@ -116,7 +116,7 @@ changes `/api/patients` to `/api/platform/patients` and breaks every caller.
 Not by moving directories, and not by route groups either.
 
 The reason this is clean rather than a compromise is that the route files are
-*already* pure transport. Verified — `src/app/api/clients/route.ts` is 20 lines,
+_already_ pure transport. Verified — `src/app/api/clients/route.ts` is 20 lines,
 `src/app/api/clients/[id]/route.ts` is 33, and every one of the 102 route files
 has the same shape: import DTOs and a use case from `src/server/**`, declare
 `auth` and `revalidateTags`, delegate. There is no domain logic in the route tree
@@ -130,7 +130,7 @@ and nothing else:
 + import { registerPatient } from "src/platform/patients/register-patient";
 ```
 
-A route file's *contents* change; its *path* never does.
+A route file's _contents_ change; its _path_ never does.
 
 **Route groups were considered and rejected.** `src/app/api/(platform)/patients/route.ts`
 is URL-transparent and would work. But it still means physically relocating 102
@@ -141,8 +141,8 @@ are no route groups anywhere in the app today (verified: `find src/app -type d
 benefit. If grouping is ever genuinely wanted, `(pillar)` groups remain available
 and are a safe, separate, purely-cosmetic change.
 
-**The invariant, and how it is proven.** *The pillar refactor must not change a
-single existing route URL.*
+**The invariant, and how it is proven.** _The pillar refactor must not change a
+single existing route URL._
 
 `scripts/qa/check-route-inventory.ts` walks `src/app/api/**`, derives every
 `(urlPath, httpMethod)` pair from the directory structure and the exported route
@@ -174,30 +174,30 @@ So the invariant is proven by three things, not one:
 
 ### Complete module move table
 
-| Current | Target | Pillar |
-|---|---|---|
-| `src/app/api/**` | **unchanged** — transport only | — |
-| `server/core/**` | `core/**` | core |
-| `server/users/**` | `platform/identity/users/**` | platform |
-| `server/staff/**` | `platform/identity/staff/**` | platform |
-| — | `platform/practitioners/**` | platform (NEW) |
-| — | `platform/organization/**`, `platform/branches/**` | platform (NEW) |
-| `server/clients/**` | `platform/patients/**` | platform |
-| `server/measurements/**` | **splits** → `platform/encounters/observations/**` + `verticals/nutrition/anthropometry/**` | both |
-| `server/interactions/**` | `platform/crm/contact-attempts/**` | platform |
-| `server/dashboard/**` | `platform/reporting/**` | platform |
-| — | `platform/appointments/**`, `platform/encounters/**`, `platform/billing/**`, `platform/files/**`, `platform/notifications/**`, `platform/search/**`, `platform/clinical-templates/**` | platform (NEW) |
-| `server/assessments/**` | `verticals/nutrition/assessments/**` | vertical |
-| `server/nutrition-calculations/**` | `verticals/nutrition/calculations/**` (engine byte-identical) | vertical |
-| `server/recipes/**`, `server/recipe-categories/**`, `server/recipe-food-groups/**` | `verticals/nutrition/patient-education/**` | vertical |
-| `server/consultation-requests/**` | `site-cms/leads/**` | site-cms |
-| `server/site-settings/**` | `site-cms/site-settings/**` | site-cms |
-| `server/doctor-profile/**` | `site-cms/doctor-profile/**` | site-cms |
-| `server/packages/**`, `server/packages-page-settings/**` | `site-cms/packages/**` | site-cms |
-| `server/reviews/**`, `server/videos/**` | `site-cms/reviews/**`, `site-cms/videos/**` | site-cms |
-| `server/faq-items/**`, `server/faq-sections/**`, `server/faq/**` | `site-cms/faq/**` | site-cms |
-| `server/campaigns/**` | `site-cms/campaigns/**` | site-cms |
-| `server/books/**`, `server/book-settings/**` | `books/**` (unchanged internally) | books |
+| Current                                                                            | Target                                                                                                                                                                                | Pillar         |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `src/app/api/**`                                                                   | **unchanged** — transport only                                                                                                                                                        | —              |
+| `server/core/**`                                                                   | `core/**`                                                                                                                                                                             | core           |
+| `server/users/**`                                                                  | `platform/identity/users/**`                                                                                                                                                          | platform       |
+| `server/staff/**`                                                                  | `platform/identity/staff/**`                                                                                                                                                          | platform       |
+| —                                                                                  | `platform/practitioners/**`                                                                                                                                                           | platform (NEW) |
+| —                                                                                  | `platform/organization/**`, `platform/branches/**`                                                                                                                                    | platform (NEW) |
+| `server/clients/**`                                                                | `platform/patients/**`                                                                                                                                                                | platform       |
+| `server/measurements/**`                                                           | **splits** → `platform/encounters/observations/**` + `verticals/nutrition/anthropometry/**`                                                                                           | both           |
+| `server/interactions/**`                                                           | `platform/crm/contact-attempts/**`                                                                                                                                                    | platform       |
+| `server/dashboard/**`                                                              | `platform/reporting/**`                                                                                                                                                               | platform       |
+| —                                                                                  | `platform/appointments/**`, `platform/encounters/**`, `platform/billing/**`, `platform/files/**`, `platform/notifications/**`, `platform/search/**`, `platform/clinical-templates/**` | platform (NEW) |
+| `server/assessments/**`                                                            | `verticals/nutrition/assessments/**`                                                                                                                                                  | vertical       |
+| `server/nutrition-calculations/**`                                                 | `verticals/nutrition/calculations/**` (engine byte-identical)                                                                                                                         | vertical       |
+| `server/recipes/**`, `server/recipe-categories/**`, `server/recipe-food-groups/**` | `verticals/nutrition/patient-education/**`                                                                                                                                            | vertical       |
+| `server/consultation-requests/**`                                                  | `site-cms/leads/**`                                                                                                                                                                   | site-cms       |
+| `server/site-settings/**`                                                          | `site-cms/site-settings/**`                                                                                                                                                           | site-cms       |
+| `server/doctor-profile/**`                                                         | `site-cms/doctor-profile/**`                                                                                                                                                          | site-cms       |
+| `server/packages/**`, `server/packages-page-settings/**`                           | `site-cms/packages/**`                                                                                                                                                                | site-cms       |
+| `server/reviews/**`, `server/videos/**`                                            | `site-cms/reviews/**`, `site-cms/videos/**`                                                                                                                                           | site-cms       |
+| `server/faq-items/**`, `server/faq-sections/**`, `server/faq/**`                   | `site-cms/faq/**`                                                                                                                                                                     | site-cms       |
+| `server/campaigns/**`                                                              | `site-cms/campaigns/**`                                                                                                                                                               | site-cms       |
+| `server/books/**`, `server/book-settings/**`                                       | `books/**` (unchanged internally)                                                                                                                                                     | books          |
 
 ### Two placements that needed an argument
 
@@ -214,23 +214,23 @@ endpoints kept exactly where they are, and Books permitted to import from it
 the one exception in the boundary rules below).
 
 **Where `consultation-requests` goes → `site-cms/leads/`.**
-It is public website lead capture. But it *creates a Patient*, so it crosses into
+It is public website lead capture. But it _creates a Patient_, so it crosses into
 the platform pillar. The dependency direction resolves it: `site-cms` may import
 `platform`, never the reverse. Lead capture calls a platform-owned
 `registerPatient` use case; the platform knows nothing about leads. This also
 preserves the deliberate firewall documented on `CreateConsultationRequestDto` —
-the public DTO is *not* the patient DTO, and the public response is always
+the public DTO is _not_ the patient DTO, and the public response is always
 `{success:true}`.
 
 ### Import boundary rules
 
-| From ↓ / May import → | core | platform | verticals | site-cms | books |
-|---|---|---|---|---|---|
-| **core** | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **platform** | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **verticals** | ✅ | ✅ | own vertical only | ❌ | ❌ |
-| **site-cms** | ✅ | ✅ | ❌ | ✅ | ❌ |
-| **books** | ✅ | ❌ | ⚠️ `nutrition/patient-education` only | ✅ | ✅ |
+| From ↓ / May import → | core | platform | verticals                             | site-cms | books |
+| --------------------- | ---- | -------- | ------------------------------------- | -------- | ----- |
+| **core**              | ✅   | ❌       | ❌                                    | ❌       | ❌    |
+| **platform**          | ✅   | ✅       | ❌                                    | ❌       | ❌    |
+| **verticals**         | ✅   | ✅       | own vertical only                     | ❌       | ❌    |
+| **site-cms**          | ✅   | ✅       | ❌                                    | ✅       | ❌    |
+| **books**             | ✅   | ❌       | ⚠️ `nutrition/patient-education` only | ✅       | ✅    |
 
 The one rule that matters: **`platform/` never imports `verticals/`,
 `site-cms/`, or `books/`.** Everything else is a consequence. `core/` importing
@@ -255,7 +255,7 @@ in ascending cost:
 3. **A `dependency-cruiser` config** producing a rendered graph, for review
    rather than for gating. Optional; useful at the extraction decision point.
 
-Deliberately *not* used: TypeScript project references (would require splitting
+Deliberately _not_ used: TypeScript project references (would require splitting
 `tsconfig.json` per pillar inside one Next app, which Next's build does not like),
 and separate npm workspaces (this is not a monorepo, by workspace constitution).
 
@@ -302,12 +302,12 @@ Out: any behaviour change. The move is mechanical and must be provable as such.
 
 ## Edge cases and risks
 
-| Risk | Mitigation |
-|---|---|
-| A move of ~500 files creates a merge nightmare for the three repos with unpushed `staging` commits and for concurrent sessions | Do the move as **one commit, in one sitting**, after pushing outstanding work. Nothing else lands that day. |
+| Risk                                                                                                                                                                                                                | Mitigation                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A move of ~500 files creates a merge nightmare for the three repos with unpushed `staging` commits and for concurrent sessions                                                                                      | Do the move as **one commit, in one sitting**, after pushing outstanding work. Nothing else lands that day.                                                                                           |
 | `src/server/core/authorization/role.model` is a load-bearing **side-effect import** — Next dev-mode compiles `instrumentation.ts` as a separate bundle, so model registration must happen in the route module graph | The comment in `toolkit.config.ts` explains it. Preserve the side-effect import when `core/` moves, and verify `@Relation(() => RoleSchema)` still resolves at request time before closing the phase. |
-| Path aliases: the repo imports as `src/server/...` | Update `tsconfig.json` paths and rely on `tsc --noEmit` to find every stale specifier. A move with zero behaviour change should produce zero type errors. |
-| Books imports from `site-cms` and from nutrition patient-education | Recorded as allowed edges rather than pretended away. |
+| Path aliases: the repo imports as `src/server/...`                                                                                                                                                                  | Update `tsconfig.json` paths and rely on `tsc --noEmit` to find every stale specifier. A move with zero behaviour change should produce zero type errors.                                             |
+| Books imports from `site-cms` and from nutrition patient-education                                                                                                                                                  | Recorded as allowed edges rather than pretended away.                                                                                                                                                 |
 
 ## Testing strategy
 
@@ -360,10 +360,10 @@ agreed the route tree should not move, and confirmed route groups are
 URL-transparent (so the first draft's reason for rejecting them was wrong even
 though the conclusion — unnecessary churn — stands). Two findings accepted:
 
-| # | Finding | Sev | Resolution |
-|---|---|---|---|
-| 1 | A static source manifest cannot prove semantic compatibility — it misses aliased/conditional exports, changed auth/DTOs/status codes/content types, `HEAD`/`OPTIONS`, middleware and rewrites. | MAJOR | **Accepted.** The proof is now three-part: static manifest, Next build manifest, and contract tests. |
-| 2 | "Every route is pure transport" is contradicted by the four hand-rolled handlers; reading exported names sees their existence, not their behaviour. | MAJOR | **Accepted.** All four get explicit contract tests for content type and streaming. |
+| #   | Finding                                                                                                                                                                                        | Sev   | Resolution                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------- |
+| 1   | A static source manifest cannot prove semantic compatibility — it misses aliased/conditional exports, changed auth/DTOs/status codes/content types, `HEAD`/`OPTIONS`, middleware and rewrites. | MAJOR | **Accepted.** The proof is now three-part: static manifest, Next build manifest, and contract tests. |
+| 2   | "Every route is pure transport" is contradicted by the four hand-rolled handlers; reading exported names sees their existence, not their behaviour.                                            | MAJOR | **Accepted.** All four get explicit contract tests for content type and streaming.                   |
 
 Also accepted: the URL-derivation script must normalize dynamic/catch-all/group
 syntax and explicitly reject parallel and intercepting segments rather than

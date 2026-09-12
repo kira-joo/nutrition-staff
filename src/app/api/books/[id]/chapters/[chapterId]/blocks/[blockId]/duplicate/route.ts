@@ -11,5 +11,10 @@ export const POST = createPostRoute({
   body: ExpectedRevisionDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
   handler: async ({ params, body }) =>
-    duplicateBookBlock(params.id, { kind: "chapter", chapterId: params.chapterId }, params.blockId, body.expectedRevision),
+    duplicateBookBlock(
+      params.id,
+      { kind: "chapter", chapterId: params.chapterId },
+      params.blockId,
+      body.expectedRevision,
+    ),
 });

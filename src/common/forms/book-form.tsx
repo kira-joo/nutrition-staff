@@ -53,7 +53,15 @@ export function BookForm({ book, endpoint, onSaved }: BookFormProps) {
   const contentFields: FormFieldConfig<BookFormValues>[] = [
     { type: FieldType.INPUT, name: "title", label: "Title", rules: { required: true } },
     { type: FieldType.INPUT, name: "subtitle", label: "Subtitle" },
-    { type: FieldType.INPUT, name: "slug", label: "Slug", rules: { required: true, pattern: { value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, message: "lowercase letters, numbers, and hyphens only" } } },
+    {
+      type: FieldType.INPUT,
+      name: "slug",
+      label: "Slug",
+      rules: {
+        required: true,
+        pattern: { value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, message: "lowercase letters, numbers, and hyphens only" },
+      },
+    },
     { type: FieldType.TEXTAREA, name: "shortDescription", label: "Short description", rows: 3 },
     { type: FieldType.INPUT, name: "category", label: "Category" },
     { type: FieldType.INPUT, name: "editionLabelTemplate", label: "Edition label template", placeholder: "الطبعة {n}" },
@@ -93,7 +101,14 @@ export function BookForm({ book, endpoint, onSaved }: BookFormProps) {
         />
       ),
     },
-    { type: FieldType.IMAGE_ASSET, name: "coverImage", label: "Cover image", policy: bookPortraitPolicy, hidden: coverMode !== "uploaded", colSpan: "full" },
+    {
+      type: FieldType.IMAGE_ASSET,
+      name: "coverImage",
+      label: "Cover image",
+      policy: bookPortraitPolicy,
+      hidden: coverMode !== "uploaded",
+      colSpan: "full",
+    },
     {
       type: FieldType.CUSTOM,
       name: "backCoverMode",

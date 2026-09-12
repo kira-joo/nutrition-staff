@@ -15,7 +15,8 @@ export const dynamic = "force-dynamic";
 export const GET = createGetRoute({
   query: ListRecipesQueryDto,
   auth: { permissions: [AppPermission.RECIPE.READ] },
-  handler: async ({ query }) => recipeRepository.findAllAndCountPublic({ query, relations: ["category", "foodGroups"] }),
+  handler: async ({ query }) =>
+    recipeRepository.findAllAndCountPublic({ query, relations: ["category", "foodGroups"] }),
 });
 
 // No `body` here on purpose — always multipart/form-data (upload-on-submit).

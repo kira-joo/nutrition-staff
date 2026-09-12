@@ -12,16 +12,16 @@ product, without breaking the customer who depends on them.
 
 More than half of this repository is not the product being planned.
 
-| Subsystem | Size | What it is |
-|---|---|---|
-| **Books** | ~90 backend files + ~4.2k frontend LOC (≈ a quarter of the entire frontend) | A bespoke Arabic digital publishing system: chapters, 12 block types, TipTap rich text, references and citations, immutable editions with frozen content and recipe snapshots, Puppeteer PDF rendering against a `dr-omnia-book-v1` template, artifact generation, a public flipbook reader |
-| **Campaigns** | ~30 files | A marketing landing-page builder: 7 block types, slug-routed, date-windowed |
-| **Packages + PackagesPageSettings** | — | Public pricing-page content |
-| **Reviews** | — | Marketing testimonials with before/after weight-loss images |
-| **Videos** | — | A public content library |
-| **FAQ (sections + items + composed endpoint)** | — | Public website FAQ |
-| **SiteSettings** | — | Website config: SEO, ogImage, social links, active campaign |
-| **DoctorProfile** | — | The public "about the doctor" page |
+| Subsystem                                      | Size                                                                        | What it is                                                                                                                                                                                                                                                                                  |
+| ---------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Books**                                      | ~90 backend files + ~4.2k frontend LOC (≈ a quarter of the entire frontend) | A bespoke Arabic digital publishing system: chapters, 12 block types, TipTap rich text, references and citations, immutable editions with frozen content and recipe snapshots, Puppeteer PDF rendering against a `dr-omnia-book-v1` template, artifact generation, a public flipbook reader |
+| **Campaigns**                                  | ~30 files                                                                   | A marketing landing-page builder: 7 block types, slug-routed, date-windowed                                                                                                                                                                                                                 |
+| **Packages + PackagesPageSettings**            | —                                                                           | Public pricing-page content                                                                                                                                                                                                                                                                 |
+| **Reviews**                                    | —                                                                           | Marketing testimonials with before/after weight-loss images                                                                                                                                                                                                                                 |
+| **Videos**                                     | —                                                                           | A public content library                                                                                                                                                                                                                                                                    |
+| **FAQ (sections + items + composed endpoint)** | —                                                                           | Public website FAQ                                                                                                                                                                                                                                                                          |
+| **SiteSettings**                               | —                                                                           | Website config: SEO, ogImage, social links, active campaign                                                                                                                                                                                                                                 |
+| **DoctorProfile**                              | —                                                                           | The public "about the doctor" page                                                                                                                                                                                                                                                          |
 
 A clinic in Alexandria buying a medical platform does not want an Arabic book
 publisher, a landing-page builder, or Dr. Omnia's testimonials.
@@ -31,13 +31,13 @@ publisher, a landing-page builder, or Dr. Omnia's testimonials.
 **Keep everything in the repository, fenced as deployment-specific. Delete
 nothing. Extract nothing now.**
 
-| # | Decision | Rationale |
-|---|---|---|
-| D1 | `site-cms/` and `books/` become explicit pillars with an enforced import boundary | Makes them visibly not-the-product, and makes a later extraction a move rather than a rewrite |
-| D2 | Nothing is deleted or rewritten | It all works, `nutrition-client` depends on it, and Books is a genuinely successful product |
-| D3 | Books is **not** redesigned | Preserved successful experience. Explicit in the workspace constitution |
-| D4 | Both are org-scoped like everything else | So the tenancy model has no holes |
-| D5 | Extraction is a deferred decision with published trigger criteria | Keeps the option open and cheap without exercising it |
+| #   | Decision                                                                          | Rationale                                                                                     |
+| --- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| D1  | `site-cms/` and `books/` become explicit pillars with an enforced import boundary | Makes them visibly not-the-product, and makes a later extraction a move rather than a rewrite |
+| D2  | Nothing is deleted or rewritten                                                   | It all works, `nutrition-client` depends on it, and Books is a genuinely successful product   |
+| D3  | Books is **not** redesigned                                                       | Preserved successful experience. Explicit in the workspace constitution                       |
+| D4  | Both are org-scoped like everything else                                          | So the tenancy model has no holes                                                             |
+| D5  | Extraction is a deferred decision with published trigger criteria                 | Keeps the option open and cheap without exercising it                                         |
 
 ## Books, specifically
 
@@ -46,7 +46,7 @@ vertical model (§5) never mentions it, and it does not fit either category:
 
 - It is not clinic management, so it is not `platform/`.
 - It is not nutrition clinical work, so it is not a vertical.
-- It is not website *content management* either — it is a publishing product with
+- It is not website _content management_ either — it is a publishing product with
   its own draft/edition lifecycle, its own renderer, and its own public reader.
 
 It also has invariants that must not be disturbed by any restructuring, each of

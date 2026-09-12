@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -8,7 +9,8 @@ import { ChapterList } from "src/common/book-blocks/chapter-list";
 import { useBookContentQueue } from "src/common/books/use-book-content-queue";
 import { useUnsavedChangesGuard } from "src/common/books/use-unsaved-changes-guard";
 
-export default function BookContentPage({ params }: { params: { id: string } }) {
+export default function BookContentPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const bookQuery = useRequesterQuery({ endpoint: getBookByIdEndpoint, options: { params: { id: params.id } } });
 
   return <QueryState query={bookQuery}>{(book) => <ContentEditor key={book._id} initialBook={book} />}</QueryState>;

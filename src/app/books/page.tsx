@@ -82,8 +82,16 @@ export default function BooksPage() {
         endpoint={getBooksEndpoint}
         entityName={ENTITY_PLURAL_LABELS[EntityName.BOOK]}
         filters={[
-          { key: "status", header: "Status", options: Object.values(BookStatus).map((value) => ({ label: value, value })) },
-          { key: "visibility", header: "Visibility", options: Object.values(BookVisibility).map((value) => ({ label: value, value })) },
+          {
+            key: "status",
+            header: "Status",
+            options: Object.values(BookStatus).map((value) => ({ label: value, value })),
+          },
+          {
+            key: "visibility",
+            header: "Visibility",
+            options: Object.values(BookVisibility).map((value) => ({ label: value, value })),
+          },
         ]}
         columns={columns}
         rowActions={[

@@ -27,7 +27,10 @@ export function tableGridField<T extends FieldValues>(name: Path<T>, label: stri
         field.onChange({ headers: [...value.headers, ""], rows: value.rows.map((row) => [...row, ""]) });
       }
       function removeColumn(index: number): void {
-        field.onChange({ headers: value.headers.filter((_, i) => i !== index), rows: value.rows.map((row) => row.filter((_, i) => i !== index)) });
+        field.onChange({
+          headers: value.headers.filter((_, i) => i !== index),
+          rows: value.rows.map((row) => row.filter((_, i) => i !== index)),
+        });
       }
       function setHeader(index: number, text: string): void {
         field.onChange({ ...value, headers: value.headers.map((header, i) => (i === index ? text : header)) });
@@ -41,7 +44,9 @@ export function tableGridField<T extends FieldValues>(name: Path<T>, label: stri
       function setCell(rowIndex: number, cellIndex: number, text: string): void {
         field.onChange({
           ...value,
-          rows: value.rows.map((row, r) => (r === rowIndex ? row.map((cell, c) => (c === cellIndex ? text : cell)) : row)),
+          rows: value.rows.map((row, r) =>
+            r === rowIndex ? row.map((cell, c) => (c === cellIndex ? text : cell)) : row,
+          ),
         });
       }
 
@@ -53,7 +58,12 @@ export function tableGridField<T extends FieldValues>(name: Path<T>, label: stri
                 {value.headers.map((header, index) => (
                   <th key={index} className="border border-slate-200 p-1">
                     <div className="flex items-center gap-1">
-                      <CustomInput name={`${name}-header-${index}`} value={header} onChange={(event) => setHeader(index, event.target.value)} dir="rtl" />
+                      <CustomInput
+                        name={`${name}-header-${index}`}
+                        value={header}
+                        onChange={(event) => setHeader(index, event.target.value)}
+                        dir="rtl"
+                      />
                       <button type="button" aria-label="Remove column" onClick={() => removeColumn(index)}>
                         <Trash2 className="h-3 w-3 text-red-600" />
                       </button>

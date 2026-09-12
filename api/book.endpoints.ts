@@ -1,4 +1,9 @@
-import { MethodType, type Endpoint, type PaginatedResponse, type PaginationQuery } from "@kira-joo/frontend-toolkit-core";
+import {
+  MethodType,
+  type Endpoint,
+  type PaginatedResponse,
+  type PaginationQuery,
+} from "@kira-joo/frontend-toolkit-core";
 import type { Book, CreateBookFormValues } from "../src/common/interfaces/book.interface";
 
 // GET/DELETE are plain JSON; POST (create) is plain JSON too (a Book is

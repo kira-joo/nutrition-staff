@@ -1,7 +1,14 @@
 "use client";
 
 import { useRequesterMutation, type ImageAsset, type UploadPolicy } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, CustomImageAssetUpload, CustomInput, CustomSwitch, CustomTextarea, toast } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  CustomButton,
+  CustomImageAssetUpload,
+  CustomInput,
+  CustomSwitch,
+  CustomTextarea,
+  toast,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { useState } from "react";
 import { updateChapterEndpoint } from "../../../api/book-content.endpoints";
 import type { Chapter } from "src/common/interfaces/book-chapter.interface";
@@ -55,7 +62,10 @@ export function ChapterSettingsForm({ bookId, chapter, enqueue }: ChapterSetting
       const formData = new FormData();
       formData.set("payload", JSON.stringify({ ...jsonPayload, expectedRevision }));
       if (coverImage instanceof File) formData.set("coverImage", coverImage);
-      return updateMutation.mutateAsync({ params: { bookId, chapterId: chapter.id }, body: formData as unknown as Record<string, unknown> });
+      return updateMutation.mutateAsync({
+        params: { bookId, chapterId: chapter.id },
+        body: formData as unknown as Record<string, unknown>,
+      });
     })
       .then(() => toast.success("Chapter settings saved"))
       .catch((error: { message?: string }) => toast.error(error.message ?? "Failed to save chapter settings"));
@@ -63,7 +73,13 @@ export function ChapterSettingsForm({ bookId, chapter, enqueue }: ChapterSetting
 
   return (
     <div className="flex flex-col gap-3 rounded-md border border-slate-200 bg-white p-3">
-      <CustomInput name={`chapter-subtitle-${chapter.id}`} label="Subtitle (optional)" value={subtitle} onChange={(event) => setSubtitle(event.target.value)} dir="rtl" />
+      <CustomInput
+        name={`chapter-subtitle-${chapter.id}`}
+        label="Subtitle (optional)"
+        value={subtitle}
+        onChange={(event) => setSubtitle(event.target.value)}
+        dir="rtl"
+      />
       <CustomTextarea
         name={`chapter-intro-${chapter.id}`}
         label="Intro (optional)"
@@ -74,10 +90,22 @@ export function ChapterSettingsForm({ bookId, chapter, enqueue }: ChapterSetting
       />
       <div>
         <label className="mb-1 block text-sm font-medium text-slate-700">Cover image (optional)</label>
-        <CustomImageAssetUpload value={coverImage} policy={bookContentImagePolicy as UploadPolicy} onChange={setCoverImage} />
+        <CustomImageAssetUpload
+          value={coverImage}
+          policy={bookContentImagePolicy as UploadPolicy}
+          onChange={setCoverImage}
+        />
       </div>
-      <CustomSwitch checked={startOnNewPage} onChange={setStartOnNewPage} label="Always start this chapter on a fresh page" />
-      <CustomSwitch checked={includeInToc} onChange={setIncludeInToc} label="Show this chapter in the table of contents" />
+      <CustomSwitch
+        checked={startOnNewPage}
+        onChange={setStartOnNewPage}
+        label="Always start this chapter on a fresh page"
+      />
+      <CustomSwitch
+        checked={includeInToc}
+        onChange={setIncludeInToc}
+        label="Show this chapter in the table of contents"
+      />
       {includeInToc ? (
         <CustomInput
           name={`chapter-toc-title-${chapter.id}`}

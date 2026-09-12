@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
@@ -18,7 +19,8 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function RecipeDetailsPage({ params }: { params: { id: string } }) {
+export default function RecipeDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const recipeQuery = useRequesterQuery({
     endpoint: getRecipeByIdEndpoint,
     options: { params: { id: params.id } },
@@ -35,9 +37,7 @@ export default function RecipeDetailsPage({ params }: { params: { id: string } }
           icon={ChefHat}
           title={recipe.title?.en || recipe.title?.ar || "Recipe"}
           badge={
-            <Badge variant={recipe.status === ContentStatus.PUBLISHED ? "success" : "secondary"}>
-              {recipe.status}
-            </Badge>
+            <Badge variant={recipe.status === ContentStatus.PUBLISHED ? "success" : "secondary"}>{recipe.status}</Badge>
           }
           actions={
             <RouteButton
@@ -70,7 +70,9 @@ export default function RecipeDetailsPage({ params }: { params: { id: string } }
                       .join(", ") || "—"
                   }
                 />
-                <AssetViewer image={{ asset: recipe.image, label: recipe.title?.en || recipe.title?.ar || "Recipe photo" }} />
+                <AssetViewer
+                  image={{ asset: recipe.image, label: recipe.title?.en || recipe.title?.ar || "Recipe photo" }}
+                />
               </div>
             </PageSection>
             <PageSection icon={Activity} title="Status & activity">

@@ -28,13 +28,16 @@ export interface UploadedPdfArtifact {
  */
 export async function uploadPdfArtifact(pdf: Buffer, publicId: string): Promise<UploadedPdfArtifact> {
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream({ resource_type: "raw", folder: BOOK_ARTIFACT_FOLDER, public_id: publicId, overwrite: true }, (error, result) => {
-      if (error || !result) {
-        reject(error ?? new Error("Cloudinary raw upload returned no result."));
-        return;
-      }
-      resolve({ publicId: result.public_id, url: result.secure_url, bytes: result.bytes });
-    });
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: "raw", folder: BOOK_ARTIFACT_FOLDER, public_id: publicId, overwrite: true },
+      (error, result) => {
+        if (error || !result) {
+          reject(error ?? new Error("Cloudinary raw upload returned no result."));
+          return;
+        }
+        resolve({ publicId: result.public_id, url: result.secure_url, bytes: result.bytes });
+      },
+    );
     uploadStream.end(pdf);
   });
 }

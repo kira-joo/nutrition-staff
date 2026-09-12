@@ -1,7 +1,12 @@
 import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 import { resolveArtifactState } from "src/common/books/artifacts/resolve-artifact-state";
 import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identity";
-import type { BookBackMatter, BookFrontMatter, BookReference, Chapter } from "src/common/interfaces/book-chapter.interface";
+import type {
+  BookBackMatter,
+  BookFrontMatter,
+  BookReference,
+  Chapter,
+} from "src/common/interfaces/book-chapter.interface";
 import type { BookCoverMode } from "src/common/interfaces/book.interface";
 import type { BookArtifactSchema } from "src/server/books/artifacts/book-artifact.schema";
 import type { BookSchema } from "src/server/books/book.schema";
@@ -57,7 +62,11 @@ export interface PublicBookReaderPayload {
  * ready" (`errorMessage`, `storageUrl`, `storagePublicId`, `startedAt`/
  * `finishedAt`, `generatedByUserId`).
  */
-export function buildPublicBookReaderPayload(book: BookSchema, edition: BookEditionSchema, artifact: BookArtifactSchema | null): PublicBookReaderPayload {
+export function buildPublicBookReaderPayload(
+  book: BookSchema,
+  edition: BookEditionSchema,
+  artifact: BookArtifactSchema | null,
+): PublicBookReaderPayload {
   const { sources: _sources, ...publicResolvedSettings } = edition.resolvedSettings;
 
   const artifactState = resolveArtifactState(artifact, edition.templateVersion);

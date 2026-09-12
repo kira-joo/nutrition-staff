@@ -35,15 +35,12 @@ import { ContentStatus } from "src/common/enums";
 export function assertPublishReady(
   entity: unknown,
   status: ContentStatus,
-  isRequired: (path: string) => boolean
+  isRequired: (path: string) => boolean,
 ): void {
   if (status !== ContentStatus.PUBLISHED) return;
 
   const incompletePaths = findIncompleteLocalizedPaths(entity, { isRequired });
   if (incompletePaths.length > 0) {
-    throw new BadRequestError(
-      "Cannot publish: the following fields are missing a translation.",
-      { incompletePaths }
-    );
+    throw new BadRequestError("Cannot publish: the following fields are missing a translation.", { incompletePaths });
   }
 }

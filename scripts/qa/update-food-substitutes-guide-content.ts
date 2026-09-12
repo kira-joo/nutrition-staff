@@ -77,10 +77,10 @@ const OPENING_QUOTE =
 const ABOUT_BOOK_PAYLOADS = [
   heading("نبذة عن الكتاب"),
   paragraph(
-    "دليل البدائل الغذائية هو مرجعك اليومي لتبسيط قرارات الطعام دون تعقيد أو حرمان. صُمم هذا الدليل ليمنحك حرية استبدال الأصناف الغذائية بما يناسب ذوقك وظروف يومك، مع الحفاظ الكامل على توازن خطتك الغذائية وأهدافك الصحية."
+    "دليل البدائل الغذائية هو مرجعك اليومي لتبسيط قرارات الطعام دون تعقيد أو حرمان. صُمم هذا الدليل ليمنحك حرية استبدال الأصناف الغذائية بما يناسب ذوقك وظروف يومك، مع الحفاظ الكامل على توازن خطتك الغذائية وأهدافك الصحية.",
   ),
   paragraph(
-    "من النشويات والبروتينات إلى الدهون والفواكه والحلويات ووجبات الطعام خارج المنزل، ستجد في هذه الصفحات بدائل عملية ومدروسة تدعمك في رحلتك نحو نمط حياة صحي ومستدام."
+    "من النشويات والبروتينات إلى الدهون والفواكه والحلويات ووجبات الطعام خارج المنزل، ستجد في هذه الصفحات بدائل عملية ومدروسة تدعمك في رحلتك نحو نمط حياة صحي ومستدام.",
   ),
   paragraph("إعداد: د. أمنية أحمد — أخصائية التغذية العلاجية والسمنة والنحافة."),
 ];
@@ -89,7 +89,7 @@ const INTRODUCTION_PAYLOADS = [
   heading("المقدمة"),
   quote(OPENING_QUOTE, "د. أمنية أحمد"),
   paragraph(
-    "في الصفحات القادمة، ستجد دليلاً عملياً منظّماً على هيئة مجموعات غذائية وموضوعات يومية، بدءاً من القواعد الذهبية للاستبدال، ومروراً بجميع المجموعات الغذائية الأساسية، وصولاً إلى نصائح التعامل مع الرغبة الشديدة في الطعام والتسوق الذكي. استخدم هذا الدليل كمرجع مرن يواكب حياتك اليومية، لا كقائمة ممنوعات."
+    "في الصفحات القادمة، ستجد دليلاً عملياً منظّماً على هيئة مجموعات غذائية وموضوعات يومية، بدءاً من القواعد الذهبية للاستبدال، ومروراً بجميع المجموعات الغذائية الأساسية، وصولاً إلى نصائح التعامل مع الرغبة الشديدة في الطعام والتسوق الذكي. استخدم هذا الدليل كمرجع مرن يواكب حياتك اليومية، لا كقائمة ممنوعات.",
   ),
 ];
 
@@ -112,7 +112,7 @@ const CHAPTERS: ChapterSpec[] = [
     subtitle: "القواعد الذهبية",
     payloads: [
       paragraph(
-        "قد لا تتوافر لديك دائماً عناصر وجبتك المحددة، أو قد تشعر بالرغبة في كسر الروتين والتنويع. يُعد هذا الدليل أداة مرنة تُتيح لك تبديل الأطعمة بحرية وأمان كاملين، مع الحفاظ على التوازن السعري والماكروز."
+        "قد لا تتوافر لديك دائماً عناصر وجبتك المحددة، أو قد تشعر بالرغبة في كسر الروتين والتنويع. يُعد هذا الدليل أداة مرنة تُتيح لك تبديل الأطعمة بحرية وأمان كاملين، مع الحفاظ على التوازن السعري والماكروز.",
       ),
       subheading("📌 القواعد الذهبية للاستبدال"),
       bulletList([
@@ -159,7 +159,9 @@ const CHAPTERS: ChapterSpec[] = [
         "1 علبة تونة مصفاة تماماً من الزيت أو محفوظة في الماء.",
         "½ كوب بقوليات مطبوخة (عدس، حمص، فاصوليا بيضاء) — ملاحظة: تُحسب كبروتين ونشويات معاً.",
       ]),
-      tip("حاول إدخال الأسماك الزيتية (كالسلمون والسردين) مرتين أسبوعياً للحصول على أحماض أوميجا-3 المضادة للالتهابات."),
+      tip(
+        "حاول إدخال الأسماك الزيتية (كالسلمون والسردين) مرتين أسبوعياً للحصول على أحماض أوميجا-3 المضادة للالتهابات.",
+      ),
     ],
   },
   {
@@ -290,12 +292,16 @@ const CHAPTERS: ChapterSpec[] = [
     payloads: [
       note("لا داعي للحرمان من أكلاتنا الذائعة؛ السر يكمن في طريقة الطهي ونسب المكونات."),
       subheading("المحشي الصحي"),
-      paragraph("البديل: استبدل نصف كمية الأرز بالفريك أو الكينوا أو لحم مفروم بدون دهن، وزد من كمية الخضرة (بقدونس، كزبرة، شبت)."),
+      paragraph(
+        "البديل: استبدل نصف كمية الأرز بالفريك أو الكينوا أو لحم مفروم بدون دهن، وزد من كمية الخضرة (بقدونس، كزبرة، شبت).",
+      ),
       subheading("المسقعة الصحية"),
-      paragraph("البديل: شوي الباذنجان والفلفل في الفرن أو القلاية الهوائية (Air Fryer) مع رشة زيت زيتون بدلاً من القلي الأعمق."),
+      paragraph(
+        "البديل: شوي الباذنجان والفلفل في الفرن أو القلاية الهوائية (Air Fryer) مع رشة زيت زيتون بدلاً من القلي الأعمق.",
+      ),
       subheading("صينية البشاميل"),
       paragraph(
-        "البديل: استخدام معكرونة القمح الكامل، وحليب خالي الدسم، وتكثيف الصوص بالشوفان المطحون بدلاً من الدقيق الأبيض والزبدة الكثيفة."
+        "البديل: استخدام معكرونة القمح الكامل، وحليب خالي الدسم، وتكثيف الصوص بالشوفان المطحون بدلاً من الدقيق الأبيض والزبدة الكثيفة.",
       ),
       subheading("الكفتة"),
       paragraph("البديل: إضافة البرغل أو الشوفان المطحون للكفتة بدلاً من الخبز والدهون العالية، مع طهيها بالفرن."),
@@ -347,7 +353,7 @@ const CHAPTERS: ChapterSpec[] = [
     payloads: [
       quote(
         "لا يوجد طعام سيئ وطعام جيد بشكل مطلق.. العلاقة مع الطعام هي علاقة توازن ووعي، وليست قائمة من الممنوعات. الهدف هو تحويل التغذية إلى نمط حياة مستدام تحبه وتستمتع به.",
-        "د. أمنية أحمد"
+        "د. أمنية أحمد",
       ),
       subheading("📋 خلاصة الدليل السريعة"),
       bulletList([
@@ -367,7 +373,9 @@ async function main() {
   await connectToDatabase();
 
   const book = await bookRepository.findOne({ where: { _id: BOOK_ID } });
-  console.log(`Loaded book "${book.title}" (contentRevision ${book.contentRevision}, ${book.chapters.length} existing chapters)`);
+  console.log(
+    `Loaded book "${book.title}" (contentRevision ${book.contentRevision}, ${book.chapters.length} existing chapters)`,
+  );
 
   const nextAboutBookBlocks = await buildBlocks(ABOUT_BOOK_PAYLOADS);
   const nextIntroductionBlocks = await buildBlocks(INTRODUCTION_PAYLOADS);
@@ -392,15 +400,20 @@ async function main() {
     introduction: { blocks: nextIntroductionBlocks },
   };
 
-  assertBookSizeBudget({ ...book, chapters: nextChapters, frontMatter: nextFrontMatter } as unknown as Record<string, unknown>);
+  assertBookSizeBudget({ ...book, chapters: nextChapters, frontMatter: nextFrontMatter } as unknown as Record<
+    string,
+    unknown
+  >);
 
   const saved = await bookRepository.update(
     { where: { _id: BOOK_ID, contentRevision: book.contentRevision } },
-    { chapters: nextChapters, frontMatter: nextFrontMatter, contentRevision: book.contentRevision + 1 }
+    { chapters: nextChapters, frontMatter: nextFrontMatter, contentRevision: book.contentRevision + 1 },
   );
 
   console.log(`Saved. New contentRevision: ${saved.contentRevision}, chapters: ${saved.chapters.length}`);
-  console.log("NOTE: this only updates the DRAFT. Publish a new Edition (and regenerate the PDF) to reflect this in the public reader / PDF.");
+  console.log(
+    "NOTE: this only updates the DRAFT. Publish a new Edition (and regenerate the PDF) to reflect this in the public reader / PDF.",
+  );
 
   await mongoose.disconnect();
 }

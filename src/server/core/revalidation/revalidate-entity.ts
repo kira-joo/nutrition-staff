@@ -43,7 +43,9 @@ export const campaignSlugChangeTags = (previousSlug: string, newSlug: string): s
 
 /** A book header update (`PUT /api/books/:id`) can change slug, visibility, showOnWebsite, allowFlipbook, allowPdfDownload, or status in one request — rather than special-casing which field actually flipped, this always busts the list plus both the old and new slug's detail cache, exactly like `campaignSlugChangeTags`. Over-invalidating a low-frequency staff action is cheap; under-invalidating is a real bug (a book that just went private/unlisted staying visible). */
 export const bookSlugChangeTags = (previousSlug: string, newSlug: string): string[] =>
-  previousSlug === newSlug ? [CacheTag.BOOKS, CacheTag.book(newSlug)] : [CacheTag.BOOKS, CacheTag.book(previousSlug), CacheTag.book(newSlug)];
+  previousSlug === newSlug
+    ? [CacheTag.BOOKS, CacheTag.book(newSlug)]
+    : [CacheTag.BOOKS, CacheTag.book(previousSlug), CacheTag.book(newSlug)];
 
 /** Publishing a new Edition changes `currentEditionId`/`status`/`editionCount` — always busts the list and this book's detail page. */
 export const bookDetailTags = (slug: string): string[] => [CacheTag.BOOKS, CacheTag.book(slug)];

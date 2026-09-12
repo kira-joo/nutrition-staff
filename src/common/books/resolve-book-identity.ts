@@ -1,6 +1,12 @@
 import { BookOverrideKey } from "../enums";
 import type { BookOverrides } from "../interfaces/book.interface";
-import type { BookContactBlock, BookPageWatermark, BookPrintSettings, BookSettings, BookSocialLink } from "../interfaces/book-settings.interface";
+import type {
+  BookContactBlock,
+  BookPageWatermark,
+  BookPrintSettings,
+  BookSettings,
+  BookSocialLink,
+} from "../interfaces/book-settings.interface";
 import { DEFAULT_PAGE_WATERMARK } from "../interfaces/book-settings.interface";
 import type { ImageAsset } from "@kira-joo/frontend-toolkit-core";
 
@@ -31,7 +37,11 @@ function isOverridden(book: BookForResolution, key: BookOverrideKey): boolean {
   return book.overriddenFields.includes(key);
 }
 
-function sourceFor(book: BookForResolution, key: BookOverrideKey, defaultValue: unknown): "override" | "default" | "unset" {
+function sourceFor(
+  book: BookForResolution,
+  key: BookOverrideKey,
+  defaultValue: unknown,
+): "override" | "default" | "unset" {
   if (isOverridden(book, key)) return "override";
   return defaultValue === undefined || defaultValue === null || defaultValue === "" ? "unset" : "default";
 }
@@ -50,15 +60,27 @@ export function resolveBookIdentity(settings: BookSettings, book: BookForResolut
 
   return {
     doctorName: isOverridden(book, BookOverrideKey.DOCTOR_NAME) ? (overrides.doctorName ?? "") : settings.doctorName,
-    doctorTitle: isOverridden(book, BookOverrideKey.DOCTOR_TITLE) ? (overrides.doctorTitle ?? "") : settings.doctorTitle,
+    doctorTitle: isOverridden(book, BookOverrideKey.DOCTOR_TITLE)
+      ? (overrides.doctorTitle ?? "")
+      : settings.doctorTitle,
     doctorBio: isOverridden(book, BookOverrideKey.DOCTOR_BIO) ? (overrides.doctorBio ?? "") : settings.doctorBio,
-    doctorImage: isOverridden(book, BookOverrideKey.DOCTOR_IMAGE) ? (overrides.doctorImage ?? null) : (settings.doctorImage ?? null),
-    bookLogo: isOverridden(book, BookOverrideKey.BOOK_LOGO) ? (overrides.bookLogo ?? null) : (settings.bookLogo ?? null),
-    websiteUrl: isOverridden(book, BookOverrideKey.WEBSITE_URL) ? (overrides.websiteUrl ?? null) : (settings.websiteUrl ?? null),
-    socialLinks: isOverridden(book, BookOverrideKey.SOCIAL_LINKS) ? (overrides.socialLinks ?? []) : settings.socialLinks,
+    doctorImage: isOverridden(book, BookOverrideKey.DOCTOR_IMAGE)
+      ? (overrides.doctorImage ?? null)
+      : (settings.doctorImage ?? null),
+    bookLogo: isOverridden(book, BookOverrideKey.BOOK_LOGO)
+      ? (overrides.bookLogo ?? null)
+      : (settings.bookLogo ?? null),
+    websiteUrl: isOverridden(book, BookOverrideKey.WEBSITE_URL)
+      ? (overrides.websiteUrl ?? null)
+      : (settings.websiteUrl ?? null),
+    socialLinks: isOverridden(book, BookOverrideKey.SOCIAL_LINKS)
+      ? (overrides.socialLinks ?? [])
+      : settings.socialLinks,
     contact: isOverridden(book, BookOverrideKey.CONTACT) ? (overrides.contact ?? {}) : settings.contact,
     disclaimer: isOverridden(book, BookOverrideKey.DISCLAIMER) ? (overrides.disclaimer ?? "") : settings.disclaimer,
-    copyrightText: isOverridden(book, BookOverrideKey.COPYRIGHT_TEXT) ? (overrides.copyrightText ?? "") : settings.copyrightText,
+    copyrightText: isOverridden(book, BookOverrideKey.COPYRIGHT_TEXT)
+      ? (overrides.copyrightText ?? "")
+      : settings.copyrightText,
     backCoverClosingText: isOverridden(book, BookOverrideKey.BACK_COVER_CLOSING_TEXT)
       ? (overrides.backCoverClosingText ?? "")
       : settings.backCoverClosingText,
@@ -87,12 +109,24 @@ export function resolveBookIdentity(settings: BookSettings, book: BookForResolut
       [BookOverrideKey.DOCTOR_IMAGE]: sourceFor(book, BookOverrideKey.DOCTOR_IMAGE, settings.doctorImage),
       [BookOverrideKey.BOOK_LOGO]: sourceFor(book, BookOverrideKey.BOOK_LOGO, settings.bookLogo),
       [BookOverrideKey.WEBSITE_URL]: sourceFor(book, BookOverrideKey.WEBSITE_URL, settings.websiteUrl),
-      [BookOverrideKey.SOCIAL_LINKS]: sourceFor(book, BookOverrideKey.SOCIAL_LINKS, settings.socialLinks?.length ? settings.socialLinks : undefined),
+      [BookOverrideKey.SOCIAL_LINKS]: sourceFor(
+        book,
+        BookOverrideKey.SOCIAL_LINKS,
+        settings.socialLinks?.length ? settings.socialLinks : undefined,
+      ),
       [BookOverrideKey.CONTACT]: sourceFor(book, BookOverrideKey.CONTACT, settings.contact),
       [BookOverrideKey.DISCLAIMER]: sourceFor(book, BookOverrideKey.DISCLAIMER, settings.disclaimer),
       [BookOverrideKey.COPYRIGHT_TEXT]: sourceFor(book, BookOverrideKey.COPYRIGHT_TEXT, settings.copyrightText),
-      [BookOverrideKey.BACK_COVER_CLOSING_TEXT]: sourceFor(book, BookOverrideKey.BACK_COVER_CLOSING_TEXT, settings.backCoverClosingText),
-      [BookOverrideKey.BACK_COVER_AUDIENCE_TEXT]: sourceFor(book, BookOverrideKey.BACK_COVER_AUDIENCE_TEXT, settings.backCoverAudienceText),
+      [BookOverrideKey.BACK_COVER_CLOSING_TEXT]: sourceFor(
+        book,
+        BookOverrideKey.BACK_COVER_CLOSING_TEXT,
+        settings.backCoverClosingText,
+      ),
+      [BookOverrideKey.BACK_COVER_AUDIENCE_TEXT]: sourceFor(
+        book,
+        BookOverrideKey.BACK_COVER_AUDIENCE_TEXT,
+        settings.backCoverAudienceText,
+      ),
       [BookOverrideKey.QR_DESTINATION]: sourceFor(book, BookOverrideKey.QR_DESTINATION, settings.defaultQrDestination),
       [BookOverrideKey.PRINT]: sourceFor(book, BookOverrideKey.PRINT, settings.print),
     },

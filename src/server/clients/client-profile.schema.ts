@@ -1,4 +1,11 @@
-import { createMongoModel, Filterable, MongoField, MongoSchema, Relation, Unique } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  Filterable,
+  MongoField,
+  MongoSchema,
+  Relation,
+  Unique,
+} from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ClientLifecycle, ClientSource, Gender } from "src/common/enums";

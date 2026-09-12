@@ -8,7 +8,10 @@ export async function createClientMeasurement(body: CreateClientMeasurementDto, 
   let heightCmUsed: number | undefined;
 
   if (body.weightKg !== undefined) {
-    const client = await clientProfileRepository.findOne({ where: { _id: body.clientProfileId }, skipThrowError: true });
+    const client = await clientProfileRepository.findOne({
+      where: { _id: body.clientProfileId },
+      skipThrowError: true,
+    });
     if (client?.heightCm) {
       heightCmUsed = client.heightCm;
       const heightM = heightCmUsed / 100;

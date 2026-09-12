@@ -37,7 +37,7 @@ and it documents five deliberately-unmigrated gaps. Two support `--dry-run`;
 exist on the schema** and strict mode would strip them.
 
 `sync-user-indexes.ts` is worth singling out: it exists because Mongoose's
-`autoIndex` only *adds* missing indexes and **will not alter an existing index
+`autoIndex` only _adds_ missing indexes and **will not alter an existing index
 whose key pattern matches but whose options differ** — so an environment
 predating the sparse-unique change silently keeps enforcing plain `unique: true`
 forever. It prints indexes before and after. That behaviour is the model for

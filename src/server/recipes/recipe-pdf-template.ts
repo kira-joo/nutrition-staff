@@ -117,14 +117,19 @@ async function renderRecipePage(recipe: PopulatedRecipe, isLast: boolean): Promi
   const categoryTagHtml = categoryPicked
     ? `<span class="tag tag-category" dir="${categoryPicked.dir}">${escapeHtml(categoryPicked.text)}</span>`
     : "";
-  const tagsHtml = categoryTagHtml || foodGroupTagsHtml ? `<div class="tags">${categoryTagHtml}${foodGroupTagsHtml}</div>` : "";
+  const tagsHtml =
+    categoryTagHtml || foodGroupTagsHtml ? `<div class="tags">${categoryTagHtml}${foodGroupTagsHtml}</div>` : "";
 
   const descriptionPicked = pickText(recipe.description);
   const descriptionHtml = descriptionPicked
     ? `<p class="description" dir="${descriptionPicked.dir}">${escapeHtml(descriptionPicked.text)}</p>`
     : "";
 
-  const factsHtml = [renderFact("Prep", recipe.prepTime), renderFact("Cook", recipe.cookTime), renderFact("Servings", recipe.servings)].join("");
+  const factsHtml = [
+    renderFact("Prep", recipe.prepTime),
+    renderFact("Cook", recipe.cookTime),
+    renderFact("Servings", recipe.servings),
+  ].join("");
 
   const ingredientsList = renderList(recipe.ingredients, false);
   const instructionsList = renderList(recipe.instructions, true);
@@ -228,7 +233,7 @@ const STYLES = `
  */
 export async function buildRecipesPdfHtml(recipes: PopulatedRecipe[]): Promise<string> {
   const pages = await Promise.all(
-    recipes.map((recipe, index) => renderRecipePage(recipe, index === recipes.length - 1))
+    recipes.map((recipe, index) => renderRecipePage(recipe, index === recipes.length - 1)),
   );
 
   return (

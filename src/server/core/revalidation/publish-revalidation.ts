@@ -50,7 +50,9 @@ export async function publishRevalidation(tags: string[]): Promise<void> {
     if (controller.signal.aborted) {
       throw new Error(`nutrition-client revalidation timed out after ${REVALIDATION_TIMEOUT_MS}ms`);
     }
-    throw new Error(`nutrition-client revalidation request failed: ${error instanceof Error ? error.message : "unknown network error"}`);
+    throw new Error(
+      `nutrition-client revalidation request failed: ${error instanceof Error ? error.message : "unknown network error"}`,
+    );
   } finally {
     clearTimeout(timeout);
   }

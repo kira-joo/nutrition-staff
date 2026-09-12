@@ -25,7 +25,9 @@ export async function duplicateChapter(bookId: string, chapterId: string, expect
   const sourceIndex = book.chapters.findIndex((chapter) => chapter.id === chapterId);
 
   const clonedBlocks = await Promise.all(sourceChapter.blocks.map((block, index) => cloneBookBlock(block, index)));
-  const clonedCover = sourceChapter.coverImage ? await duplicateImageAsset(sourceChapter.coverImage, CHAPTER_ASSET_FOLDER) : null;
+  const clonedCover = sourceChapter.coverImage
+    ? await duplicateImageAsset(sourceChapter.coverImage, CHAPTER_ASSET_FOLDER)
+    : null;
 
   const newChapter: Chapter = {
     ...sourceChapter,
@@ -47,7 +49,7 @@ export async function duplicateChapter(bookId: string, chapterId: string, expect
   try {
     return await bookRepository.update(
       { where: { _id: bookId, contentRevision: expectedRevision } },
-      { chapters: nextChapters, contentRevision: expectedRevision + 1 }
+      { chapters: nextChapters, contentRevision: expectedRevision + 1 },
     );
   } catch (error) {
     if (error instanceof NotFoundError) {

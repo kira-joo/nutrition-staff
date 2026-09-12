@@ -2,10 +2,20 @@
 
 import { downloadRequester, useRequesterMutation, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, CustomButton, Modal, QueryState, toast } from "@kira-joo/frontend-toolkit-tailwind";
-import { useState } from "react";
+import { useState, use } from "react";
 import { getBookByIdEndpoint } from "../../../../../api/book.endpoints";
-import { getBookEditionsEndpoint, getBookPublishCheckEndpoint, publishBookEditionEndpoint, type PublishValidationIssue } from "../../../../../api/book-edition.endpoints";
-import { downloadBookArtifactPdfEndpoint, generateBookArtifactEndpoint, getBookArtifactEndpoint, type BookArtifact } from "../../../../../api/book-artifact.endpoints";
+import {
+  getBookEditionsEndpoint,
+  getBookPublishCheckEndpoint,
+  publishBookEditionEndpoint,
+  type PublishValidationIssue,
+} from "../../../../../api/book-edition.endpoints";
+import {
+  downloadBookArtifactPdfEndpoint,
+  generateBookArtifactEndpoint,
+  getBookArtifactEndpoint,
+  type BookArtifact,
+} from "../../../../../api/book-artifact.endpoints";
 import type { Book } from "src/common/interfaces/book.interface";
 import type { BookEdition } from "src/common/interfaces/book-edition.interface";
 import { BookStatus } from "src/common/enums";
@@ -19,15 +29,25 @@ import { resolveArtifactState, type ArtifactUiState } from "src/common/books/art
 // ARCHIVED is genuinely blocked (un-archive to Draft first).
 const PUBLISHABLE_STATUSES: BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW, BookStatus.PUBLISHED];
 
-export default function BookEditionsPage({ params }: { params: { id: string } }) {
+export default function BookEditionsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const bookQuery = useRequesterQuery({ endpoint: getBookByIdEndpoint, options: { params: { id: params.id } } });
-  const editionsQuery = useRequesterQuery({ endpoint: getBookEditionsEndpoint, options: { params: { id: params.id } } });
+  const editionsQuery = useRequesterQuery({
+    endpoint: getBookEditionsEndpoint,
+    options: { params: { id: params.id } },
+  });
 
   return (
     <QueryState query={bookQuery}>
       {(book) => (
         <div className="flex flex-col gap-6">
-          <PublishPanel book={book} onPublished={() => { bookQuery.refetch(); editionsQuery.refetch(); }} />
+          <PublishPanel
+            book={book}
+            onPublished={() => {
+              bookQuery.refetch();
+              editionsQuery.refetch();
+            }}
+          />
           <EditionHistory bookId={params.id} editions={editionsQuery.data ?? []} loading={editionsQuery.isLoading} />
         </div>
       )}
@@ -36,11 +56,18 @@ export default function BookEditionsPage({ params }: { params: { id: string } })
 }
 
 function PublishPanel({ book, onPublished }: { book: Book; onPublished: () => void }) {
-  const [checkResult, setCheckResult] = useState<{ errors: PublishValidationIssue[]; warnings: PublishValidationIssue[] } | null>(null);
+  const [checkResult, setCheckResult] = useState<{
+    errors: PublishValidationIssue[];
+    warnings: PublishValidationIssue[];
+  } | null>(null);
   const [acknowledged, setAcknowledged] = useState<Set<string>>(new Set());
   const [checking, setChecking] = useState(false);
 
-  const checkQuery = useRequesterQuery({ endpoint: getBookPublishCheckEndpoint, options: { params: { id: book._id } }, queryOptions: { enabled: false } });
+  const checkQuery = useRequesterQuery({
+    endpoint: getBookPublishCheckEndpoint,
+    options: { params: { id: book._id } },
+    queryOptions: { enabled: false },
+  });
   const publishMutation = useRequesterMutation({
     endpoint: publishBookEditionEndpoint,
     onSuccess: () => {
@@ -78,7 +105,9 @@ function PublishPanel({ book, onPublished }: { book: Book; onPublished: () => vo
     });
   }
 
-  const allWarningsAcknowledged = checkResult ? checkResult.warnings.every((warning) => acknowledged.has(warning.code)) : false;
+  const allWarningsAcknowledged = checkResult
+    ? checkResult.warnings.every((warning) => acknowledged.has(warning.code))
+    : false;
 
   return (
     <div className="flex flex-col gap-3 rounded-md border border-slate-200 p-4">
@@ -86,7 +115,8 @@ function PublishPanel({ book, onPublished }: { book: Book; onPublished: () => vo
         <div>
           <h3 className="font-semibold">Publishing</h3>
           <p className="text-sm text-slate-500">
-            Status: <Badge variant="secondary">{book.status}</Badge> · Current edition: {book.editionCount > 0 ? `#${book.editionCount}` : "none yet"}
+            Status: <Badge variant="secondary">{book.status}</Badge> · Current edition:{" "}
+            {book.editionCount > 0 ? `#${book.editionCount}` : "none yet"}
           </p>
         </div>
         {canPublish ? (
@@ -116,7 +146,10 @@ function PublishPanel({ book, onPublished }: { book: Book; onPublished: () => vo
               <div className="flex flex-col gap-2">
                 <p className="font-medium text-amber-600">Please review and acknowledge these warnings:</p>
                 {checkResult.warnings.map((warning) => (
-                  <label key={warning.code} className="flex items-start gap-2 rounded-md bg-amber-50 p-2 text-sm text-amber-800">
+                  <label
+                    key={warning.code}
+                    className="flex items-start gap-2 rounded-md bg-amber-50 p-2 text-sm text-amber-800"
+                  >
                     <input
                       type="checkbox"
                       checked={acknowledged.has(warning.code)}
@@ -178,7 +211,12 @@ function EditionHistory({ bookId, editions, loading }: { bookId: string; edition
       ))}
 
       {viewing ? (
-        <Modal open onOpenChange={() => setViewing(null)} title={viewing.editionLabel ?? `Edition ${viewing.editionNumber}`} size="lg">
+        <Modal
+          open
+          onOpenChange={() => setViewing(null)}
+          title={viewing.editionLabel ?? `Edition ${viewing.editionNumber}`}
+          size="lg"
+        >
           <div className="flex flex-col gap-2 text-sm">
             <p>
               <strong>Title at publish:</strong> {viewing.titleAtPublish}
@@ -236,7 +274,10 @@ const ARTIFACT_STATE_LABEL: Record<ArtifactUiState, string> = {
  * is needed here.
  */
 function ArtifactPanel({ bookId, edition }: { bookId: string; edition: BookEdition }) {
-  const artifactQuery = useRequesterQuery({ endpoint: getBookArtifactEndpoint, options: { params: { id: bookId, editionId: edition._id } } });
+  const artifactQuery = useRequesterQuery({
+    endpoint: getBookArtifactEndpoint,
+    options: { params: { id: bookId, editionId: edition._id } },
+  });
   const generateMutation = useRequesterMutation({
     endpoint: generateBookArtifactEndpoint,
     onSuccess: () => {
@@ -278,7 +319,9 @@ function ArtifactPanel({ bookId, edition }: { bookId: string; edition: BookEditi
         </p>
       ) : null}
 
-      {state === "FAILED" && artifact?.errorMessage ? <p className="text-xs text-red-600">Generation failed — you can try again.</p> : null}
+      {state === "FAILED" && artifact?.errorMessage ? (
+        <p className="text-xs text-red-600">Generation failed — you can try again.</p>
+      ) : null}
 
       <div className="flex gap-2">
         <CustomButton

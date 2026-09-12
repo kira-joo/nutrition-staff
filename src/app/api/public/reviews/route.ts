@@ -12,5 +12,6 @@ export const dynamic = "force-dynamic";
 export const GET = createGetRoute({
   query: PublicListReviewsQueryDto,
   auth: false,
-  handler: async ({ query }) => reviewRepository.findAllAndCountPublic({ query, where: { status: ContentStatus.PUBLISHED } }),
+  handler: async ({ query }) =>
+    reviewRepository.findAllAndCountPublic({ query, where: { status: ContentStatus.PUBLISHED } }),
 });

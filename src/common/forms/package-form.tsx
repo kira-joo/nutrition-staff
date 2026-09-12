@@ -65,7 +65,10 @@ export function PackageForm({ defaultValues, endpoint }: PackageFormProps) {
         return (
           <div className="flex flex-col gap-3">
             {(Object.keys(DURATION_LABELS) as (keyof PricingTiers)[]).map((duration) => (
-              <div key={duration} className="grid grid-cols-1 gap-2 rounded-md border border-slate-200 p-3 sm:grid-cols-3">
+              <div
+                key={duration}
+                className="grid grid-cols-1 gap-2 rounded-md border border-slate-200 p-3 sm:grid-cols-3"
+              >
                 <span className="self-center text-sm font-medium text-slate-700">{DURATION_LABELS[duration]}</span>
                 <CustomInput
                   label="Original price"

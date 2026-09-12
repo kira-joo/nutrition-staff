@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { DateText, PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -12,7 +13,8 @@ import {
   updateNutritionAssessmentEndpoint,
 } from "../../../../../../api/nutrition-assessment.endpoints";
 
-export default function ClientAssessmentDetailsPage({ params }: { params: { id: string; assessmentId: string } }) {
+export default function ClientAssessmentDetailsPage(props: { params: Promise<{ id: string; assessmentId: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
 
   const clientQuery = useRequesterQuery({

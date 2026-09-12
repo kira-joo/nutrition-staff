@@ -3,7 +3,10 @@ import type { StaffProfile, UpsertStaffProfileDto } from "../src/common/interfac
 
 // Backed by src/app/api/staff-profiles/[userId]/route.ts.
 
-export const getStaffProfileByUserIdEndpoint: Endpoint<{ params: { userId: string }; returnType: StaffProfile | null }> = {
+export const getStaffProfileByUserIdEndpoint: Endpoint<{
+  params: { userId: string };
+  returnType: StaffProfile | null;
+}> = {
   url: "/staff-profiles/:userId",
   methodType: MethodType.GET,
 };

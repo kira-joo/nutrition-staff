@@ -1,4 +1,10 @@
-import { createMongoModel, imageAssetField, localizedStringField, MongoField, MongoSchema } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  imageAssetField,
+  localizedStringField,
+  MongoField,
+  MongoSchema,
+} from "@kira-joo/backend-toolkit-mongoose";
 import type { ImageAsset, LocalizedString } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
@@ -10,7 +16,7 @@ const socialLinkSchema = new mongoose.Schema(
     url: { type: String, required: true },
     order: { type: Number, default: 0 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Exported for reuse anywhere else that needs an optional SEO override with
@@ -21,7 +27,7 @@ export const seoSchema = new mongoose.Schema(
     title: localizedStringField(),
     description: localizedStringField(),
   },
-  { _id: false }
+  { _id: false },
 );
 
 export interface SocialLink {

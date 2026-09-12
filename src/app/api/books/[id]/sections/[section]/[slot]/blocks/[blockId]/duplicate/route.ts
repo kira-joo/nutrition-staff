@@ -11,5 +11,6 @@ export const POST = createPostRoute({
   params: FindSectionBlockParamsDto,
   body: ExpectedRevisionDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
-  handler: async ({ params, body }) => duplicateBookBlock(params.id, containerRefFromParams(params), params.blockId, body.expectedRevision),
+  handler: async ({ params, body }) =>
+    duplicateBookBlock(params.id, containerRefFromParams(params), params.blockId, body.expectedRevision),
 });

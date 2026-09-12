@@ -3,7 +3,10 @@
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Ruler, Scale, StickyNote } from "lucide-react";
 import { BodyCompositionMethod } from "../enums";
-import type { createClientMeasurementEndpoint, updateClientMeasurementEndpoint } from "../../../api/client-measurement.endpoints";
+import type {
+  createClientMeasurementEndpoint,
+  updateClientMeasurementEndpoint,
+} from "../../../api/client-measurement.endpoints";
 import { ClientMeasurement, CreateClientMeasurementDto } from "../interfaces/client-measurement.interface";
 
 export interface ClientMeasurementFormProps {
@@ -13,7 +16,12 @@ export interface ClientMeasurementFormProps {
   onSuccess: () => void;
 }
 
-export function ClientMeasurementForm({ clientProfileId, defaultValues, endpoint, onSuccess }: ClientMeasurementFormProps) {
+export function ClientMeasurementForm({
+  clientProfileId,
+  defaultValues,
+  endpoint,
+  onSuccess,
+}: ClientMeasurementFormProps) {
   const coreFields: FormFieldConfig<CreateClientMeasurementDto>[] = [
     { type: FieldType.DATE, name: "measuredAt", label: "Measured on", includeTime: true, rules: { required: true } },
     { type: FieldType.INPUT, name: "weightKg", label: "Weight (kg)", inputType: "number" },

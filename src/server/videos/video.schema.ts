@@ -1,4 +1,13 @@
-import { createMongoModel, Filterable, imageAssetField, localizedStringField, MongoField, MongoSchema, Searchable, videoAssetField } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  Filterable,
+  imageAssetField,
+  localizedStringField,
+  MongoField,
+  MongoSchema,
+  Searchable,
+  videoAssetField,
+} from "@kira-joo/backend-toolkit-mongoose";
 import type { ImageAsset, LocalizedString, VideoAsset } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";

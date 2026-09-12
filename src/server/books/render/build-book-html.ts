@@ -26,7 +26,16 @@ const TOC_ENTRIES_PER_PAGE = 16;
 /** Structural, not the full `Book` — this file (and the `BookSchema` Mongoose document callers actually hold) never needs `_id`/`createdAt`/`updatedAt`. */
 export type BookContentForRender = Pick<
   Book,
-  "title" | "subtitle" | "coverMode" | "coverImage" | "backCoverMode" | "backCoverImage" | "chapters" | "frontMatter" | "backMatter" | "references"
+  | "title"
+  | "subtitle"
+  | "coverMode"
+  | "coverImage"
+  | "backCoverMode"
+  | "backCoverImage"
+  | "chapters"
+  | "frontMatter"
+  | "backMatter"
+  | "references"
 >;
 
 export interface BuildBookHtmlOptions {
@@ -47,7 +56,12 @@ export interface BuildBookHtmlOptions {
  * feed to Chromium — one builder, one paginator, per the approved
  * architecture. No PDF is generated here; Phase D stops at this HTML.
  */
-export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots }: BuildBookHtmlOptions): Promise<string> {
+export async function buildBookHtml({
+  book,
+  identity,
+  chapterId,
+  recipeSnapshots,
+}: BuildBookHtmlOptions): Promise<string> {
   const geometry = resolveGeometry(identity.print.pageSize, identity.print.marginPreset, identity.print.gutterMm);
   // One call site, so Staff Preview and the PDF are guaranteed the same
   // watermark — `identity` is the live-resolved identity for preview and
@@ -60,7 +74,11 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
     chapterBackgroundUrl: CHAPTER_BACKGROUND_DATA_URI,
     footerLeafUrl: FOOTER_LEAF_DATA_URI,
     pageWatermark: watermarkImage?.secureUrl
-      ? { url: watermarkImage.secureUrl, opacity: identity.pageWatermark.opacity, scaleMm: identity.pageWatermark.scaleMm }
+      ? {
+          url: watermarkImage.secureUrl,
+          opacity: identity.pageWatermark.opacity,
+          scaleMm: identity.pageWatermark.scaleMm,
+        }
       : undefined,
   });
 
@@ -81,12 +99,14 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
     stream.push(renderCoverPage(book, identity));
     stream.push(renderTitlePage(book, identity));
 
-    for (const block of book.frontMatter.aboutBook.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
+    for (const block of book.frontMatter.aboutBook.blocks)
+      stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
 
     const aboutDoctor = renderAboutDoctorPage(identity);
     if (aboutDoctor) stream.push(aboutDoctor);
 
-    for (const block of book.frontMatter.introduction.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
+    for (const block of book.frontMatter.introduction.blocks)
+      stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
 
     stream.push(renderTocReservationFragment());
   }
@@ -106,7 +126,8 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
   }
 
   if (isFullBook) {
-    for (const block of book.backMatter.conclusion.blocks) stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
+    for (const block of book.backMatter.conclusion.blocks)
+      stream.push(await renderBlockToFragment(block, book.references, recipeSnapshots));
     for (const fragment of renderReferencesPage(book.references)) stream.push(fragment);
     stream.push(await renderBackCoverPage(book, identity));
   }
@@ -119,7 +140,12 @@ export async function buildBookHtml({ book, identity, chapterId, recipeSnapshots
     ? book.chapters
         .map((chapter, index) => ({ chapter, chapterNumber: index + 1 }))
         .filter(({ chapter }) => chapter.includeInToc)
-        .map(({ chapter, chapterNumber }) => ({ chapterId: chapter.id, title: chapter.title, tocTitle: chapter.tocTitle, label: chapterLabel(chapterNumber) }))
+        .map(({ chapter, chapterNumber }) => ({
+          chapterId: chapter.id,
+          title: chapter.title,
+          tocTitle: chapter.tocTitle,
+          label: chapterLabel(chapterNumber),
+        }))
     : [];
 
   const paginationInputWithoutGeometry = {

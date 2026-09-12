@@ -23,7 +23,10 @@ export function CreateBookForm({ endpoint }: { endpoint: typeof createBookEndpoi
       name: "slug",
       label: "Slug",
       description: "Used in the book's URL — lowercase letters, numbers, and hyphens only",
-      rules: { required: true, pattern: { value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, message: "lowercase letters, numbers, and hyphens only" } },
+      rules: {
+        required: true,
+        pattern: { value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, message: "lowercase letters, numbers, and hyphens only" },
+      },
     },
     { type: FieldType.INPUT, name: "category", label: "Category" },
   ];

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, PageShell, QueryState, RouteTabs, type RouteTabItem } from "@kira-joo/frontend-toolkit-tailwind";
@@ -43,7 +44,11 @@ const CLIENT_DETAILS_TABS: RouteTabItem<string>[] = [
   },
 ];
 
-export default function ClientDetailsLayout({ children, params }: { children: ReactNode; params: { id: string } }) {
+export default function ClientDetailsLayout(props: { children: ReactNode; params: Promise<{ id: string }> }) {
+  const params = use(props.params);
+
+  const { children } = props;
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -53,7 +58,11 @@ export default function ClientDetailsLayout({ children, params }: { children: Re
   });
 
   return (
-    <QueryState query={clientQuery} entityName="Client" backRoute={{ path: AppRoute.clients, label: "Back to Clients" }}>
+    <QueryState
+      query={clientQuery}
+      entityName="Client"
+      backRoute={{ path: AppRoute.clients, label: "Back to Clients" }}
+    >
       {(client) => (
         <PageShell
           icon={UserRoundCog}

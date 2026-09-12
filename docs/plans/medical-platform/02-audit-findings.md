@@ -20,20 +20,20 @@ planning docs, resolved in favour of the code.
 
 ## Scale
 
-| Area | Count |
-|---|---|
-| App-owned Mongo collections | 22 (+2 toolkit-owned: `Role`, `Permission`) |
-| API route files | 102, with 167 handler exports |
-| — of which unauthenticated | 20 |
-| — of which bypass the route factory (binary responses) | 4 |
-| Public API routes (`/api/public/**`) | 18 — exactly saturated, every one consumed |
-| UI pages (`page.tsx`, non-api) | 81, plus 3 layouts |
-| — rendered as server components | **3** |
-| — using the shared `PageShell` | 61 |
-| Generated permission keys | 135 (27 entities × 5 actions) |
-| Seeded roles | 4, one of which has zero permissions |
-| Test files in the whole app | **1** |
-| Backend test files | **0** |
+| Area                                                   | Count                                       |
+| ------------------------------------------------------ | ------------------------------------------- |
+| App-owned Mongo collections                            | 22 (+2 toolkit-owned: `Role`, `Permission`) |
+| API route files                                        | 102, with 167 handler exports               |
+| — of which unauthenticated                             | 20                                          |
+| — of which bypass the route factory (binary responses) | 4                                           |
+| Public API routes (`/api/public/**`)                   | 18 — exactly saturated, every one consumed  |
+| UI pages (`page.tsx`, non-api)                         | 81, plus 3 layouts                          |
+| — rendered as server components                        | **3**                                       |
+| — using the shared `PageShell`                         | 61                                          |
+| Generated permission keys                              | 135 (27 entities × 5 actions)               |
+| Seeded roles                                           | 4, one of which has zero permissions        |
+| Test files in the whole app                            | **1**                                       |
+| Backend test files                                     | **0**                                       |
 
 ## Findings by area
 
@@ -50,18 +50,18 @@ simultaneously be a patient, a staff member, and a referrer. **It is kept.**
 
 ### Ten specific structural defects
 
-| # | Defect | Evidence | Fixed in |
-|---|---|---|---|
-| L1 | Four settings singletons hardcode "one clinic, one doctor, one website" via `where: {}` | `src/server/core/singleton/get-or-create-singleton.ts` + 8 call sites | [06](06-organization-and-branches.md) |
-| L2 | Zero multi-tenancy anywhere. `grep -niE "tenantId\|orgId\|clinicId\|branchId" src` → **0 hits**. Not one of 24 collections carries a scope field | grep | [06](06-organization-and-branches.md) |
-| L3 | Zero resource-scoped authorization. `authorizeUser` compares permission-key sets only; `clients/[id]/route.ts` never compares `assignedToUserId` to `user._id`; `dashboard-scope.util.ts:12` returns "no scoping" when the *requester* omits the filter | `backend-toolkit-next/src/authorization/authorize-user.ts` | [07](07-authorization-roles-permissions.md) |
-| L4 | `DoctorProfile` is a public-website CMS singleton with no `userId` — not a practitioner. It already burns the name a real `Practitioner` wants, plus 5 permission keys and a cache tag shared with `nutrition-client`. Books structurally assumes one doctor | `src/server/doctor-profile/doctor-profile.schema.ts`; `book.schema.ts` `bookOverridesSchema` | [04](04-domain-model.md), [23](23-site-cms-and-books-disposition.md) |
-| L5 | Two contradictory i18n models coexist: `LocalizedString {ar,en}` on ~14 CMS entities, plain Arabic strings in Books, and **plain untranslated strings on every clinical/CRM field**. So the machinery is on the content that won't ship and absent from the content that will | `toolkit-common` `LocalizedString`; `book.schema.ts:53-56` | [17](17-ux-architecture-and-design-system.md) |
-| L6 | The `CacheTag` vocabulary is hand-duplicated across two repos **and has already drifted** — `nutrition-client` has `video(id)`, `nutrition-staff` does not, so a video detail page can never be invalidated | `src/server/core/revalidation/cache-tag.ts` vs `nutrition-client/src/lib/cache/cache-tags.ts` | Phase 0D |
-| L7 | **No index on any clinical foreign key.** `@Filterable()` and `@Relation()` build none — `apply-indexes.ts` indexes only `@Unique()`. So every per-patient timeline query is a collection scan | `backend-toolkit-mongoose/src/schema/apply-indexes.ts` | Phase 0D, [19](19-toolkit-and-package-changes.md) |
-| L8 | **No transactions, anywhere, by explicit convention**, across six multi-collection write paths | `src/server/clients/create-client.ts:19-22` | [05](05-transactions-and-data-integrity.md) |
-| L9 | `User` has **no soft delete** but every clinical record FKs to it. `DELETE /api/users/:id` hard-deletes and orphans the graph; `scripts/seed-users.ts` runs `UserModel.deleteMany({})` | `src/server/users/delete-user.ts`; `scripts/seed-users.ts` | Phase 3 (M3) |
-| L10 | `User.phone` is `@Unique({sparse:true})` — **a mother and child sharing a phone number cannot both exist**. A 409 on a normal clinic registration | `src/server/users/user.schema.ts` | Phase 3 (M4), [09](09-patients.md) |
+| #   | Defect                                                                                                                                                                                                                                                                        | Evidence                                                                                      | Fixed in                                                             |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| L1  | Four settings singletons hardcode "one clinic, one doctor, one website" via `where: {}`                                                                                                                                                                                       | `src/server/core/singleton/get-or-create-singleton.ts` + 8 call sites                         | [06](06-organization-and-branches.md)                                |
+| L2  | Zero multi-tenancy anywhere. `grep -niE "tenantId\|orgId\|clinicId\|branchId" src` → **0 hits**. Not one of 24 collections carries a scope field                                                                                                                              | grep                                                                                          | [06](06-organization-and-branches.md)                                |
+| L3  | Zero resource-scoped authorization. `authorizeUser` compares permission-key sets only; `clients/[id]/route.ts` never compares `assignedToUserId` to `user._id`; `dashboard-scope.util.ts:12` returns "no scoping" when the _requester_ omits the filter                       | `backend-toolkit-next/src/authorization/authorize-user.ts`                                    | [07](07-authorization-roles-permissions.md)                          |
+| L4  | `DoctorProfile` is a public-website CMS singleton with no `userId` — not a practitioner. It already burns the name a real `Practitioner` wants, plus 5 permission keys and a cache tag shared with `nutrition-client`. Books structurally assumes one doctor                  | `src/server/doctor-profile/doctor-profile.schema.ts`; `book.schema.ts` `bookOverridesSchema`  | [04](04-domain-model.md), [23](23-site-cms-and-books-disposition.md) |
+| L5  | Two contradictory i18n models coexist: `LocalizedString {ar,en}` on ~14 CMS entities, plain Arabic strings in Books, and **plain untranslated strings on every clinical/CRM field**. So the machinery is on the content that won't ship and absent from the content that will | `toolkit-common` `LocalizedString`; `book.schema.ts:53-56`                                    | [17](17-ux-architecture-and-design-system.md)                        |
+| L6  | The `CacheTag` vocabulary is hand-duplicated across two repos **and has already drifted** — `nutrition-client` has `video(id)`, `nutrition-staff` does not, so a video detail page can never be invalidated                                                                   | `src/server/core/revalidation/cache-tag.ts` vs `nutrition-client/src/lib/cache/cache-tags.ts` | Phase 0D                                                             |
+| L7  | **No index on any clinical foreign key.** `@Filterable()` and `@Relation()` build none — `apply-indexes.ts` indexes only `@Unique()`. So every per-patient timeline query is a collection scan                                                                                | `backend-toolkit-mongoose/src/schema/apply-indexes.ts`                                        | Phase 0D, [19](19-toolkit-and-package-changes.md)                    |
+| L8  | **No transactions, anywhere, by explicit convention**, across six multi-collection write paths                                                                                                                                                                                | `src/server/clients/create-client.ts:19-22`                                                   | [05](05-transactions-and-data-integrity.md)                          |
+| L9  | `User` has **no soft delete** but every clinical record FKs to it. `DELETE /api/users/:id` hard-deletes and orphans the graph; `scripts/seed-users.ts` runs `UserModel.deleteMany({})`                                                                                        | `src/server/users/delete-user.ts`; `scripts/seed-users.ts`                                    | Phase 3 (M3)                                                         |
+| L10 | `User.phone` is `@Unique({sparse:true})` — **a mother and child sharing a phone number cannot both exist**. A 409 on a normal clinic registration                                                                                                                             | `src/server/users/user.schema.ts`                                                             | Phase 3 (M4), [09](09-patients.md)                                   |
 
 Plus: `NutritionCalculation.inputs`/`results` are unvalidated `Mixed` persisted
 verbatim from the client without re-running the engine; `EntityName` is a single
@@ -74,7 +74,7 @@ in-memory dashboard aggregation do not survive scale-out; `Africa/Cairo` and
 
 ### Quality is high; design is deliberately absent
 
-The engineering is unusually careful — inline comments explain *why*, cite
+The engineering is unusually careful — inline comments explain _why_, cite
 measurements, and name the bug each decision prevents. Genuinely good, and kept:
 
 - `ClientInteraction` (`src/server/interactions/**`) — an append-only contact
@@ -97,7 +97,7 @@ measurements, and name the bug each decision prevents. Genuinely good, and kept:
 - The 409 duplicate-identity resolution flow in `src/common/forms/client-form.tsx`
   — the best-designed UX in the app.
 - `/dashboard` (384 lines) — the only screen with real information design:
-  period-over-period KPI deltas, follow-up lists deliberately placed *above* the
+  period-over-period KPI deltas, follow-up lists deliberately placed _above_ the
   charts, and a "nothing needs attention" success empty state.
 
 Against that: `tailwind.config.js` is 28 lines with `theme: { extend: {} }`,

@@ -19,7 +19,7 @@ export function IsUrlOrPath(validationOptions?: ValidationOptions) {
           return value.startsWith("/") || isURL(value);
         },
         defaultMessage(): string {
-          return "Must be a valid URL or a site-relative path starting with \"/\".";
+          return 'Must be a valid URL or a site-relative path starting with "/".';
         },
       },
     });

@@ -26,7 +26,11 @@ export interface ResolvedGeometry {
   contentHeightMm: number;
 }
 
-export function resolveGeometry(pageSize: BookPageSize, marginPreset: BookMarginPreset, gutterMm: number): ResolvedGeometry {
+export function resolveGeometry(
+  pageSize: BookPageSize,
+  marginPreset: BookMarginPreset,
+  gutterMm: number,
+): ResolvedGeometry {
   const size = PAGE_SIZE_MM[pageSize];
   const margins = MARGIN_PRESET_MM[marginPreset];
   return {

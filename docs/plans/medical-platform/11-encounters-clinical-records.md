@@ -33,7 +33,7 @@ re-runs the engine**, with `calculatedAt` carried through unchanged and only
 
 ### The appointment/encounter separation
 
-Non-negotiable per the brief, and correct: an appointment is a *plan* that can be
+Non-negotiable per the brief, and correct: an appointment is a _plan_ that can be
 cancelled or never happen; an encounter is a clinical event that did happen.
 The relationship is `Encounter.appointmentId?` — optional, because:
 

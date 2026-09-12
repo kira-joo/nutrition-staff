@@ -1,8 +1,20 @@
 "use client";
 
-import { useRequesterMutation, useRequesterQuery, type ImageAsset, type UploadPolicy } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, CustomImageAssetUpload, CustomInput, PageSection, QueryState, toast } from "@kira-joo/frontend-toolkit-tailwind";
-import { useState } from "react";
+import {
+  useRequesterMutation,
+  useRequesterQuery,
+  type ImageAsset,
+  type UploadPolicy,
+} from "@kira-joo/frontend-toolkit-core";
+import {
+  CustomButton,
+  CustomImageAssetUpload,
+  CustomInput,
+  PageSection,
+  QueryState,
+  toast,
+} from "@kira-joo/frontend-toolkit-tailwind";
+import { useState, use } from "react";
 import { getBookSettingsEndpoint } from "../../../../../api/book-settings.endpoints";
 import { getBookByIdEndpoint, updateBookEndpoint } from "../../../../../api/book.endpoints";
 import { ArrayFieldEditor } from "src/common/forms/array-field-editor";
@@ -32,7 +44,8 @@ const TEXTAREA_KEYS: { key: BookOverrideKey; label: string }[] = [
   { key: BookOverrideKey.BACK_COVER_AUDIENCE_TEXT, label: "Back cover — who this guide is for" },
 ];
 
-export default function BookOverridesPage({ params }: { params: { id: string } }) {
+export default function BookOverridesPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const bookQuery = useRequesterQuery({ endpoint: getBookByIdEndpoint, options: { params: { id: params.id } } });
   const settingsQuery = useRequesterQuery({ endpoint: getBookSettingsEndpoint });
 
@@ -199,7 +212,11 @@ function OverridesEditor({
             label="Doctor image"
             isOverridden={isOverridden(BookOverrideKey.DOCTOR_IMAGE)}
             renderDefault={() =>
-              settings.doctorImage ? <img src={settings.doctorImage.secureUrl} alt="" className="h-24 w-24 rounded object-cover" /> : "—"
+              settings.doctorImage ? (
+                <img src={settings.doctorImage.secureUrl} alt="" className="h-24 w-24 rounded object-cover" />
+              ) : (
+                "—"
+              )
             }
             renderOverride={() => (
               <CustomImageAssetUpload
@@ -214,7 +231,13 @@ function OverridesEditor({
           <OverrideField
             label="Book logo"
             isOverridden={isOverridden(BookOverrideKey.BOOK_LOGO)}
-            renderDefault={() => (settings.bookLogo ? <img src={settings.bookLogo.secureUrl} alt="" className="h-24 w-24 rounded object-cover" /> : "—")}
+            renderDefault={() =>
+              settings.bookLogo ? (
+                <img src={settings.bookLogo.secureUrl} alt="" className="h-24 w-24 rounded object-cover" />
+              ) : (
+                "—"
+              )
+            }
             renderOverride={() => (
               <CustomImageAssetUpload
                 value={overrides.bookLogo ?? null}
@@ -232,7 +255,9 @@ function OverridesEditor({
         <OverrideField
           label="Social links"
           isOverridden={isOverridden(BookOverrideKey.SOCIAL_LINKS)}
-          renderDefault={() => (settings.socialLinks?.length ? settings.socialLinks.map((l) => l.platform).join(", ") : "—")}
+          renderDefault={() =>
+            settings.socialLinks?.length ? settings.socialLinks.map((l) => l.platform).join(", ") : "—"
+          }
           renderOverride={() => (
             <ArrayFieldEditor
               items={overrides.socialLinks ?? []}
@@ -242,8 +267,18 @@ function OverridesEditor({
               emptyLabel="No overridden social links yet."
               renderItem={(item, _index, update) => (
                 <div className="grid grid-cols-2 gap-2">
-                  <input className="rounded border px-2 py-1" placeholder="Platform" value={item.platform} onChange={(e) => update({ platform: e.target.value })} />
-                  <input className="rounded border px-2 py-1" placeholder="URL" value={item.url} onChange={(e) => update({ url: e.target.value })} />
+                  <input
+                    className="rounded border px-2 py-1"
+                    placeholder="Platform"
+                    value={item.platform}
+                    onChange={(e) => update({ platform: e.target.value })}
+                  />
+                  <input
+                    className="rounded border px-2 py-1"
+                    placeholder="URL"
+                    value={item.url}
+                    onChange={(e) => update({ url: e.target.value })}
+                  />
                 </div>
               )}
             />
@@ -266,7 +301,9 @@ function OverridesEditor({
                   className="rounded border px-2 py-1"
                   placeholder={field}
                   value={overrides.contact?.[field] ?? ""}
-                  onChange={(e) => setOverrides((prev) => ({ ...prev, contact: { ...prev.contact, [field]: e.target.value } }))}
+                  onChange={(e) =>
+                    setOverrides((prev) => ({ ...prev, contact: { ...prev.contact, [field]: e.target.value } }))
+                  }
                 />
               ))}
             </div>
@@ -291,7 +328,12 @@ function OverridesEditor({
               <select
                 className="rounded border px-2 py-1"
                 value={overrides.print?.pageSize ?? settings.print.pageSize}
-                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, pageSize: e.target.value as BookPageSize } }))}
+                onChange={(e) =>
+                  setOverrides((prev) => ({
+                    ...prev,
+                    print: { ...prev.print, pageSize: e.target.value as BookPageSize },
+                  }))
+                }
               >
                 {Object.values(BookPageSize).map((value) => (
                   <option key={value} value={value}>
@@ -302,7 +344,12 @@ function OverridesEditor({
               <select
                 className="rounded border px-2 py-1"
                 value={overrides.print?.marginPreset ?? settings.print.marginPreset}
-                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, marginPreset: e.target.value as BookMarginPreset } }))}
+                onChange={(e) =>
+                  setOverrides((prev) => ({
+                    ...prev,
+                    print: { ...prev.print, marginPreset: e.target.value as BookMarginPreset },
+                  }))
+                }
               >
                 {Object.values(BookMarginPreset).map((value) => (
                   <option key={value} value={value}>
@@ -315,20 +362,29 @@ function OverridesEditor({
                 className="rounded border px-2 py-1"
                 placeholder="Gutter (mm)"
                 value={overrides.print?.gutterMm ?? settings.print.gutterMm}
-                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, gutterMm: Number(e.target.value) } }))}
+                onChange={(e) =>
+                  setOverrides((prev) => ({ ...prev, print: { ...prev.print, gutterMm: Number(e.target.value) } }))
+                }
               />
               <input
                 type="number"
                 className="rounded border px-2 py-1"
                 placeholder="First page number"
                 value={overrides.print?.pageNumberStart ?? settings.print.pageNumberStart}
-                onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, pageNumberStart: Number(e.target.value) } }))}
+                onChange={(e) =>
+                  setOverrides((prev) => ({
+                    ...prev,
+                    print: { ...prev.print, pageNumberStart: Number(e.target.value) },
+                  }))
+                }
               />
               <label className="col-span-2 flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={overrides.print?.doublePageSpread ?? settings.print.doublePageSpread}
-                  onChange={(e) => setOverrides((prev) => ({ ...prev, print: { ...prev.print, doublePageSpread: e.target.checked } }))}
+                  onChange={(e) =>
+                    setOverrides((prev) => ({ ...prev, print: { ...prev.print, doublePageSpread: e.target.checked } }))
+                  }
                 />
                 Double-page spread preview
               </label>

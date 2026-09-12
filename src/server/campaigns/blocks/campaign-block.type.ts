@@ -93,4 +93,5 @@ export interface CountdownBlock {
 }
 
 /** Union of every block type — a new block type adds a member here. */
-export type CampaignBlock = HeroBlock | RichTextBlock | FeatureGridBlock | MediaBlock | CtaBlock | FaqRefBlock | CountdownBlock;
+export type CampaignBlock =
+  HeroBlock | RichTextBlock | FeatureGridBlock | MediaBlock | CtaBlock | FaqRefBlock | CountdownBlock;

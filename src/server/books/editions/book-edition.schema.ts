@@ -2,7 +2,12 @@ import { createMongoModel, imageAssetField, MongoField, MongoSchema } from "@kir
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import type { ImageAsset, LocalizedString } from "@kira-joo/frontend-toolkit-core";
-import type { BookBackMatter, BookFrontMatter, BookReference, Chapter } from "src/common/interfaces/book-chapter.interface";
+import type {
+  BookBackMatter,
+  BookFrontMatter,
+  BookReference,
+  Chapter,
+} from "src/common/interfaces/book-chapter.interface";
 import type { BookCoverMode } from "src/common/interfaces/book.interface";
 import type { ResolvedBookIdentity } from "src/common/books/resolve-book-identity";
 

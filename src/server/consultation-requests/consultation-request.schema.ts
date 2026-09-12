@@ -1,4 +1,11 @@
-import { createMongoModel, Filterable, MongoField, MongoSchema, Relation, Searchable } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  Filterable,
+  MongoField,
+  MongoSchema,
+  Relation,
+  Searchable,
+} from "@kira-joo/backend-toolkit-mongoose";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ConsultationRequestIntent } from "src/common/enums";

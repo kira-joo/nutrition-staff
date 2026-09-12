@@ -21,8 +21,8 @@ cannot run today without a config change. `vitest` 2.1.9,
 The framework is well tested — the toolkit packages carry 121 test files in
 `frontend-toolkit-tailwind`, 49 in `backend-toolkit-mongoose`, 26 in
 `backend-toolkit-next`, 17 in `frontend-toolkit-core`, 16 in
-`backend-toolkit-core`, 6 in `toolkit-common`. So the *plumbing* is tested and
-the *application's own domain logic is not at all*.
+`backend-toolkit-core`, 6 in `toolkit-common`. So the _plumbing_ is tested and
+the _application's own domain logic is not at all_.
 
 `scripts/qa/` holds 13 real verification helpers, and they are good: a headless
 Chromium mobile-overflow regression check that asserts
@@ -69,10 +69,10 @@ pillar move and the `Client → Patient` rename are provably behaviour-preservin
 
 A **Vitest workspace** with two projects:
 
-| Project | Environment | Covers |
-|---|---|---|
-| `node` | node | `src/server/**`, `src/platform/**`, `src/verticals/**`, `core/**`, `migrations/**`, `scripts/**` |
-| `dom` | jsdom | `src/app/**`, `src/common/**`, `src/components/**` |
+| Project | Environment | Covers                                                                                           |
+| ------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| `node`  | node        | `src/server/**`, `src/platform/**`, `src/verticals/**`, `core/**`, `migrations/**`, `scripts/**` |
+| `dom`   | jsdom       | `src/app/**`, `src/common/**`, `src/components/**`                                               |
 
 Integration tests use `mongodb-memory-server`, already a devDependency of
 `backend-toolkit-mongoose` and used there in 15 test files. Transaction tests use
@@ -82,14 +82,14 @@ harness for the hardest tests in the programme already exists and is proven.**
 
 ### The test pyramid, by layer
 
-| Layer | What | Tool |
-|---|---|---|
-| **Pure functions** | The nutrition engine, money arithmetic, interval/overlap math, slot generation, invoice totals, age resolution, profile completeness | Vitest, no DB. The largest tier, and the cheapest. |
-| **Repository / integration** | Schema constraints, indexes, soft delete, scope injection, **transaction commit and rollback** | `mongodb-memory-server` / `MongoMemoryReplSet` |
-| **Service / use case** | Every multi-collection workflow, both committed and rolled back; state machines; permission scoping | in-memory Mongo |
-| **Route** | DTO validation, auth options, status codes, error shapes | route handlers invoked directly, as `backend-toolkit-next`'s own tests do |
-| **Component** | Clinical banner, calendar, board, forms | Testing Library |
-| **Browser QA** | Real geometry, real flows, real Arabic | Playwright MCP + `scripts/qa/` |
+| Layer                        | What                                                                                                                                 | Tool                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| **Pure functions**           | The nutrition engine, money arithmetic, interval/overlap math, slot generation, invoice totals, age resolution, profile completeness | Vitest, no DB. The largest tier, and the cheapest.                        |
+| **Repository / integration** | Schema constraints, indexes, soft delete, scope injection, **transaction commit and rollback**                                       | `mongodb-memory-server` / `MongoMemoryReplSet`                            |
+| **Service / use case**       | Every multi-collection workflow, both committed and rolled back; state machines; permission scoping                                  | in-memory Mongo                                                           |
+| **Route**                    | DTO validation, auth options, status codes, error shapes                                                                             | route handlers invoked directly, as `backend-toolkit-next`'s own tests do |
+| **Component**                | Clinical banner, calendar, board, forms                                                                                              | Testing Library                                                           |
+| **Browser QA**               | Real geometry, real flows, real Arabic                                                                                               | Playwright MCP + `scripts/qa/`                                            |
 
 ### Non-negotiable test categories per phase
 
@@ -165,16 +165,16 @@ usable roles, and are retired rather than left as folklore.
 
 Deliberately targeted rather than a blanket percentage:
 
-| Area | Target |
-|---|---|
-| The nutrition engine | **100% branch** |
-| Money and interval math | 100% branch |
-| State machines | every transition, legal and illegal |
-| Multi-collection workflows | commit + rollback each |
-| Migrations | idempotency each |
-| Authorization | every protected route |
-| Idempotency and concurrency paths | every protected route |
-| Everything else | meaningful tests, no percentage gate |
+| Area                              | Target                               |
+| --------------------------------- | ------------------------------------ |
+| The nutrition engine              | **100% branch**                      |
+| Money and interval math           | 100% branch                          |
+| State machines                    | every transition, legal and illegal  |
+| Multi-collection workflows        | commit + rollback each               |
+| Migrations                        | idempotency each                     |
+| Authorization                     | every protected route                |
+| Idempotency and concurrency paths | every protected route                |
+| Everything else                   | meaningful tests, no percentage gate |
 
 A global coverage number would be gamed by testing the 40 interchangeable CRUD
 pages and would say nothing about the code that matters.
@@ -196,18 +196,18 @@ never publish a package.
 One workflow per repository, running on push and on pull request, covering the
 subset relevant to that repository:
 
-| Step | Applies to | Notes |
-|---|---|---|
-| `npx tsc --noEmit` | all 9 | `nutrition-staff` has no `typecheck` script; this is the command |
-| `npm test` | all 9 | Vitest everywhere. For `nutrition-staff` this is the node + dom workspace from above |
-| `npm run build` | both apps + all 5 toolkits | catches the "compiles in dev, fails in build" class |
-| `scripts/qa/check-import-boundaries.ts` | `nutrition-staff` | the four-pillar rule ([03](03-target-architecture.md)) |
-| `scripts/qa/check-route-inventory.ts` | `nutrition-staff` | proves no route URL changed ([03](03-target-architecture.md)) |
-| `scripts/qa/check-transaction-rules.ts` | `nutrition-staff` | no manual sessions, no swallow-without-mark ([05](05-transactions-and-data-integrity.md)) |
-| `scripts/qa/check-cache-tag-parity.ts` | `nutrition-staff` | the staff↔client `CacheTag` drift that already exists |
-| Migration tests | `nutrition-staff` | every migration run twice for idempotency ([21](21-migrations-and-seeding.md)) |
-| `scripts/qa/check-route-inventory.ts` + Next build-manifest diff | `nutrition-staff` | three-part route proof ([03](03-target-architecture.md)) |
-| `npm pack` + smoke install into a scratch project | the 5 toolkit repos | catches the "works locally, broken once published" class that a symlink hides. This is the CI counterpart of the manual tarball verification the `shared-package-change` skill requires |
+| Step                                                             | Applies to                 | Notes                                                                                                                                                                                   |
+| ---------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npx tsc --noEmit`                                               | all 9                      | `nutrition-staff` has no `typecheck` script; this is the command                                                                                                                        |
+| `npm test`                                                       | all 9                      | Vitest everywhere. For `nutrition-staff` this is the node + dom workspace from above                                                                                                    |
+| `npm run build`                                                  | both apps + all 5 toolkits | catches the "compiles in dev, fails in build" class                                                                                                                                     |
+| `scripts/qa/check-import-boundaries.ts`                          | `nutrition-staff`          | the four-pillar rule ([03](03-target-architecture.md))                                                                                                                                  |
+| `scripts/qa/check-route-inventory.ts`                            | `nutrition-staff`          | proves no route URL changed ([03](03-target-architecture.md))                                                                                                                           |
+| `scripts/qa/check-transaction-rules.ts`                          | `nutrition-staff`          | no manual sessions, no swallow-without-mark ([05](05-transactions-and-data-integrity.md))                                                                                               |
+| `scripts/qa/check-cache-tag-parity.ts`                           | `nutrition-staff`          | the staff↔client `CacheTag` drift that already exists                                                                                                                                   |
+| Migration tests                                                  | `nutrition-staff`          | every migration run twice for idempotency ([21](21-migrations-and-seeding.md))                                                                                                          |
+| `scripts/qa/check-route-inventory.ts` + Next build-manifest diff | `nutrition-staff`          | three-part route proof ([03](03-target-architecture.md))                                                                                                                                |
+| `npm pack` + smoke install into a scratch project                | the 5 toolkit repos        | catches the "works locally, broken once published" class that a symlink hides. This is the CI counterpart of the manual tarball verification the `shared-package-change` skill requires |
 
 Notes on scope and cost:
 

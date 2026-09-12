@@ -47,7 +47,9 @@ export function FaqRefBlockEditor({ defaultValues, endpoint, submitParams, onSuc
         heading: defaultValues?.heading ?? EMPTY_LOCALIZED,
         faqSectionId: defaultValues?.faqSectionId ?? "",
       }}
-      transformValues={(values) => ({ ...values, type: CampaignBlockType.FAQ_REF }) as unknown as Record<string, unknown>}
+      transformValues={(values) =>
+        ({ ...values, type: CampaignBlockType.FAQ_REF }) as unknown as Record<string, unknown>
+      }
       submitEndpoint={endpoint}
       submitParams={submitParams}
       onSuccess={() => {

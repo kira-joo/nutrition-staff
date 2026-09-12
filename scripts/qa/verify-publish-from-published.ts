@@ -30,8 +30,11 @@ async function main() {
   if (!actor) throw new Error("No admin user found.");
 
   const before = await bookRepository.findOne({ where: { _id: BOOK_ID } });
-  console.log(`BEFORE: status=${before.status}, editionCount=${before.editionCount}, currentEditionId=${before.currentEditionId}`);
-  if (before.status !== "published") throw new Error(`Expected book to already be "published" for this check — was "${before.status}".`);
+  console.log(
+    `BEFORE: status=${before.status}, editionCount=${before.editionCount}, currentEditionId=${before.currentEditionId}`,
+  );
+  if (before.status !== "published")
+    throw new Error(`Expected book to already be "published" for this check — was "${before.status}".`);
 
   const publicBefore = await fetchPublicPayload();
   console.log(`Public endpoint BEFORE: editionNumber=${publicBefore.editionNumber}`);
@@ -44,10 +47,14 @@ async function main() {
     acknowledgedWarningCodes: [],
     notes: "Lifecycle fix verification — publishing again directly from PUBLISHED.",
   });
-  console.log(`Published edition ${edition.editionNumber} (${edition._id}) while source status was "published". New status: ${updatedBook.status}, currentEditionId: ${updatedBook.currentEditionId}`);
+  console.log(
+    `Published edition ${edition.editionNumber} (${edition._id}) while source status was "published". New status: ${updatedBook.status}, currentEditionId: ${updatedBook.currentEditionId}`,
+  );
 
   const previousEdition = await bookEditionRepository.findOne({ where: { _id: before.currentEditionId } });
-  console.log(`Previous edition ${previousEdition.editionNumber} (${previousEdition._id}) still exists, untouched, contentRevision=${previousEdition.contentRevision}`);
+  console.log(
+    `Previous edition ${previousEdition.editionNumber} (${previousEdition._id}) still exists, untouched, contentRevision=${previousEdition.contentRevision}`,
+  );
 
   const artifact = await generateBookArtifact(BOOK_ID, edition._id.toString(), actor._id.toString());
   console.log(`New edition PDF artifact: ${artifact.status}`);
@@ -58,7 +65,9 @@ async function main() {
   if (publicBefore.editionNumber === publicAfter.editionNumber) {
     throw new Error("Public endpoint did not advance to the new edition — something is wrong.");
   }
-  console.log(`\nVERIFIED: public endpoint moved from edition ${publicBefore.editionNumber} to ${publicAfter.editionNumber} only after the new publish succeeded, and the book remained "published" throughout (never left publicly-visible status).`);
+  console.log(
+    `\nVERIFIED: public endpoint moved from edition ${publicBefore.editionNumber} to ${publicAfter.editionNumber} only after the new publish succeeded, and the book remained "published" throughout (never left publicly-visible status).`,
+  );
 
   await mongoose.disconnect();
 }

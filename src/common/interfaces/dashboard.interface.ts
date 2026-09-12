@@ -64,12 +64,7 @@ export type DashboardSourceChart = DashboardLabeledValue[];
 
 export type DashboardGrowthChart = ChartDataPoint[];
 
-export type DashboardActivityType =
-  | "client_created"
-  | "interaction"
-  | "measurement"
-  | "assessment"
-  | "calculation";
+export type DashboardActivityType = "client_created" | "interaction" | "measurement" | "assessment" | "calculation";
 
 export interface DashboardActivityEntry {
   type: DashboardActivityType;

@@ -12,7 +12,11 @@ export const dynamic = "force-dynamic";
 export const GET = createGetRoute({
   params: FindBookParamsDto,
   auth: { permissions: [AppPermission.BOOK_EDITION.READ] },
-  handler: async ({ params }) => bookEditionRepository.findAll({ where: { bookId: params.id }, sort: { field: "editionNumber", order: SortOrder.DESC } }),
+  handler: async ({ params }) =>
+    bookEditionRepository.findAll({
+      where: { bookId: params.id },
+      sort: { field: "editionNumber", order: SortOrder.DESC },
+    }),
 });
 
 // Publish is modelled as "create an Edition" — see the architecture plan's

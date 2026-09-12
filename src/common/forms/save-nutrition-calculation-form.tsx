@@ -2,7 +2,11 @@
 
 import { CustomForm, FieldType, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
 import { createNutritionCalculationEndpoint } from "../../../api/nutrition-calculation.endpoints";
-import { ComputeNutritionCalculationResponse, CreateNutritionCalculationDto, NutritionCalculation } from "../interfaces/nutrition-calculation.interface";
+import {
+  ComputeNutritionCalculationResponse,
+  CreateNutritionCalculationDto,
+  NutritionCalculation,
+} from "../interfaces/nutrition-calculation.interface";
 
 interface SaveFormValues {
   notes?: string;

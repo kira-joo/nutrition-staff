@@ -8,6 +8,5 @@ export const dynamic = "force-dynamic";
 // same "backend complete" convention as every other module.
 export const GET = createGetRoute({
   auth: false,
-  handler: async () =>
-    recipeCategoryRepository.findAllNoCountPublic({ where: { status: ContentStatus.PUBLISHED } }),
+  handler: async () => recipeCategoryRepository.findAllNoCountPublic({ where: { status: ContentStatus.PUBLISHED } }),
 });

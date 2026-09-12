@@ -12,7 +12,7 @@ import type { DeepPartial, MongooseRepository } from "@kira-joo/backend-toolkit-
  */
 export async function getOrCreateSingleton<T>(
   repository: Pick<MongooseRepository<T>, "findOne" | "save">,
-  defaults: DeepPartial<T>
+  defaults: DeepPartial<T>,
 ): Promise<T> {
   const existing = await repository.findOne({ where: {}, skipThrowError: true });
   if (existing) return existing;
@@ -22,7 +22,7 @@ export async function getOrCreateSingleton<T>(
 /** Same one-document convention as {@link getOrCreateSingleton}, for a write: updates the document if it already exists, otherwise creates it from `patch`. */
 export async function upsertSingleton<T>(
   repository: Pick<MongooseRepository<T>, "findOne" | "update" | "save">,
-  patch: DeepPartial<T>
+  patch: DeepPartial<T>,
 ): Promise<T> {
   const existing = await repository.findOne({ where: {}, skipThrowError: true });
   if (existing) return repository.update({ where: {} }, patch);

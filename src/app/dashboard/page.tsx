@@ -108,7 +108,9 @@ function FollowUpRowContent({ row, overdue }: { row: FollowUpRow; overdue: boole
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
           {row.clientPhone ? <span>{row.clientPhone}</span> : null}
           {/* `row.lifecycle` is a loosely-typed API string, not guaranteed to be a known `ClientLifecycle` — fall back rather than index out of bounds. */}
-          <Badge variant={LIFECYCLE_BADGE_VARIANT[row.lifecycle as ClientLifecycle] ?? "secondary"}>{row.lifecycle}</Badge>
+          <Badge variant={LIFECYCLE_BADGE_VARIANT[row.lifecycle as ClientLifecycle] ?? "secondary"}>
+            {row.lifecycle}
+          </Badge>
           {row.assignedStaffName ? <span>Assigned: {row.assignedStaffName}</span> : null}
         </div>
       </div>
@@ -146,7 +148,10 @@ function AttentionRow({ item }: { item: AttentionItem }) {
 export default function DashboardPage() {
   const [now, setNow] = useState(() => new Date());
   const [activePresetId, setActivePresetId] = useState("30d");
-  const [customRange, setCustomRange] = useState<DashboardDateRange>({ from: isoDate(daysBefore(now, 29)), to: isoDate(now) });
+  const [customRange, setCustomRange] = useState<DashboardDateRange>({
+    from: isoDate(daysBefore(now, 29)),
+    to: isoDate(now),
+  });
   const [assignedToUserId, setAssignedToUserId] = useState<string | undefined>(undefined);
 
   // Presets are relative to "right now" — recomputed whenever `now` is
@@ -165,12 +170,21 @@ export default function DashboardPage() {
   const staffOptions = staffOptionsQuery.data?.data ?? [];
 
   const kpisQuery = useRequesterQuery({ endpoint: getDashboardKpisEndpoint, options: { query: periodQuery } });
-  const followUpsQuery = useRequesterQuery({ endpoint: getDashboardFollowUpsEndpoint, options: { query: snapshotQuery } });
+  const followUpsQuery = useRequesterQuery({
+    endpoint: getDashboardFollowUpsEndpoint,
+    options: { query: snapshotQuery },
+  });
   const growthQuery = useRequesterQuery({ endpoint: getDashboardGrowthChartEndpoint, options: { query: periodQuery } });
-  const lifecycleQuery = useRequesterQuery({ endpoint: getDashboardLifecycleChartEndpoint, options: { query: snapshotQuery } });
+  const lifecycleQuery = useRequesterQuery({
+    endpoint: getDashboardLifecycleChartEndpoint,
+    options: { query: snapshotQuery },
+  });
   const sourceQuery = useRequesterQuery({ endpoint: getDashboardSourceChartEndpoint, options: { query: periodQuery } });
   const activityQuery = useRequesterQuery({ endpoint: getDashboardActivityEndpoint, options: { query: periodQuery } });
-  const attentionQuery = useRequesterQuery({ endpoint: getDashboardAttentionEndpoint, options: { query: snapshotQuery } });
+  const attentionQuery = useRequesterQuery({
+    endpoint: getDashboardAttentionEndpoint,
+    options: { query: snapshotQuery },
+  });
 
   const [refreshing, setRefreshing] = useState(false);
   const handleRefresh = async () => {
@@ -190,12 +204,13 @@ export default function DashboardPage() {
 
   const kpis = kpisQuery.data;
   const attention = attentionQuery.data;
-  const attentionCount = attention
-    ? Object.values(attention).reduce((total, items) => total + items.length, 0)
-    : 0;
+  const attentionCount = attention ? Object.values(attention).reduce((total, items) => total + items.length, 0) : 0;
 
   return (
-    <PageShell title="Dashboard" description="Today's clinic snapshot — who needs attention, what changed, and how the client base is growing.">
+    <PageShell
+      title="Dashboard"
+      description="Today's clinic snapshot — who needs attention, what changed, and how the client base is growing."
+    >
       <div className="flex flex-col gap-6">
         <DashboardFilterBar
           presets={RANGE_PRESETS}
@@ -211,14 +226,23 @@ export default function DashboardPage() {
               wrapperClassName="min-w-[10rem]"
               value={assignedToUserId ?? ""}
               onChange={(value) => setAssignedToUserId(value ? String(value) : undefined)}
-              options={[{ label: "All staff", value: "" }, ...staffOptions.map((staff) => ({ label: staff.name, value: staff._id }))]}
+              options={[
+                { label: "All staff", value: "" },
+                ...staffOptions.map((staff) => ({ label: staff.name, value: staff._id })),
+              ]}
             />
           }
         />
 
         {/* Primary KPI row — the most operationally urgent numbers at a glance. */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="Total Clients" value={kpis?.totalClients.value ?? 0} state={kpis?.totalClients.state ?? "neutral"} icon={Users} loading={kpisQuery.loading} />
+          <KpiCard
+            label="Total Clients"
+            value={kpis?.totalClients.value ?? 0}
+            state={kpis?.totalClients.state ?? "neutral"}
+            icon={Users}
+            loading={kpisQuery.loading}
+          />
           <KpiCard
             label="New Leads"
             value={kpis?.newLeads.value ?? 0}
@@ -246,7 +270,13 @@ export default function DashboardPage() {
 
         {/* Secondary KPI row — volume/growth metrics, valuable but less time-sensitive. */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="Active Clients" value={kpis?.activeClients.value ?? 0} state="neutral" icon={UserRoundCheck} loading={kpisQuery.loading} />
+          <KpiCard
+            label="Active Clients"
+            value={kpis?.activeClients.value ?? 0}
+            state="neutral"
+            icon={UserRoundCheck}
+            loading={kpisQuery.loading}
+          />
           <KpiCard
             label="New Clients"
             value={kpis?.newClients.value ?? 0}
@@ -300,13 +330,22 @@ export default function DashboardPage() {
             emptyTitle="Nothing overdue"
             emptyDescription="Every scheduled follow-up is on track."
             loading={followUpsQuery.loading}
-            actions={<Badge variant={(followUpsQuery.data?.overdue.length ?? 0) > 0 ? "destructive" : "secondary"}>{followUpsQuery.data?.overdue.length ?? 0}</Badge>}
+            actions={
+              <Badge variant={(followUpsQuery.data?.overdue.length ?? 0) > 0 ? "destructive" : "secondary"}>
+                {followUpsQuery.data?.overdue.length ?? 0}
+              </Badge>
+            }
           />
         </div>
 
         {/* Charts and analytics. */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ChartCard title="Client Growth" description="Cumulative clients over the selected period" loading={growthQuery.loading} className="lg:col-span-2">
+          <ChartCard
+            title="Client Growth"
+            description="Cumulative clients over the selected period"
+            loading={growthQuery.loading}
+            className="lg:col-span-2"
+          >
             <LineChart
               data={(growthQuery.data ?? []).map((point) => ({ date: point.date, value: point.value }))}
               series={[{ key: "value", label: "Cumulative Clients", color: "#0ea5e9" }]}
@@ -314,7 +353,11 @@ export default function DashboardPage() {
             />
           </ChartCard>
 
-          <ChartCard title="Current Lifecycle Funnel" description="Current pipeline snapshot — not a historical conversion rate" loading={lifecycleQuery.loading}>
+          <ChartCard
+            title="Current Lifecycle Funnel"
+            description="Current pipeline snapshot — not a historical conversion rate"
+            loading={lifecycleQuery.loading}
+          >
             <QueryState query={lifecycleQuery} entityName="Lifecycle data">
               {(lifecycleData) => (
                 <div className="flex flex-col gap-6">
@@ -324,20 +367,32 @@ export default function DashboardPage() {
             </QueryState>
           </ChartCard>
 
-          <ChartCard title="Client Source Distribution" description="Where clients created in this period came from" loading={sourceQuery.loading}>
+          <ChartCard
+            title="Client Source Distribution"
+            description="Where clients created in this period came from"
+            loading={sourceQuery.loading}
+          >
             <DonutChart data={sourceQuery.data ?? []} emptyMessage="No clients created in this period" />
           </ChartCard>
         </div>
 
         {/* Recent activity — a read-side merge of existing records, most recent first. */}
-        <ChartCard title="Recent Activity" description="What changed recently, across the whole clinic" loading={activityQuery.loading}>
+        <ChartCard
+          title="Recent Activity"
+          description="What changed recently, across the whole clinic"
+          loading={activityQuery.loading}
+        >
           <Timeline
             items={(activityQuery.data ?? []).map((entry, index) => ({
               id: `${entry.type}-${entry.clientProfileId}-${index}`,
               content: (
                 <div className="flex items-center justify-between gap-3">
                   <span>
-                    <AppLink path={AppRoute.clientOverview} params={{ id: entry.clientProfileId }} className="font-medium">
+                    <AppLink
+                      path={AppRoute.clientOverview}
+                      params={{ id: entry.clientProfileId }}
+                      className="font-medium"
+                    >
                       {entry.clientName}
                     </AppLink>{" "}
                     <span className="text-slate-500">— {entry.summary}</span>

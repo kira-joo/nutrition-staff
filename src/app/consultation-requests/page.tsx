@@ -2,13 +2,7 @@
 
 import { Eye, Inbox, UserRoundCog } from "lucide-react";
 
-import {
-  Badge,
-  DateText,
-  FeatureTable,
-  PageShell,
-  type TableColumn,
-} from "@kira-joo/frontend-toolkit-tailwind";
+import { Badge, DateText, FeatureTable, PageShell, type TableColumn } from "@kira-joo/frontend-toolkit-tailwind";
 
 import { LIFECYCLE_BADGE_VARIANT } from "src/common/badges/badge-variants";
 import { ConsultationRequestIntent } from "src/common/enums";
@@ -61,7 +55,9 @@ export default function ConsultationRequestsPage() {
       header: "Client status",
       render: (request) =>
         request.clientProfileId ? (
-          <Badge variant={LIFECYCLE_BADGE_VARIANT[request.clientProfileId.lifecycle]}>{request.clientProfileId.lifecycle}</Badge>
+          <Badge variant={LIFECYCLE_BADGE_VARIANT[request.clientProfileId.lifecycle]}>
+            {request.clientProfileId.lifecycle}
+          </Badge>
         ) : (
           "—"
         ),
@@ -74,7 +70,11 @@ export default function ConsultationRequestsPage() {
   ];
 
   return (
-    <PageShell icon={Inbox} title="Consultation Requests" description="Submissions from the public website's consultation form">
+    <PageShell
+      icon={Inbox}
+      title="Consultation Requests"
+      description="Submissions from the public website's consultation form"
+    >
       <FeatureTable<ConsultationRequest, typeof getConsultationRequestsEndpoint>
         endpoint={getConsultationRequestsEndpoint}
         entityName="Consultation Requests"

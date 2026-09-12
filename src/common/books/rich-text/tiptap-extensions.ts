@@ -51,7 +51,9 @@ export const HighlightMark = Mark.create({
   },
   parseHTML: () => [{ tag: "mark" }],
   renderHTML: ({ HTMLAttributes }) => {
-    const color = isHighlightColorToken(HTMLAttributes["data-color"]) ? HTMLAttributes["data-color"] : DEFAULT_HIGHLIGHT_COLOR;
+    const color = isHighlightColorToken(HTMLAttributes["data-color"])
+      ? HTMLAttributes["data-color"]
+      : DEFAULT_HIGHLIGHT_COLOR;
     return ["mark", mergeAttributes(HTMLAttributes, { class: `book-highlight book-highlight--${color}` }), 0];
   },
 });

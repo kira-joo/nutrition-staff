@@ -1,7 +1,16 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { Badge, DateText, InfoRow, PageSection, PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  Badge,
+  DateText,
+  InfoRow,
+  PageSection,
+  PageShell,
+  QueryState,
+  RouteButton,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, ListTree, Pencil } from "lucide-react";
 import { getRecipeCategoryByIdEndpoint } from "../../../../api/recipe-category.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -9,7 +18,8 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function RecipeCategoryDetailsPage({ params }: { params: { id: string } }) {
+export default function RecipeCategoryDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const categoryQuery = useRequesterQuery({
     endpoint: getRecipeCategoryByIdEndpoint,
     options: { params: { id: params.id } },

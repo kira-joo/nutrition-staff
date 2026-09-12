@@ -12,12 +12,14 @@ export const dynamic = "force-dynamic";
 export const PUT = createPutRoute({
   params: FindSectionBlockParamsDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
-  handler: async ({ request, params }) => replaceBookBlock(request, params.id, containerRefFromParams(params), params.blockId),
+  handler: async ({ request, params }) =>
+    replaceBookBlock(request, params.id, containerRefFromParams(params), params.blockId),
 });
 
 export const DELETE = createDeleteRoute({
   params: FindSectionBlockParamsDto,
   body: ExpectedRevisionDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
-  handler: async ({ params, body }) => removeBookBlock(params.id, containerRefFromParams(params), params.blockId, body.expectedRevision),
+  handler: async ({ params, body }) =>
+    removeBookBlock(params.id, containerRefFromParams(params), params.blockId, body.expectedRevision),
 });

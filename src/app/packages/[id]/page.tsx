@@ -1,7 +1,16 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { Badge, DateText, InfoRow, PageSection, PageShell, QueryState, RouteButton } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  Badge,
+  DateText,
+  InfoRow,
+  PageSection,
+  PageShell,
+  QueryState,
+  RouteButton,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, DollarSign, Package as PackageIcon, Pencil } from "lucide-react";
 import { getPackageByIdEndpoint } from "../../../../api/package.endpoints";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -9,7 +18,8 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function PackageDetailsPage({ params }: { params: { id: string } }) {
+export default function PackageDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const packageQuery = useRequesterQuery({
     endpoint: getPackageByIdEndpoint,
     options: { params: { id: params.id } },
@@ -52,9 +62,18 @@ export default function PackageDetailsPage({ params }: { params: { id: string } 
             </PageSection>
             <PageSection icon={DollarSign} title="Pricing">
               <div className="flex flex-col gap-3">
-                <InfoRow label="1 Month" value={`${pkg.pricingTiers.month.price} (was ${pkg.pricingTiers.month.originalPrice})`} />
-                <InfoRow label="2 Months" value={`${pkg.pricingTiers.quarter.price} (was ${pkg.pricingTiers.quarter.originalPrice})`} />
-                <InfoRow label="3 Months" value={`${pkg.pricingTiers.half.price} (was ${pkg.pricingTiers.half.originalPrice})`} />
+                <InfoRow
+                  label="1 Month"
+                  value={`${pkg.pricingTiers.month.price} (was ${pkg.pricingTiers.month.originalPrice})`}
+                />
+                <InfoRow
+                  label="2 Months"
+                  value={`${pkg.pricingTiers.quarter.price} (was ${pkg.pricingTiers.quarter.originalPrice})`}
+                />
+                <InfoRow
+                  label="3 Months"
+                  value={`${pkg.pricingTiers.half.price} (was ${pkg.pricingTiers.half.originalPrice})`}
+                />
                 <InfoRow label="Created" value={<DateText value={pkg.createdAt} />} />
                 <InfoRow label="Updated" value={<DateText value={pkg.updatedAt} />} />
               </div>

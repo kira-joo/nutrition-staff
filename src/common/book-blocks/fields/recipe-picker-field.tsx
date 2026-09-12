@@ -13,11 +13,21 @@ export function recipePickerField<T extends FieldValues>(name: Path<T>, label: s
     type: FieldType.CUSTOM,
     name,
     label,
-    render: ({ field, error }) => <RecipePickerControl value={field.value as string} onChange={field.onChange} error={error} />,
+    render: ({ field, error }) => (
+      <RecipePickerControl value={field.value as string} onChange={field.onChange} error={error} />
+    ),
   };
 }
 
-function RecipePickerControl({ value, onChange, error }: { value: string; onChange: (id: string) => void; error?: string }) {
+function RecipePickerControl({
+  value,
+  onChange,
+  error,
+}: {
+  value: string;
+  onChange: (id: string) => void;
+  error?: string;
+}) {
   const recipesQuery = useRequesterQuery({
     endpoint: getRecipesEndpoint,
     options: { query: { status: ContentStatus.PUBLISHED, page: 1, limit: 200 } },
@@ -31,7 +41,10 @@ function RecipePickerControl({ value, onChange, error }: { value: string; onChan
       onChange={(nextValue) => onChange(Array.isArray(nextValue) ? nextValue[0] : nextValue)}
       error={error}
       placeholder={recipesQuery.isLoading ? "Loading recipes…" : "Select a recipe"}
-      options={recipes.map((recipe: Recipe) => ({ label: recipe.title?.ar ?? recipe.title?.en ?? recipe._id, value: recipe._id }))}
+      options={recipes.map((recipe: Recipe) => ({
+        label: recipe.title?.ar ?? recipe.title?.en ?? recipe._id,
+        value: recipe._id,
+      }))}
     />
   );
 }

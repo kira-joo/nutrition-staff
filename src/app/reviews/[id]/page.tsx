@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
@@ -18,7 +19,8 @@ import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 import { getReviewByIdEndpoint } from "../../../../api/review.endpoints";
 
-export default function ReviewDetailsPage({ params }: { params: { id: string } }) {
+export default function ReviewDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const reviewQuery = useRequesterQuery({
     endpoint: getReviewByIdEndpoint,
     options: { params: { id: params.id } },

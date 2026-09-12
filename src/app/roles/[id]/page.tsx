@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
@@ -16,19 +17,26 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
 import { getRoleByIdEndpoint } from "../../../../api/role.endpoints";
 
-export default function RoleDetailsPage({ params }: { params: { id: string } }) {
+export default function RoleDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const roleQuery = useRequesterQuery({
     endpoint: getRoleByIdEndpoint,
     options: { params: { id: params.id } },
   });
 
   return (
-    <QueryState query={roleQuery} entityName={EntityName.ROLE} backRoute={{ path: AppRoute.roles, label: "Back to Roles" }}>
+    <QueryState
+      query={roleQuery}
+      entityName={EntityName.ROLE}
+      backRoute={{ path: AppRoute.roles, label: "Back to Roles" }}
+    >
       {(role) => (
         <PageShell
           icon={ShieldCheck}
           title={role.name}
-          badge={<Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>}
+          badge={
+            <Badge variant={role.isActive ? "success" : "secondary"}>{role.isActive ? "Active" : "Inactive"}</Badge>
+          }
           actions={
             <RouteButton
               path={AppRoute.roleUpdate}

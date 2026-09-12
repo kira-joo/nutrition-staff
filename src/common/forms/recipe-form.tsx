@@ -91,9 +91,7 @@ export function RecipeForm({ defaultValues, endpoint }: RecipeFormProps) {
           createItem={() => ({ ...EMPTY_LOCALIZED })}
           addLabel="Add ingredient"
           emptyLabel="No ingredients yet."
-          renderItem={(item, index, update) => (
-            <LocalizedTextPair label="Ingredient" value={item} onChange={update} />
-          )}
+          renderItem={(item, index, update) => <LocalizedTextPair label="Ingredient" value={item} onChange={update} />}
         />
       ),
     },

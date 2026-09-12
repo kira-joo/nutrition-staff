@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -8,14 +9,19 @@ import { RoleForm } from "src/common/forms/role-form";
 import { AppRoute } from "src/common/routes/app-route";
 import { getRoleByIdEndpoint, updateRoleEndpoint } from "../../../../../api/role.endpoints";
 
-export default function RoleUpdatePage({ params }: { params: { id: string } }) {
+export default function RoleUpdatePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const roleQuery = useRequesterQuery({
     endpoint: getRoleByIdEndpoint,
     options: { params: { id: params.id } },
   });
 
   return (
-    <QueryState query={roleQuery} entityName={EntityName.ROLE} backRoute={{ path: AppRoute.roles, label: "Back to Roles" }}>
+    <QueryState
+      query={roleQuery}
+      entityName={EntityName.ROLE}
+      backRoute={{ path: AppRoute.roles, label: "Back to Roles" }}
+    >
       {(role) => (
         <PageShell icon={ShieldCheck} title="Update Role" description="Update role permissions">
           <RoleForm defaultValues={role} endpoint={updateRoleEndpoint} />

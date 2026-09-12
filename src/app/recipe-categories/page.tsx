@@ -57,7 +57,11 @@ export default function RecipeCategoriesPage() {
       title="Recipe Categories"
       description="Categories recipes can be filtered by on the public site"
       actions={
-        <RouteButton path={AppRoute.recipeCategoryCreate} permission={AppPermission.RECIPE_CATEGORY.CREATE} leftIcon={Plus}>
+        <RouteButton
+          path={AppRoute.recipeCategoryCreate}
+          permission={AppPermission.RECIPE_CATEGORY.CREATE}
+          leftIcon={Plus}
+        >
           Add Category
         </RouteButton>
       }

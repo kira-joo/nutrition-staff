@@ -1,8 +1,5 @@
 import { eraseTokenCookie } from "@kira-joo/backend-toolkit-next";
-import {
-  STAFF_SESSION_COOKIE,
-  STAFF_SESSION_MAX_AGE_SECONDS,
-} from "src/common/auth/session-cookie.constant";
+import { STAFF_SESSION_COOKIE, STAFF_SESSION_MAX_AGE_SECONDS } from "src/common/auth/session-cookie.constant";
 import { createPostRoute } from "src/server/core/route-factories";
 
 export const dynamic = "force-dynamic";

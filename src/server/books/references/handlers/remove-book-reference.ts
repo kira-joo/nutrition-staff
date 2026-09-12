@@ -9,9 +9,12 @@ export async function removeBookReference(bookId: string, referenceId: string, e
 
   const citingBlocks = findBlocksCitingReference(book, referenceId);
   if (citingBlocks.length > 0) {
-    throw new BadRequestError(`This reference is cited by ${citingBlocks.length} block(s). Remove those citations first.`, {
-      citingBlockIds: citingBlocks.map((block) => block.id),
-    });
+    throw new BadRequestError(
+      `This reference is cited by ${citingBlocks.length} block(s). Remove those citations first.`,
+      {
+        citingBlockIds: citingBlocks.map((block) => block.id),
+      },
+    );
   }
 
   const nextReferences = book.references.filter((reference) => reference.id !== referenceId);
@@ -19,7 +22,7 @@ export async function removeBookReference(bookId: string, referenceId: string, e
   try {
     return await bookRepository.update(
       { where: { _id: bookId, contentRevision: expectedRevision } },
-      { references: nextReferences, contentRevision: expectedRevision + 1 }
+      { references: nextReferences, contentRevision: expectedRevision + 1 },
     );
   } catch (error) {
     if (error instanceof NotFoundError) {

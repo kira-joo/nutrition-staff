@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { SortOrder, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Card, CustomButton, DateText, EmptyState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -9,7 +10,8 @@ import { AppRoute } from "src/common/routes/app-route";
 import { useNavigate } from "src/common/routes/use-navigate";
 import { getNutritionCalculationsEndpoint } from "../../../../../api/nutrition-calculation.endpoints";
 
-export default function ClientCalculationsPage({ params }: { params: { id: string } }) {
+export default function ClientCalculationsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
   const { can } = usePermissions();
 
@@ -44,7 +46,9 @@ export default function ClientCalculationsPage({ params }: { params: { id: strin
             <Card
               key={calculation._id}
               className="cursor-pointer p-4 hover:bg-slate-50"
-              onClick={() => navigate(AppRoute.clientCalculationDetails, { id: params.id, calculationId: calculation._id })}
+              onClick={() =>
+                navigate(AppRoute.clientCalculationDetails, { id: params.id, calculationId: calculation._id })
+              }
             >
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
@@ -53,7 +57,9 @@ export default function ClientCalculationsPage({ params }: { params: { id: strin
                   </span>
                   <span className="text-sm text-slate-500">
                     {calculation.results.bmi ? `BMI ${calculation.results.bmi.value}` : ""}
-                    {calculation.results.goalCalories ? ` • Goal ${calculation.results.goalCalories.value} kcal/day` : ""}
+                    {calculation.results.goalCalories
+                      ? ` • Goal ${calculation.results.goalCalories.value} kcal/day`
+                      : ""}
                     {calculation.results.maintenanceCalories && !calculation.results.goalCalories
                       ? ` • Maintenance ${calculation.results.maintenanceCalories.value} kcal/day`
                       : ""}

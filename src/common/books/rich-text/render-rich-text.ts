@@ -9,7 +9,12 @@ import { DEFAULT_HIGHLIGHT_COLOR, isFontSizeToken, isHighlightColorToken, isText
  * `assert-valid-rich-text-doc.ts` are ever emitted as an attribute.
  */
 export function escapeHtml(text: string): string {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 const SAFE_HREF_PATTERN = /^(https?:\/\/|\/)/;
@@ -109,12 +114,15 @@ export function richTextToPlainText(doc: RichTextDoc | null | undefined): string
  * a paragraph continuation that crosses a page boundary keeps its bold/
  * italic/highlight/link/citation marks instead of losing them.
  */
-export function richTextToParagraphRuns(doc: RichTextDoc | null | undefined): { runs: { text: string; marks: RichTextMark[] }[] }[] {
+export function richTextToParagraphRuns(
+  doc: RichTextDoc | null | undefined,
+): { runs: { text: string; marks: RichTextMark[] }[] }[] {
   if (!doc || !Array.isArray(doc.content)) return [];
   return doc.content.reduce<{ runs: { text: string; marks: RichTextMark[] }[] }[]>((paragraphs, node) => {
     if (node.type !== "paragraph") return paragraphs;
     const runs = (node.content ?? []).reduce<{ text: string; marks: RichTextMark[] }[]>((acc, child) => {
-      if (child.type === "text" && (child.text ?? "").length > 0) acc.push({ text: child.text ?? "", marks: child.marks ?? [] });
+      if (child.type === "text" && (child.text ?? "").length > 0)
+        acc.push({ text: child.text ?? "", marks: child.marks ?? [] });
       return acc;
     }, []);
     paragraphs.push({ runs });

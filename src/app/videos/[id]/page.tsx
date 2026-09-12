@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
@@ -18,7 +19,8 @@ import { EntityName } from "src/common/authorization/entity-name.enum";
 import { ContentStatus } from "src/common/enums";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function VideoDetailsPage({ params }: { params: { id: string } }) {
+export default function VideoDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const videoQuery = useRequesterQuery({
     endpoint: getVideoByIdEndpoint,
     options: { params: { id: params.id } },
@@ -56,7 +58,9 @@ export default function VideoDetailsPage({ params }: { params: { id: string } })
                   <source src={video.video.secureUrl} />
                 </video>
               ) : video.poster ? (
-                <AssetViewer image={{ asset: video.poster, label: video.title?.en || video.title?.ar || "Video poster" }} />
+                <AssetViewer
+                  image={{ asset: video.poster, label: video.title?.en || video.title?.ar || "Video poster" }}
+                />
               ) : (
                 <p className="text-sm text-slate-500">No uploaded video or poster.</p>
               )}

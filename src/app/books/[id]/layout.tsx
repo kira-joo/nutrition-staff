@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { Badge, PageShell, QueryState, RouteTabs, type RouteTabItem } from "@kira-joo/frontend-toolkit-tailwind";
@@ -26,7 +27,11 @@ const BOOK_EDITOR_TABS: RouteTabItem<string>[] = [
   { id: "editions", label: "Editions", path: AppRoute.bookEditions, permission: AppPermission.BOOK_EDITION.READ },
 ];
 
-export default function BookEditorLayout({ children, params }: { children: ReactNode; params: { id: string } }) {
+export default function BookEditorLayout(props: { children: ReactNode; params: Promise<{ id: string }> }) {
+  const params = use(props.params);
+
+  const { children } = props;
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -35,8 +40,17 @@ export default function BookEditorLayout({ children, params }: { children: React
   return (
     <QueryState query={bookQuery} entityName="Book" backRoute={{ path: AppRoute.books, label: "Back to Books" }}>
       {(book) => (
-        <PageShell icon={BookOpen} title={book.title} badge={<Badge variant={BOOK_STATUS_BADGE_VARIANT[book.status]}>{book.status}</Badge>}>
-          <RouteTabs tabs={BOOK_EDITOR_TABS} pathname={pathname} params={{ id: params.id }} onNavigate={(href) => router.push(href)} />
+        <PageShell
+          icon={BookOpen}
+          title={book.title}
+          badge={<Badge variant={BOOK_STATUS_BADGE_VARIANT[book.status]}>{book.status}</Badge>}
+        >
+          <RouteTabs
+            tabs={BOOK_EDITOR_TABS}
+            pathname={pathname}
+            params={{ id: params.id }}
+            onNavigate={(href) => router.push(href)}
+          />
           <div className="mt-4">{children}</div>
         </PageShell>
       )}

@@ -12,7 +12,7 @@ import {
   type TableColumn,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Plus, Ruler } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, use } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { AppRoute } from "src/common/routes/app-route";
@@ -24,7 +24,8 @@ import {
   updateClientMeasurementEndpoint,
 } from "../../../../../api/client-measurement.endpoints";
 
-export default function ClientMeasurementsPage({ params }: { params: { id: string } }) {
+export default function ClientMeasurementsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
   const { can } = usePermissions();
   const tableRef = useRef<FeatureTableHandle>(null);
@@ -76,10 +77,7 @@ export default function ClientMeasurementsPage({ params }: { params: { id: strin
           )}
         </div>
         {can(AppPermission.CLIENT_MEASUREMENT.CREATE) ? (
-          <CustomButton
-            leftIcon={Plus}
-            onClick={() => navigate(AppRoute.clientMeasurementCreate, { id: params.id })}
-          >
+          <CustomButton leftIcon={Plus} onClick={() => navigate(AppRoute.clientMeasurementCreate, { id: params.id })}>
             Add measurement
           </CustomButton>
         ) : null}

@@ -13,7 +13,7 @@ import {
   RouteButton,
 } from "@kira-joo/frontend-toolkit-tailwind";
 import { Activity, Briefcase, Contact, IdCard, Pencil, UserPlus, UserRound } from "lucide-react";
-import { useState } from "react";
+import { useState, use } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { EntityName } from "src/common/authorization/entity-name.enum";
@@ -25,7 +25,8 @@ import { getClientByUserIdEndpoint } from "../../../../api/client-profile.endpoi
 import { getStaffProfileByUserIdEndpoint } from "../../../../api/staff-profile.endpoints";
 import { getUserByIdEndpoint } from "../../../../api/user.endpoints";
 
-export default function UserDetailsPage({ params }: { params: { id: string } }) {
+export default function UserDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { can } = usePermissions();
   const [staffDialogOpen, setStaffDialogOpen] = useState(false);
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
@@ -112,7 +113,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
                   </>
                 ) : (
                   <p className="text-sm text-slate-500">
-                    This identity has no staff profile yet — it isn't a current or former staff member.
+                    This identity has no staff profile yet — it isn&apos;t a current or former staff member.
                   </p>
                 )}
               </div>
@@ -149,7 +150,7 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
                 ) : (
                   <>
                     <p className="text-sm text-slate-500">
-                      This identity has no client profile yet — it isn't a current or former client.
+                      This identity has no client profile yet — it isn&apos;t a current or former client.
                     </p>
                     {can(AppPermission.CLIENT.CREATE) ? (
                       <CustomButton

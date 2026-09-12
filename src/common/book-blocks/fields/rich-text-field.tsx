@@ -8,14 +8,19 @@ import type { RichTextDoc } from "src/common/books/rich-text/rich-text-doc.inter
 export function richTextField<T extends FieldValues>(
   name: Path<T>,
   label: string,
-  referenceOptions: { id: string; label: string }[] = []
+  referenceOptions: { id: string; label: string }[] = [],
 ): FormFieldConfig<T> {
   return {
     type: FieldType.CUSTOM,
     name,
     label,
     render: ({ field, error }) => (
-      <RichTextEditor value={field.value as RichTextDoc} onChange={field.onChange} referenceOptions={referenceOptions} error={error} />
+      <RichTextEditor
+        value={field.value as RichTextDoc}
+        onChange={field.onChange}
+        referenceOptions={referenceOptions}
+        error={error}
+      />
     ),
   };
 }

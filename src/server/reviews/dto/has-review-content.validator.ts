@@ -48,7 +48,7 @@ class HasReviewContentConstraint implements ValidatorConstraintInterface {
  * Both copies read the whole object via `args.object`.
  */
 export function HasReviewContent(validationOptions?: ValidationOptions): ClassDecorator {
-  return function (target: Function) {
+  return function (target) {
     for (const propertyName of ["content", "__hasReviewContent"]) {
       registerDecorator({
         target,

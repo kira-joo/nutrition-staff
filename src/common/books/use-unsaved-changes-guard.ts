@@ -15,7 +15,15 @@ import { useEffect, useRef } from "react";
  */
 export function useUnsavedChangesGuard(isPending: boolean, flush: () => Promise<unknown>) {
   const isPendingRef = useRef(isPending);
-  isPendingRef.current = isPending;
+
+  // isPendingRef is only ever read from the event listeners below, which
+  // always run after this has committed — never synchronously during
+  // render — so a dedicated effect satisfies react-hooks/refs without
+  // changing behaviour. Kept separate from the listener effect below so
+  // updating isPending doesn't tear down and re-add the listeners.
+  useEffect(() => {
+    isPendingRef.current = isPending;
+  }, [isPending]);
 
   useEffect(() => {
     function handleBeforeUnload(event: BeforeUnloadEvent): void {
