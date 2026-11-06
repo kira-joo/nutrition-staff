@@ -40,6 +40,13 @@ error serialization all happen in the factory.
   `src/server/core/toolkit.config.ts`.
 - Read `backend-toolkit-next/src/routes/create-route.ts` and its test file once —
   it makes every route file in this repo trivially readable.
+- **Client-side `Endpoint` constants live in `src/common/api/*.endpoints.ts`.
+  Never put a file in a repo-root `api/` directory.** Vercel turns every file
+  under a top-level `/api/` into its own Serverless Function, independently of
+  Next.js. The 31 endpoint files that used to sit there pushed every `staging`
+  deployment past the Hobby plan's 12-function cap
+  (`exceeded_serverless_functions_per_deployment`). Route handlers live in
+  `src/app/api/`.
 
 ## Cache invalidation
 

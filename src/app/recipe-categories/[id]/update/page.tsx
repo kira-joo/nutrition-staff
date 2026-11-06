@@ -4,10 +4,7 @@ import { use } from "react";
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { ListTree } from "lucide-react";
-import {
-  getRecipeCategoryByIdEndpoint,
-  updateRecipeCategoryEndpoint,
-} from "src/common/api/recipe-category.endpoints";
+import { getRecipeCategoryByIdEndpoint, updateRecipeCategoryEndpoint } from "src/common/api/recipe-category.endpoints";
 import { RecipeCategoryForm } from "src/common/forms/recipe-category-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
