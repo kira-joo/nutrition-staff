@@ -1,7 +1,18 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { CustomForm, DateText, FieldType, InfoRow, PageSection, PageShell, QueryState, toast, type FormFieldConfig } from "@kira-joo/frontend-toolkit-tailwind";
+import {
+  CustomForm,
+  DateText,
+  FieldType,
+  InfoRow,
+  PageSection,
+  PageShell,
+  QueryState,
+  toast,
+  type FormFieldConfig,
+} from "@kira-joo/frontend-toolkit-tailwind";
 import { FlaskConical } from "lucide-react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
@@ -19,7 +30,10 @@ interface NotesFormValues {
   notes?: string;
 }
 
-export default function ClientCalculationDetailsPage({ params }: { params: { id: string; calculationId: string } }) {
+export default function ClientCalculationDetailsPage(props: {
+  params: Promise<{ id: string; calculationId: string }>;
+}) {
+  const params = use(props.params);
   const { can } = usePermissions();
   const navigate = useNavigate();
 
@@ -55,7 +69,16 @@ export default function ClientCalculationDetailsPage({ params }: { params: { id:
               <div className="flex flex-col gap-3">
                 <InfoRow label="Calculated by" value={calculation.calculatedByUserId.name} />
                 <InfoRow label="Engine version" value={calculation.engineVersion} />
-                <InfoRow label="Assigned" value={calculation.assignedAt ? <DateText value={calculation.assignedAt} /> : "N/A (calculated directly for this client)"} />
+                <InfoRow
+                  label="Assigned"
+                  value={
+                    calculation.assignedAt ? (
+                      <DateText value={calculation.assignedAt} />
+                    ) : (
+                      "N/A (calculated directly for this client)"
+                    )
+                  }
+                />
                 <InfoRow
                   label="Based on measurement"
                   value={
@@ -80,7 +103,10 @@ export default function ClientCalculationDetailsPage({ params }: { params: { id:
                         type="button"
                         className="text-left underline hover:text-slate-900"
                         onClick={() =>
-                          navigate(AppRoute.clientAssessmentDetails, { id: params.id, assessmentId: linkedAssessmentQuery.data._id })
+                          navigate(AppRoute.clientAssessmentDetails, {
+                            id: params.id,
+                            assessmentId: linkedAssessmentQuery.data._id,
+                          })
                         }
                       >
                         <DateText value={linkedAssessmentQuery.data.assessedAt} />
@@ -98,7 +124,13 @@ export default function ClientCalculationDetailsPage({ params }: { params: { id:
             <PageSection title="Notes">
               {can(AppPermission.NUTRITION_CALCULATION.UPDATE) ? (
                 <CustomForm<NotesFormValues, typeof updateNutritionCalculationEndpoint>
-                  sections={[{ fields: [{ type: FieldType.TEXTAREA, name: "notes", label: "Notes" }] as FormFieldConfig<NotesFormValues>[] }]}
+                  sections={[
+                    {
+                      fields: [
+                        { type: FieldType.TEXTAREA, name: "notes", label: "Notes" },
+                      ] as FormFieldConfig<NotesFormValues>[],
+                    },
+                  ]}
                   defaultValues={{ notes: calculation.notes }}
                   submitEndpoint={updateNutritionCalculationEndpoint}
                   submitParams={{ id: calculation._id }}

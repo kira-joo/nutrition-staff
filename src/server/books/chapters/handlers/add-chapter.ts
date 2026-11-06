@@ -18,7 +18,13 @@ export async function addChapter(request: NextRequest, bookId: string) {
     throw new BadRequestError(`This book has reached its ${MAX_CHAPTERS}-chapter limit.`);
   }
 
-  const { uploaded } = await processAssetUploadFields({ files, payload, fields: CHAPTER_ASSET_FIELDS, provider: assetProvider, folder: CHAPTER_ASSET_FOLDER });
+  const { uploaded } = await processAssetUploadFields({
+    files,
+    payload,
+    fields: CHAPTER_ASSET_FIELDS,
+    provider: assetProvider,
+    folder: CHAPTER_ASSET_FOLDER,
+  });
 
   try {
     const dto = await validateDto(CreateChapterDto, payload);
@@ -40,7 +46,10 @@ export async function addChapter(request: NextRequest, bookId: string) {
     assertBookSizeBudget({ ...book, chapters: nextChapters } as unknown as Record<string, unknown>);
 
     try {
-      return await bookRepository.update({ where: { _id: bookId, contentRevision: expectedRevision } }, { chapters: nextChapters, contentRevision: expectedRevision + 1 });
+      return await bookRepository.update(
+        { where: { _id: bookId, contentRevision: expectedRevision } },
+        { chapters: nextChapters, contentRevision: expectedRevision + 1 },
+      );
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ConflictError("This book's content was changed elsewhere. Refresh the page and try again.");

@@ -12,8 +12,17 @@ import type { BookSchema } from "src/server/books/book.schema";
 export function freezeBookContent(
   book: Pick<
     BookSchema,
-    "title" | "subtitle" | "coverMode" | "coverImage" | "backCoverMode" | "backCoverImage" | "frontMatter" | "chapters" | "backMatter" | "references"
-  >
+    | "title"
+    | "subtitle"
+    | "coverMode"
+    | "coverImage"
+    | "backCoverMode"
+    | "backCoverImage"
+    | "frontMatter"
+    | "chapters"
+    | "backMatter"
+    | "references"
+  >,
 ): FrozenBookContent {
   return JSON.parse(
     JSON.stringify({
@@ -27,6 +36,6 @@ export function freezeBookContent(
       chapters: book.chapters,
       backMatter: book.backMatter,
       references: book.references,
-    })
+    }),
   );
 }

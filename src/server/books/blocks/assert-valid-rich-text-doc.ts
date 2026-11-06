@@ -23,7 +23,7 @@ const SAFE_HREF_PATTERN = /^(https?:\/\/|\/)/;
  */
 export function assertValidRichTextDoc(value: unknown): void {
   if (!isPlainObject(value) || value.type !== "doc" || !Array.isArray(value.content)) {
-    throw new BadRequestError("Invalid rich text document: expected { type: \"doc\", content: [...] }.");
+    throw new BadRequestError('Invalid rich text document: expected { type: "doc", content: [...] }.');
   }
 
   let nodeCount = 0;
@@ -82,7 +82,9 @@ export function assertValidRichTextDoc(value: unknown): void {
     }
     for (const mark of marks) {
       if (!isPlainObject(mark) || typeof mark.type !== "string" || !ALLOWED_MARK_TYPES.has(mark.type)) {
-        throw new BadRequestError(`Invalid mark at ${path}: "${JSON.stringify(mark)}".`, { allowed: [...ALLOWED_MARK_TYPES] });
+        throw new BadRequestError(`Invalid mark at ${path}: "${JSON.stringify(mark)}".`, {
+          allowed: [...ALLOWED_MARK_TYPES],
+        });
       }
       const extraKeys = Object.keys(mark).filter((key) => !["type", "attrs"].includes(key));
       if (extraKeys.length > 0) {
@@ -104,7 +106,9 @@ export function assertValidRichTextDoc(value: unknown): void {
         throw new BadRequestError(`Link mark at ${path} must have exactly one attr, "href" (a string).`);
       }
       if (!SAFE_HREF_PATTERN.test(attrs.href)) {
-        throw new BadRequestError(`Link mark at ${path} has an unsafe href protocol: "${attrs.href}". Only http(s):// and relative paths are allowed.`);
+        throw new BadRequestError(
+          `Link mark at ${path} has an unsafe href protocol: "${attrs.href}". Only http(s):// and relative paths are allowed.`,
+        );
       }
       return;
     }
@@ -126,25 +130,33 @@ export function assertValidRichTextDoc(value: unknown): void {
         throw new BadRequestError(`Highlight mark at ${path} accepts only a "color" attr.`, { disallowed: extraKeys });
       }
       if (attrs.color !== undefined && attrs.color !== null && !isHighlightColorToken(attrs.color)) {
-        throw new BadRequestError(`Highlight mark at ${path} has an unsupported color token: "${String(attrs.color)}".`);
+        throw new BadRequestError(
+          `Highlight mark at ${path} has an unsupported color token: "${String(attrs.color)}".`,
+        );
       }
       return;
     }
     if (markType === "fontSize") {
       const extraKeys = Object.keys(attrs).filter((key) => key !== "size");
       if (extraKeys.length > 0 || !isFontSizeToken(attrs.size)) {
-        throw new BadRequestError(`Font size mark at ${path} must have exactly one attr, "size", set to a supported size token.`, {
-          received: String(attrs.size),
-        });
+        throw new BadRequestError(
+          `Font size mark at ${path} must have exactly one attr, "size", set to a supported size token.`,
+          {
+            received: String(attrs.size),
+          },
+        );
       }
       return;
     }
     if (markType === "textColor") {
       const extraKeys = Object.keys(attrs).filter((key) => key !== "color");
       if (extraKeys.length > 0 || !isTextColorToken(attrs.color)) {
-        throw new BadRequestError(`Text colour mark at ${path} must have exactly one attr, "color", set to a supported colour token.`, {
-          received: String(attrs.color),
-        });
+        throw new BadRequestError(
+          `Text colour mark at ${path} must have exactly one attr, "color", set to a supported colour token.`,
+          {
+            received: String(attrs.color),
+          },
+        );
       }
       return;
     }

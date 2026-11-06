@@ -25,7 +25,8 @@ export const POST = createPostRoute({
   body: CreateConsultationRequestDto,
   auth: false,
   handler: async ({ body, request }) => {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
     return createConsultationRequest(body, ip);
   },
 });

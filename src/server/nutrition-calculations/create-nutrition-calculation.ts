@@ -28,7 +28,9 @@ export async function createNutritionCalculation(body: CreateNutritionCalculatio
 
     if (!profile) {
       if (!body.createClientProfileIfMissing) {
-        throw new ConflictError("This person has no client profile yet — confirm creating one to assign this calculation.");
+        throw new ConflictError(
+          "This person has no client profile yet — confirm creating one to assign this calculation.",
+        );
       }
       profile = await clientProfileRepository.save({
         userId: body.targetUserId,

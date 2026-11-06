@@ -31,11 +31,11 @@ compile-time constants.
 day one.** Not full row-level SaaS tenancy now; not DB-per-tenant with no org
 entity.
 
-| Option | Verdict |
-|---|---|
+| Option                                       | Verdict                                                                                                                                                                                                                                                                                         |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Org/Branch entities, single-tenant deploy ✅ | Gets branches, rooms and resources — which the scheduling module needs in v1 regardless of tenancy — replaces the singleton hack with real settings, and makes the SaaS switch a resolver change. Cost now is one required indexed field per schema, which is nearly free on empty collections. |
-| Full row-level SaaS now | Every route, every `where`, cross-tenant leak tests, tenant-scoped cache tags, tenant-scoped sequences. Materially larger Phases 0–2 for a capability with no current customer. |
-| DB-per-tenant, no org entity | Cheapest today, but branches/rooms/resources and per-clinic settings still need modelling, and adding `organizationId` later means migrating 50 collections with a migration framework that does not exist yet. This is the trap. |
+| Full row-level SaaS now                      | Every route, every `where`, cross-tenant leak tests, tenant-scoped cache tags, tenant-scoped sequences. Materially larger Phases 0–2 for a capability with no current customer.                                                                                                                 |
+| DB-per-tenant, no org entity                 | Cheapest today, but branches/rooms/resources and per-clinic settings still need modelling, and adding `organizationId` later means migrating 50 collections with a migration framework that does not exist yet. This is the trap.                                                               |
 
 The asymmetry is the whole argument: adding the column now costs a day; adding
 it after there is production patient data across 50 collections costs a quarter
@@ -63,11 +63,11 @@ deliberately so — one `AsyncLocalStorage`-based `RequestContext` carries both.
 export interface RequestContext {
   organizationId: string;
   actor: { userId: string; roleNames: string[]; permissions: string[] };
-  branchId?: string;          // the actor's working branch, from a header or a preference
+  branchId?: string; // the actor's working branch, from a header or a preference
   requestId: string;
 }
 export function runWithRequestContext<T>(ctx: RequestContext, fn: () => Promise<T>): Promise<T>;
-export function getRequestContext(): RequestContext;      // throws if absent
+export function getRequestContext(): RequestContext; // throws if absent
 export function tryGetRequestContext(): RequestContext | null;
 ```
 
@@ -95,7 +95,7 @@ not a tenant boundary at all.** Three defects, all verified against the code.
 catastrophic cross-tenant read to one boolean any request-path file can set.
 
 **Defect 2 — `required: true` does not prevent a caller supplying another
-tenant's id**, and nothing stopped an update from *changing* `organizationId`.
+tenant's id**, and nothing stopped an update from _changing_ `organizationId`.
 
 **Defect 3 — populate is completely unscoped.** Verified:
 `execute-find-query.ts:28` passes each populate node straight to
@@ -107,9 +107,9 @@ organization's document. This was the most serious finding in the whole review.
 The corrected design:
 
 **0. On enforcement, honestly.** The boundary rule below is an ESLint rule, and
-ESLint can be disabled inline with a comment. It is therefore a *review* control,
+ESLint can be disabled inline with a comment. It is therefore a _review_ control,
 not a security control: its job is to make an unscoped repository import
-impossible to add *accidentally* and impossible to miss in a diff. The controls
+impossible to add _accidentally_ and impossible to miss in a diff. The controls
 that do not depend on discipline are the ones in points 2–4 — stamping from
 context, immutability, compound uniqueness, and per-method invariant tests. A
 `// eslint-disable` on a global-repository import is a deliberate act that shows
@@ -154,10 +154,10 @@ to one function rather than a redesign.
 **One consequence to handle explicitly**, because Mongoose's `match` behaves
 asymmetrically and it is caller-visible:
 
-| Ref shape | A match-miss produces |
-|---|---|
-| Single ref (`practitionerId`) | the populated field is **`null`** |
-| Array of refs (`branchIds`) | the offending element is **silently filtered out** of the array |
+| Ref shape                     | A match-miss produces                                           |
+| ----------------------------- | --------------------------------------------------------------- |
+| Single ref (`practitionerId`) | the populated field is **`null`**                               |
+| Array of refs (`branchIds`)   | the offending element is **silently filtered out** of the array |
 
 Neither leaks data, which is the point. But both are states the calling code did
 not previously have to consider — a required single ref coming back `null` could
@@ -195,15 +195,15 @@ scoped the obvious ones" is how tenant leaks happen.
 `get-or-create-singleton.ts` is **retired**, not generalised. The four settings
 records become:
 
-| Old | New |
-|---|---|
-| `SiteSettings` (clinic identity half) | `Organization.contact`, `.currency`, `.timezone`, `.branding` |
+| Old                                                                        | New                                                              |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `SiteSettings` (clinic identity half)                                      | `Organization.contact`, `.currency`, `.timezone`, `.branding`    |
 | `SiteSettings` (website half: SEO, ogImage, socialLinks, activeCampaignId) | **stays** as a `site-cms/` record, now carrying `organizationId` |
-| `DoctorProfile` | **stays** as `site-cms/` marketing content, org-scoped |
-| `PackagesPageSettings` | **stays** as `site-cms/`, org-scoped |
-| `BookSettings` | **stays** in `books/`, org-scoped |
+| `DoctorProfile`                                                            | **stays** as `site-cms/` marketing content, org-scoped           |
+| `PackagesPageSettings`                                                     | **stays** as `site-cms/`, org-scoped                             |
+| `BookSettings`                                                             | **stays** in `books/`, org-scoped                                |
 
-So the singleton *pattern* dies; the four records survive as org-scoped rows
+So the singleton _pattern_ dies; the four records survive as org-scoped rows
 found by `{organizationId}` rather than by `{}`. That keeps every public
 endpoint's response shape identical, which is what protects `nutrition-client`.
 
@@ -282,7 +282,7 @@ needs a rehearsal because it moves fields that `nutrition-client` reads.
 - A scoped repository call with no ambient context **throws** rather than
   returning unscoped data. The single most important test in the phase.
 - A write that omits `organizationId` fails at the schema; a write that supplies
-  a *different* one is rejected; a patch containing `organizationId` has it
+  a _different_ one is rejected; a patch containing `organizationId` has it
   stripped.
 - **Per-method invariant tests, not one test of `combineFilters`.** Every scoped
   repository method — `findOne`, `findAll`, `count`, `findByIds`,
@@ -321,17 +321,17 @@ needs a rehearsal because it moves fields that `nutrition-client` reads.
 
 **Reviewed 2026-08-22. Verdict on the original design: FATALLY FLAWED. Rewritten.**
 
-| # | Finding | Sev | Analysis | Resolution |
-|---|---|---|---|---|
-| 1 | A caller-controlled `skipOrganizationScope` on the ordinary repository API is not a tenant boundary — it makes a catastrophic operation one boolean away. | CRITICAL | Correct, and the original framing ("needed in exactly three places, enumerated so it can be audited") was wishful. An enumerated list is not an enforcement mechanism. | **Accepted.** Split into `createScopedRepository` (no opt-out) and `createGlobalRepository` (importable only from bootstrap/migrations/scripts, enforced by the boundary rule). |
-| 2 | `combineFilters`' `$and` is correct but only protects paths that call it — nothing against `$expr`, `$where`, `$lookup`, populate or raw models. | MAJOR | Correct. Verified `combine-filters.ts:14` is sound in itself. | **Accepted.** Operation matrix now a deliverable; raw stages barred from the request path. |
-| 3 | `required: true` only proves *some* org id exists — a caller can supply another tenant's, and updates can change it. | CRITICAL | Correct. A real hole. | **Accepted.** Stamped from context on create, mismatch rejected, stripped from patches, immutable thereafter. |
-| 4 | **Populate is unscoped** — the populate tree goes straight to Mongoose and its secondary query never passes through the related repository's scope resolver. | CRITICAL | **Verified**: `execute-find-query.ts:28` calls `query.populate(node)` and `PopulateNode` has no `match`. The single most serious finding in the review. | **Accepted.** `PopulateNode.match` added and populated with the tenant predicate at every depth, or the relation is loaded through its own scoped repository. A tenant-owned populate node without a match is a build-time error. |
-| 5 | `findByIds` is safe only because it delegates to `findAll` today; a future optimisation could bypass scope. Needs per-method invariant tests. | MAJOR | Correct — verified the delegation at `create-mongoose-repository.ts:179`. | **Accepted.** Per-method two-org invariant tests, not a single `combineFilters` unit test. |
-| 6 | Prepending one `$match` does not scope `$lookup` / `$unionWith` / `$graphLookup`. | CRITICAL | Correct, and the first draft's claim that the tenant match "cannot be omitted" was false comfort. | **Accepted.** `aggregate()` relabelled raw and unscoped, global-repository-only; request-path aggregates use scoped builders. Also amended in [16](16-dashboard-and-reporting.md) and [19](19-toolkit-and-package-changes.md). |
-| 7 | Counts, distinct, bulk writes, migrations, change streams and raw model access all remain leak paths, and the planned API expansion widens the surface. | MAJOR | Correct. | **Accepted.** The published operation matrix is now a Phase 3 deliverable. |
-| 8 | A module-level cached single-org lookup is wrong for future SaaS — caches survive deploys and must key by canonical host with eviction. | MAJOR | Correct. | **Accepted.** An explicit resolver interface with cache keys and invalidation, from day one. |
-| 9 | Compound uniqueness must include `organizationId` everywhere — adding a standalone index is insufficient. | MAJOR | Correct, and the first draft only said "indexed". | **Accepted.** Every unique index on a tenant-owned entity is compound; the migration reviews all of them. |
+| #   | Finding                                                                                                                                                      | Sev      | Analysis                                                                                                                                                               | Resolution                                                                                                                                                                                                                        |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | A caller-controlled `skipOrganizationScope` on the ordinary repository API is not a tenant boundary — it makes a catastrophic operation one boolean away.    | CRITICAL | Correct, and the original framing ("needed in exactly three places, enumerated so it can be audited") was wishful. An enumerated list is not an enforcement mechanism. | **Accepted.** Split into `createScopedRepository` (no opt-out) and `createGlobalRepository` (importable only from bootstrap/migrations/scripts, enforced by the boundary rule).                                                   |
+| 2   | `combineFilters`' `$and` is correct but only protects paths that call it — nothing against `$expr`, `$where`, `$lookup`, populate or raw models.             | MAJOR    | Correct. Verified `combine-filters.ts:14` is sound in itself.                                                                                                          | **Accepted.** Operation matrix now a deliverable; raw stages barred from the request path.                                                                                                                                        |
+| 3   | `required: true` only proves _some_ org id exists — a caller can supply another tenant's, and updates can change it.                                         | CRITICAL | Correct. A real hole.                                                                                                                                                  | **Accepted.** Stamped from context on create, mismatch rejected, stripped from patches, immutable thereafter.                                                                                                                     |
+| 4   | **Populate is unscoped** — the populate tree goes straight to Mongoose and its secondary query never passes through the related repository's scope resolver. | CRITICAL | **Verified**: `execute-find-query.ts:28` calls `query.populate(node)` and `PopulateNode` has no `match`. The single most serious finding in the review.                | **Accepted.** `PopulateNode.match` added and populated with the tenant predicate at every depth, or the relation is loaded through its own scoped repository. A tenant-owned populate node without a match is a build-time error. |
+| 5   | `findByIds` is safe only because it delegates to `findAll` today; a future optimisation could bypass scope. Needs per-method invariant tests.                | MAJOR    | Correct — verified the delegation at `create-mongoose-repository.ts:179`.                                                                                              | **Accepted.** Per-method two-org invariant tests, not a single `combineFilters` unit test.                                                                                                                                        |
+| 6   | Prepending one `$match` does not scope `$lookup` / `$unionWith` / `$graphLookup`.                                                                            | CRITICAL | Correct, and the first draft's claim that the tenant match "cannot be omitted" was false comfort.                                                                      | **Accepted.** `aggregate()` relabelled raw and unscoped, global-repository-only; request-path aggregates use scoped builders. Also amended in [16](16-dashboard-and-reporting.md) and [19](19-toolkit-and-package-changes.md).    |
+| 7   | Counts, distinct, bulk writes, migrations, change streams and raw model access all remain leak paths, and the planned API expansion widens the surface.      | MAJOR    | Correct.                                                                                                                                                               | **Accepted.** The published operation matrix is now a Phase 3 deliverable.                                                                                                                                                        |
+| 8   | A module-level cached single-org lookup is wrong for future SaaS — caches survive deploys and must key by canonical host with eviction.                      | MAJOR    | Correct.                                                                                                                                                               | **Accepted.** An explicit resolver interface with cache keys and invalidation, from day one.                                                                                                                                      |
+| 9   | Compound uniqueness must include `organizationId` everywhere — adding a standalone index is insufficient.                                                    | MAJOR    | Correct, and the first draft only said "indexed".                                                                                                                      | **Accepted.** Every unique index on a tenant-owned entity is compound; the migration reviews all of them.                                                                                                                         |
 
 **Rejected nothing in this area.** The original design was materially unsafe and
 the review was right on every point.

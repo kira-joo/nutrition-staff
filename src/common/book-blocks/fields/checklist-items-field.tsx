@@ -19,7 +19,11 @@ export function checklistItemsField<T extends FieldValues>(name: Path<T>, label:
         emptyLabel="No items yet."
         renderItem={(item, _index, update) => (
           <div className="flex items-center gap-2">
-            <input type="checkbox" checked={item.checked} onChange={(event) => update({ checked: event.target.checked })} />
+            <input
+              type="checkbox"
+              checked={item.checked}
+              onChange={(event) => update({ checked: event.target.checked })}
+            />
             <CustomInput
               name={`${name}-text`}
               value={item.text}

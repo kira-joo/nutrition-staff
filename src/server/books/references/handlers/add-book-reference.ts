@@ -17,7 +17,7 @@ export async function addBookReference(bookId: string, dto: CreateBookReferenceD
   try {
     return await bookRepository.update(
       { where: { _id: bookId, contentRevision: dto.expectedRevision } },
-      { references: nextReferences, contentRevision: dto.expectedRevision + 1 }
+      { references: nextReferences, contentRevision: dto.expectedRevision + 1 },
     );
   } catch (error) {
     if (error instanceof NotFoundError) {

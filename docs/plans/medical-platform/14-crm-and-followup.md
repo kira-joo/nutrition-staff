@@ -48,13 +48,13 @@ immutability are carried across unchanged and get the tests they lack.
 
 Additions:
 
-| Addition | Purpose |
-|---|---|
-| `outcome` enum (`REACHED / NO_ANSWER / WRONG_NUMBER / REFUSED / RESCHEDULED`) | "Called three times, never reached" is the actual CRM signal, and it is unrecordable today |
-| `channel` enum | Phone, WhatsApp, SMS, email, in-person — reporting needs it |
-| `relatedAppointmentId`, `relatedInvoiceId` | Ties an attempt to its cause |
-| New types: `APPOINTMENT_REMINDER`, `NO_SHOW_FOLLOW_UP`, `PAYMENT_REMINDER`, `PRESCRIPTION_SENT` | The appointment and billing modules generate these |
-| `Task` | Assignable, due-dated work. Indexed `{assignedToUserId, status, dueAt}` — that index *is* the worklist |
+| Addition                                                                                        | Purpose                                                                                                |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `outcome` enum (`REACHED / NO_ANSWER / WRONG_NUMBER / REFUSED / RESCHEDULED`)                   | "Called three times, never reached" is the actual CRM signal, and it is unrecordable today             |
+| `channel` enum                                                                                  | Phone, WhatsApp, SMS, email, in-person — reporting needs it                                            |
+| `relatedAppointmentId`, `relatedInvoiceId`                                                      | Ties an attempt to its cause                                                                           |
+| New types: `APPOINTMENT_REMINDER`, `NO_SHOW_FOLLOW_UP`, `PAYMENT_REMINDER`, `PRESCRIPTION_SENT` | The appointment and billing modules generate these                                                     |
+| `Task`                                                                                          | Assignable, due-dated work. Indexed `{assignedToUserId, status, dueAt}` — that index _is_ the worklist |
 
 **`FollowUp` is deliberately not an entity.** `Patient.nextFollowUpAt` +
 `Encounter.followUpAt` + `Task` cover every case in the brief. A fourth

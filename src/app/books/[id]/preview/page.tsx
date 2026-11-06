@@ -3,18 +3,22 @@
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { CustomButton, CustomSelect, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useState, use } from "react";
 import { getBookPrintPreviewEndpoint } from "src/common/api/book-preview.endpoints";
 import { getBookByIdEndpoint } from "src/common/api/book.endpoints";
 
 /**
  * Renders the SAME self-contained HTML the (future) PDF renderer would
- * consume, injected via `<iframe srcDoc>` rather than `<iframe src>` —
- * the staff bearer token lives in `localStorage`, not a cookie, so a
- * direct `src` request to the print-preview route would be
- * unauthenticated. Preview fidelity is guaranteed by construction: same
- * template, same paginator, same fonts as whatever eventually generates
- * the PDF in Phase F.
+ * consume, injected via `<iframe srcDoc>` rather than `<iframe src>`.
+ *
+ * That used to be forced — the session was a bearer token in `localStorage`, so
+ * a direct `src` request would have been unauthenticated. With an HttpOnly
+ * session cookie it would now work, and `srcDoc` is kept by choice: fetching
+ * through the normal request path keeps failures as handled error states rather
+ * than a broken frame.
+ *
+ * Preview fidelity is guaranteed by construction: same template, same
+ * paginator, same fonts as whatever eventually generates the PDF in Phase F.
  *
  * Page numbers here are PROVISIONAL — this staff browser's own
  * line-breaking can differ by a line or two from whatever engine
@@ -23,10 +27,13 @@ import { getBookByIdEndpoint } from "src/common/api/book.endpoints";
  * text layout). Never treat a draft preview's page count as
  * authoritative; that only exists once Phase F's real generation runs.
  */
-export default function BookPreviewPage({ params }: { params: { id: string } }) {
+export default function BookPreviewPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const bookQuery = useRequesterQuery({ endpoint: getBookByIdEndpoint, options: { params: { id: params.id } } });
 
-  return <QueryState query={bookQuery}>{(book) => <PreviewFrame bookId={params.id} chapters={book.chapters} />}</QueryState>;
+  return (
+    <QueryState query={bookQuery}>{(book) => <PreviewFrame bookId={params.id} chapters={book.chapters} />}</QueryState>
+  );
 }
 
 function PreviewFrame({ bookId, chapters }: { bookId: string; chapters: { id: string; title: string }[] }) {
@@ -49,10 +56,19 @@ function PreviewFrame({ bookId, chapters }: { bookId: string; chapters: { id: st
           name="preview-scope"
           value={chapterId}
           onChange={(value) => setChapterId(Array.isArray(value) ? value[0] : value)}
-          options={[{ label: "Whole book", value: "" }, ...chapters.map((chapter) => ({ label: chapter.title, value: chapter.id }))]}
+          options={[
+            { label: "Whole book", value: "" },
+            ...chapters.map((chapter) => ({ label: chapter.title, value: chapter.id })),
+          ]}
           wrapperClassName="w-64"
         />
-        <CustomButton type="button" variant="outline" leftIcon={RefreshCw} loading={previewQuery.isFetching} onClick={() => previewQuery.refetch()}>
+        <CustomButton
+          type="button"
+          variant="outline"
+          leftIcon={RefreshCw}
+          loading={previewQuery.isFetching}
+          onClick={() => previewQuery.refetch()}
+        >
           Refresh preview
         </CustomButton>
         <span className="text-xs text-slate-500">Page numbers shown are provisional</span>

@@ -15,27 +15,27 @@ and the second is written down: `tailwind.config.js` is 28 lines with
 `theme: { extend: {} }` and a 20-line comment explaining that this app defines no
 theme of its own.
 
-| Fact | Measurement |
-|---|---|
-| UI pages | 81 `page.tsx` + 3 layouts; **only 3 server components** in the whole app |
-| Route-level states | **zero** `loading.tsx`, `error.tsx`, `not-found.tsx` |
-| The entire visual vocabulary | `PageShell` (61 of 81 pages) + `PageSection` + `InfoRow` + `FeatureTable` + `CustomForm` |
-| Interchangeable CRUD pages | **40** across 10 resources — list, 20-line create, 30-line update, `PageSection` detail, to the line |
-| CSS custom properties defined in the app | **0** (`globals.css` is three `@tailwind` lines) |
-| Typography system | none — no `next/font`, no `fontFamily`, no type scale. Headings are ad-hoc `text-3xl font-bold` / `text-2xl font-semibold` / bare `font-semibold` |
-| Spacing scale | none — stock Tailwind, `gap-3/4/6` by convention |
-| Dark mode | none |
-| `motion` dependency | **absent**. 3 `transition-colors` in the app; 0 `animate-*`; 0 keyframes; **0 `prefers-reduced-motion`** |
-| Responsive prefixes in the app | 29 `sm:`, 9 `lg:`, 1 `md:`, 0 `xl:`/`2xl:` |
-| A11y attributes | ~64 across ~16k LOC, concentrated in 3 files. `htmlFor` appears **0 times** |
-| Command palette / global search | none |
-| Breadcrumbs | none (0 hits; the toolkit has none either) |
-| `drawerPresentation` usage | **0**, though the toolkit ships it fully built |
-| Tests | 1 file |
+| Fact                                     | Measurement                                                                                                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UI pages                                 | 81 `page.tsx` + 3 layouts; **only 3 server components** in the whole app                                                                          |
+| Route-level states                       | **zero** `loading.tsx`, `error.tsx`, `not-found.tsx`                                                                                              |
+| The entire visual vocabulary             | `PageShell` (61 of 81 pages) + `PageSection` + `InfoRow` + `FeatureTable` + `CustomForm`                                                          |
+| Interchangeable CRUD pages               | **40** across 10 resources — list, 20-line create, 30-line update, `PageSection` detail, to the line                                              |
+| CSS custom properties defined in the app | **0** (`globals.css` is three `@tailwind` lines)                                                                                                  |
+| Typography system                        | none — no `next/font`, no `fontFamily`, no type scale. Headings are ad-hoc `text-3xl font-bold` / `text-2xl font-semibold` / bare `font-semibold` |
+| Spacing scale                            | none — stock Tailwind, `gap-3/4/6` by convention                                                                                                  |
+| Dark mode                                | none                                                                                                                                              |
+| `motion` dependency                      | **absent**. 3 `transition-colors` in the app; 0 `animate-*`; 0 keyframes; **0 `prefers-reduced-motion`**                                          |
+| Responsive prefixes in the app           | 29 `sm:`, 9 `lg:`, 1 `md:`, 0 `xl:`/`2xl:`                                                                                                        |
+| A11y attributes                          | ~64 across ~16k LOC, concentrated in 3 files. `htmlFor` appears **0 times**                                                                       |
+| Command palette / global search          | none                                                                                                                                              |
+| Breadcrumbs                              | none (0 hits; the toolkit has none either)                                                                                                        |
+| `drawerPresentation` usage               | **0**, though the toolkit ships it fully built                                                                                                    |
+| Tests                                    | 1 file                                                                                                                                            |
 
 The app writes hundreds of raw `text-slate-500` / `text-red-600` /
 `text-amber-700` utilities. Because the toolkit's `ROLE_DEFAULTS` happen to
-*equal* stock Tailwind values, these look identical today and **break the moment
+_equal_ stock Tailwind values, these look identical today and **break the moment
 anyone themes this app** — which white-labelling requires.
 
 Two screens prove the team can do information design when handed the problem:
@@ -52,14 +52,14 @@ medical product — is **name + a lifecycle chip**.
 - **The staff app must not inherit `nutrition-client`'s visual identity.** The
   public site's redesign is a separate programme. This app gets its own language.
 - The admin chrome is single-locale English/LTR, with no i18n and no locale
-  routing — an existing decision. But it *authors* bilingual content, so
+  routing — an existing decision. But it _authors_ bilingual content, so
   per-element `dir="rtl"`, Arabic rendering and long-Arabic overflow are live
   concerns. A sellable product will eventually need a localized RTL chrome:
   **build nothing that blocks it** — logical properties everywhere, no
   hardcoded `left`/`right`, no text baked into images.
 - Operational medical software optimises for speed, clarity, safety, context,
-  keyboard efficiency and low cognitive load. The brief: *"Do not turn
-  operational medical screens into cinematic marketing pages."*
+  keyboard efficiency and low cognitive load. The brief: _"Do not turn
+  operational medical screens into cinematic marketing pages."_
 - Toolkit-first. Generic UI goes to `frontend-toolkit-tailwind`; clinical
   composition stays local.
 - The Books UI is preserved and out of scope.
@@ -98,13 +98,13 @@ from module manifests instead of a hand-synced list
 
 ## 2. Role-based homes
 
-| Role | Sees first | Deliberately absent |
-|---|---|---|
-| **Receptionist** | The day. A live board: arrivals, waiting with durations, who is with whom, next arrivals. Then today's takings and tasks due. | Clinical content beyond alerts; revenue analytics |
-| **Doctor** | The worklist. My patients today in order with check-in state; **my unsigned drafts, oldest first**; abnormal results for my patients; my follow-ups due. | Revenue, CRM funnel, staff admin |
-| **Nurse** | Vitals to take, patients waiting, tasks. | Diagnoses, billing |
-| **Billing clerk** | Unpaid and overdue by age bucket; today's payments by method. | Clinical content |
-| **Owner / clinic admin** | KPIs with previous-period deltas, revenue by branch and practitioner, utilisation, no-show rate, receivables ageing, follow-up compliance. | Nothing — this role sees everything |
+| Role                     | Sees first                                                                                                                                               | Deliberately absent                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **Receptionist**         | The day. A live board: arrivals, waiting with durations, who is with whom, next arrivals. Then today's takings and tasks due.                            | Clinical content beyond alerts; revenue analytics |
+| **Doctor**               | The worklist. My patients today in order with check-in state; **my unsigned drafts, oldest first**; abnormal results for my patients; my follow-ups due. | Revenue, CRM funnel, staff admin                  |
+| **Nurse**                | Vitals to take, patients waiting, tasks.                                                                                                                 | Diagnoses, billing                                |
+| **Billing clerk**        | Unpaid and overdue by age bucket; today's payments by method.                                                                                            | Clinical content                                  |
+| **Owner / clinic admin** | KPIs with previous-period deltas, revenue by branch and practitioner, utilisation, no-show rate, receivables ageing, follow-up compliance.               | Nothing — this role sees everything               |
 
 Every home is composed from widgets declaring a required permission; a widget the
 role cannot see is omitted, not errored. Verticals contribute widgets. Data
@@ -163,12 +163,12 @@ bands, and the banner's latest vitals get sparklines.
 
 **The decision rule**, not a list of preferences:
 
-| Use | When |
-|---|---|
-| **Drawer** | A focused task that needs the context behind it to stay visible, completes in under ~60 seconds, and returns you where you were. Log a contact attempt · book an appointment · take a payment · record vitals · add an alert or contact · schedule a follow-up · edit invoice lines. |
-| **Modal** | A destructive or blocking confirmation, or a task that must not be abandoned half-done. Void an invoice · merge patients · sign an encounter. |
-| **Inline edit** | A single field on a record already on screen, where a drawer would be heavier than the edit. |
-| **Full page** | A long-form work surface with its own state and autosave: the encounter workspace, the calendar, list views, settings. |
+| Use             | When                                                                                                                                                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Drawer**      | A focused task that needs the context behind it to stay visible, completes in under ~60 seconds, and returns you where you were. Log a contact attempt · book an appointment · take a payment · record vitals · add an alert or contact · schedule a follow-up · edit invoice lines. |
+| **Modal**       | A destructive or blocking confirmation, or a task that must not be abandoned half-done. Void an invoice · merge patients · sign an encounter.                                                                                                                                        |
+| **Inline edit** | A single field on a record already on screen, where a drawer would be heavier than the edit.                                                                                                                                                                                         |
+| **Full page**   | A long-form work surface with its own state and autosave: the encounter workspace, the calendar, list views, settings.                                                                                                                                                               |
 
 The drawer already exists (`drawerPresentation`, focus-trapped, scroll-locking,
 RTL-logical, promise-resolving via `openDialog`) and is used zero times. Adopting
@@ -217,13 +217,13 @@ the design system and the white-label mechanism, since
 
 Overridden roles, with intent:
 
-| Role group | Direction |
-|---|---|
-| Surfaces | Three levels, low-chroma cool neutrals. A data-dense operational UI needs surfaces that recede; the current stock `slate-50` page on white cards is close to right and gains a third sunken level for nested panels. |
-| Text | Four steps (primary/secondary/muted/placeholder), all ≥ 4.5:1 on their surface. |
-| Brand | A single restrained primary used for **action**, never for decoration. The current `primary = #0f172a` (near-black) is a non-decision; a real primary is needed so a clinic's brand colour has somewhere to go. |
-| Status | See the severity system below — the most important palette decision in the product. |
-| Focus | A visible, high-contrast focus ring on every interactive element. Keyboard efficiency is a stated requirement, and it is unusable without this. |
+| Role group | Direction                                                                                                                                                                                                            |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Surfaces   | Three levels, low-chroma cool neutrals. A data-dense operational UI needs surfaces that recede; the current stock `slate-50` page on white cards is close to right and gains a third sunken level for nested panels. |
+| Text       | Four steps (primary/secondary/muted/placeholder), all ≥ 4.5:1 on their surface.                                                                                                                                      |
+| Brand      | A single restrained primary used for **action**, never for decoration. The current `primary = #0f172a` (near-black) is a non-decision; a real primary is needed so a clinic's brand colour has somewhere to go.      |
+| Status     | See the severity system below — the most important palette decision in the product.                                                                                                                                  |
+| Focus      | A visible, high-contrast focus ring on every interactive element. Keyboard efficiency is a stated requirement, and it is unusable without this.                                                                      |
 
 Plus new token groups the toolkit does not yet expose: **density** (control
 height, row height, font size — the existing `--ftk-control-height` at 2.5rem is
@@ -318,31 +318,31 @@ Not "does not break on mobile" — which is what it is today — but designed:
   every consumer needs it.
 - **768**: the primary tablet target. Reception works on a tablet; this is not a
   degraded desktop.
-- **Touch targets**: the toolkit's 40px control height is documented as *"a
+- **Touch targets**: the toolkit's 40px control height is documented as _"a
   reasonable density for a desktop admin app and the wrong one for a public
-  mobile form."* Resolution: the density tokens carry a **touch** tier at ≥44px,
+  mobile form."_ Resolution: the density tokens carry a **touch** tier at ≥44px,
   applied automatically below `md`. This satisfies the accessibility minimum
   without imposing mobile density on a desktop workstation.
 
 ## 9. New toolkit UI components
 
-Each justified against *"could an unrelated project use this without knowing what
-a patient is?"*
+Each justified against _"could an unrelated project use this without knowing what
+a patient is?"_
 
-| Component | Verdict |
-|---|---|
-| ~~`CalendarView`~~ | **Removed.** Reversed on review — app-local after a library bake-off, extraction deferred to a real second consumer. See [19](19-toolkit-and-package-changes.md). |
-| `CommandPalette` — **accessible shell only** | ✅ the `cmdk` dialog, focus and keyboard semantics, grouped items. The action registry, shortcut-conflict handling, async orchestration, permission filtering and recent/pinned persistence are app-local shell policy, narrowed on review. |
-| `Breadcrumbs` | ✅ universal |
-| Table: date-range / numeric-range / multi-select / boolean filters | ✅ closes the gap to the backend's 13 existing `FilterOperator`s |
-| Table: column priority for responsive card collapse | ✅ |
-| `MoneyInput` / `MoneyText` | ✅ — and formatting lives **here**, not in `toolkit-common`, which carries only `bigint` arithmetic. |
-| `TagInput` | ✅ (the app hand-rolls comma-separated strings today) |
-| `FormFieldArray` (repeatable groups) | ✅ (the app hand-rolls `array-field-editor.tsx`, which keys rows by index — a known latent bug its own sibling file documents) |
-| `Avatar` / `AvatarGroup`, `Tooltip`, `Popover`, `Accordion`, `Stepper`, `SegmentedControl`, `ProgressBar` | ✅ ordinary primitives, none exist |
-| `StatusBadge` (icon + label + variant, with a `size`) | ✅ `Badge` has no `size` and no icon slot |
-| `DateRangePicker` | ✅ |
-| Timeline: physical → logical properties | ✅ a correctness fix |
+| Component                                                                                                 | Verdict                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~`CalendarView`~~                                                                                        | **Removed.** Reversed on review — app-local after a library bake-off, extraction deferred to a real second consumer. See [19](19-toolkit-and-package-changes.md).                                                                           |
+| `CommandPalette` — **accessible shell only**                                                              | ✅ the `cmdk` dialog, focus and keyboard semantics, grouped items. The action registry, shortcut-conflict handling, async orchestration, permission filtering and recent/pinned persistence are app-local shell policy, narrowed on review. |
+| `Breadcrumbs`                                                                                             | ✅ universal                                                                                                                                                                                                                                |
+| Table: date-range / numeric-range / multi-select / boolean filters                                        | ✅ closes the gap to the backend's 13 existing `FilterOperator`s                                                                                                                                                                            |
+| Table: column priority for responsive card collapse                                                       | ✅                                                                                                                                                                                                                                          |
+| `MoneyInput` / `MoneyText`                                                                                | ✅ — and formatting lives **here**, not in `toolkit-common`, which carries only `bigint` arithmetic.                                                                                                                                        |
+| `TagInput`                                                                                                | ✅ (the app hand-rolls comma-separated strings today)                                                                                                                                                                                       |
+| `FormFieldArray` (repeatable groups)                                                                      | ✅ (the app hand-rolls `array-field-editor.tsx`, which keys rows by index — a known latent bug its own sibling file documents)                                                                                                              |
+| `Avatar` / `AvatarGroup`, `Tooltip`, `Popover`, `Accordion`, `Stepper`, `SegmentedControl`, `ProgressBar` | ✅ ordinary primitives, none exist                                                                                                                                                                                                          |
+| `StatusBadge` (icon + label + variant, with a `size`)                                                     | ✅ `Badge` has no `size` and no icon slot                                                                                                                                                                                                   |
+| `DateRangePicker`                                                                                         | ✅                                                                                                                                                                                                                                          |
+| Timeline: physical → logical properties                                                                   | ✅ a correctness fix                                                                                                                                                                                                                        |
 
 App-local compositions, explicitly **not** promoted: Patient Clinical Banner ·
 waiting/check-in board · encounter workspace · vitals entry · diagnosis and
@@ -363,7 +363,7 @@ a final pass:
 6. Route-level loading/error states across the app.
 7. The a11y remediation pass.
 
-Then the token *values* change in one reviewable commit. Each feature phase
+Then the token _values_ change in one reviewable commit. Each feature phase
 afterwards ships its own polished surfaces, with UX acceptance criteria in its
 own document — not a design pass bolted on at the end.
 

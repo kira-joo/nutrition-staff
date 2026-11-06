@@ -19,7 +19,9 @@ export const FONT_SIZE_VALUES = [10, 11, 12, 14, 16, 18, 20, 24] as const;
 
 export type FontSizeToken = `size-${(typeof FONT_SIZE_VALUES)[number]}`;
 
-export const FONT_SIZE_TOKENS: readonly FontSizeToken[] = FONT_SIZE_VALUES.map((value) => `size-${value}` as FontSizeToken);
+export const FONT_SIZE_TOKENS: readonly FontSizeToken[] = FONT_SIZE_VALUES.map(
+  (value) => `size-${value}` as FontSizeToken,
+);
 
 /**
  * Brand-safe text colours. Deliberately a short list drawn from the book
@@ -61,7 +63,7 @@ export function isHighlightColorToken(value: unknown): value is HighlightColorTo
  * drift apart. Nothing hand-copies these values anywhere.
  */
 export const FONT_SIZE_PT: Readonly<Record<FontSizeToken, number>> = Object.fromEntries(
-  FONT_SIZE_VALUES.map((value) => [`size-${value}`, value])
+  FONT_SIZE_VALUES.map((value) => [`size-${value}`, value]),
 ) as Record<FontSizeToken, number>;
 
 export const TEXT_COLOR_VALUE: Readonly<Record<TextColorToken, string>> = {
@@ -90,10 +92,14 @@ export const HIGHLIGHT_COLOR_VALUE: Readonly<Record<HighlightColorToken, string>
  * colours existed — keeps the historical yellow with no extra selector.
  */
 export function buildRichTextMarkCss(scope = ""): string {
-  const sizes = FONT_SIZE_TOKENS.map((token) => `${scope}.book-text-${token} { font-size: ${FONT_SIZE_PT[token]}pt; }`).join("\n");
-  const textColors = TEXT_COLOR_TOKENS.map((token) => `${scope}.book-text-color-${token} { color: ${TEXT_COLOR_VALUE[token]}; }`).join("\n");
+  const sizes = FONT_SIZE_TOKENS.map(
+    (token) => `${scope}.book-text-${token} { font-size: ${FONT_SIZE_PT[token]}pt; }`,
+  ).join("\n");
+  const textColors = TEXT_COLOR_TOKENS.map(
+    (token) => `${scope}.book-text-color-${token} { color: ${TEXT_COLOR_VALUE[token]}; }`,
+  ).join("\n");
   const highlights = HIGHLIGHT_COLOR_TOKENS.map(
-    (token) => `${scope}.book-highlight--${token} { background: ${HIGHLIGHT_COLOR_VALUE[token]}; }`
+    (token) => `${scope}.book-highlight--${token} { background: ${HIGHLIGHT_COLOR_VALUE[token]}; }`,
   ).join("\n");
   return [
     `${scope}.book-highlight { background: ${HIGHLIGHT_COLOR_VALUE[DEFAULT_HIGHLIGHT_COLOR]}; padding: 0 1mm; }`,

@@ -34,7 +34,7 @@ class HasVideoSourceConstraint implements ValidatorConstraintInterface {
  * every validator registered under that same property, including this one).
  */
 export function HasVideoSource(validationOptions?: ValidationOptions): ClassDecorator {
-  return function (target: Function) {
+  return function (target) {
     for (const propertyName of ["video", "__hasVideoSource"]) {
       registerDecorator({
         target,

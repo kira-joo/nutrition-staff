@@ -1,0 +1,27 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches:
+      - staging
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Configure npm for GitHub Packages
+        run: |
+          echo "@kira-joo:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.PACKAGES_READ_TOKEN }}" >> .npmrc
+
+      - run: npm ci
+
+      - run: npm run verify

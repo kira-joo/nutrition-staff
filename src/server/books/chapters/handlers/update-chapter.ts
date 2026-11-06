@@ -6,7 +6,12 @@ import { CHAPTER_ASSET_FIELDS, CHAPTER_ASSET_FOLDER } from "src/server/books/cha
 import { UpdateChapterDto } from "src/server/books/chapters/dto/update-chapter.dto";
 import { findChapterOrThrow } from "src/server/books/blocks/resolve-block-container";
 import { bookRepository } from "src/server/books/books.repository";
-import { assetProvider, destroyReplacedAssets, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
+import {
+  assetProvider,
+  destroyReplacedAssets,
+  destroyUploadedAssets,
+  processAssetUploadFields,
+} from "src/server/core/assets";
 
 export async function updateChapter(request: NextRequest, bookId: string, chapterId: string) {
   const { fields, files } = await parseMultipartFormData(request);
@@ -15,7 +20,13 @@ export async function updateChapter(request: NextRequest, bookId: string, chapte
   const book = await bookRepository.findOne({ where: { _id: bookId } });
   const previousChapter = findChapterOrThrow(book, chapterId);
 
-  const { uploaded } = await processAssetUploadFields({ files, payload, fields: CHAPTER_ASSET_FIELDS, provider: assetProvider, folder: CHAPTER_ASSET_FOLDER });
+  const { uploaded } = await processAssetUploadFields({
+    files,
+    payload,
+    fields: CHAPTER_ASSET_FIELDS,
+    provider: assetProvider,
+    folder: CHAPTER_ASSET_FOLDER,
+  });
 
   let saved;
   try {
@@ -29,7 +40,7 @@ export async function updateChapter(request: NextRequest, bookId: string, chapte
     try {
       saved = await bookRepository.update(
         { where: { _id: bookId, contentRevision: expectedRevision } },
-        { chapters: nextChapters, contentRevision: expectedRevision + 1 }
+        { chapters: nextChapters, contentRevision: expectedRevision + 1 },
       );
     } catch (error) {
       if (error instanceof NotFoundError) {

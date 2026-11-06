@@ -24,19 +24,19 @@ clinical or financial errors rather than as a 500.
 `session?: mongoose.ClientSession` is threaded through **every single read and
 write path** of `MongooseRepository`. Verified, file by file:
 
-| Path | File | Evidence |
-|---|---|---|
-| `findOne`, `findAll` | `backend-toolkit-mongoose/src/repository/create-mongoose-repository.ts:110,131,142,165` | destructures `session`, forwards to `executeFindQuery` |
-| query application | `.../repository/execute-find-query.ts:27,94` | `query.session(options.session)` |
-| `count` | `create-mongoose-repository.ts:176` | `executeCountQuery(model, filter, criteria.session)` |
-| `findAllAndCountPublic` | `create-mongoose-repository.ts:187,217,219` | forwards to both the find and the count |
-| `findAllNoCountPublic` | `create-mongoose-repository.ts:226,254` | — |
-| `save` (single + many) | `.../write/execute-save.ts:37,57,104` | `document.save({ session })`, `insertMany({ session })` |
-| `update` | `.../write/execute-update.ts:11,41` | — |
-| `delete` / `remove` | `.../write/execute-delete.ts:10,27,49` | — |
-| `softDelete` / `softRemove` | `.../soft-delete/execute-soft-delete.ts:13,51,62,94`, `execute-soft-remove.ts:11,37,67` | — |
-| criteria typing | `.../repository/mongoose-repository.interface.ts:9-14` | narrows core's `session?: unknown` to `mongoose.ClientSession` |
-| core contract | `backend-toolkit-core/src/repository/find-criteria.interface.ts` | `session?: unknown`, documented as ODM-narrowed |
+| Path                        | File                                                                                    | Evidence                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `findOne`, `findAll`        | `backend-toolkit-mongoose/src/repository/create-mongoose-repository.ts:110,131,142,165` | destructures `session`, forwards to `executeFindQuery`         |
+| query application           | `.../repository/execute-find-query.ts:27,94`                                            | `query.session(options.session)`                               |
+| `count`                     | `create-mongoose-repository.ts:176`                                                     | `executeCountQuery(model, filter, criteria.session)`           |
+| `findAllAndCountPublic`     | `create-mongoose-repository.ts:187,217,219`                                             | forwards to both the find and the count                        |
+| `findAllNoCountPublic`      | `create-mongoose-repository.ts:226,254`                                                 | —                                                              |
+| `save` (single + many)      | `.../write/execute-save.ts:37,57,104`                                                   | `document.save({ session })`, `insertMany({ session })`        |
+| `update`                    | `.../write/execute-update.ts:11,41`                                                     | —                                                              |
+| `delete` / `remove`         | `.../write/execute-delete.ts:10,27,49`                                                  | —                                                              |
+| `softDelete` / `softRemove` | `.../soft-delete/execute-soft-delete.ts:13,51,62,94`, `execute-soft-remove.ts:11,37,67` | —                                                              |
+| criteria typing             | `.../repository/mongoose-repository.interface.ts:9-14`                                  | narrows core's `session?: unknown` to `mongoose.ClientSession` |
+| core contract               | `backend-toolkit-core/src/repository/find-criteria.interface.ts`                        | `session?: unknown`, documented as ODM-narrowed                |
 
 **The plumbing is complete. Nothing is missing at the repository layer.**
 
@@ -53,27 +53,27 @@ tests:
 - `backend-toolkit-mongoose/src/repository/write/execute-save.test.ts:139-165`
   — same harness for `save`.
 
-So: sessions can be *joined*, but nothing in the workspace can *start* one, and
+So: sessions can be _joined_, but nothing in the workspace can _start_ one, and
 no application code has ever tried.
 
 ### The consequence, in the app today
 
 `nutrition-staff/src/server/clients/create-client.ts:19-22` states it plainly:
 
-> *"Not a real database transaction (this app has none … no precedent for
-> Mongoose sessions anywhere in this codebase)."*
+> _"Not a real database transaction (this app has none … no precedent for
+> Mongoose sessions anywhere in this codebase)."_
 
 Its rollback is a manual `userRepository.delete()` inside a `catch`. Six paths
 perform multi-collection writes with no atomicity:
 
-| Path | Collections written | Current failure mode |
-|---|---|---|
-| `src/server/clients/create-client.ts` | `users`, `clients` | manual `catch` + `delete`; if the compensating delete itself fails, an orphan `User` persists |
-| `src/server/clients/update-client.ts:24-33` | `users`, `clients` | splits one DTO across two collections, writes each half separately — a partial update is invisible to the caller, which still gets a 200 |
-| `src/server/users/delete-user.ts` | `clients`, `staffs`, `users` | soft-deletes both satellites then **hard**-deletes the `User`; a crash between steps leaves soft-deleted profiles pointing at a live user, or an orphaned clinical graph |
-| `src/server/consultation-requests/create-consultation-request.ts` | `consultationrequests`, `users`, `clients` | three identity-resolution branches, no atomicity; always answers `{success:true}` so a partial write is silent by design |
-| `src/server/interactions/create-client-interaction.ts` | `clientinteractions`, `clients` | write-through of `lastContactedAt`/`nextFollowUpAt`; a failed second write leaves the CRM cache permanently stale |
-| `src/server/books/publishing/publish-book-edition.ts` | `books`, `bookeditions` | optimistic `contentRevision` locking mitigates but does not remove the window |
+| Path                                                              | Collections written                        | Current failure mode                                                                                                                                                     |
+| ----------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/server/clients/create-client.ts`                             | `users`, `clients`                         | manual `catch` + `delete`; if the compensating delete itself fails, an orphan `User` persists                                                                            |
+| `src/server/clients/update-client.ts:24-33`                       | `users`, `clients`                         | splits one DTO across two collections, writes each half separately — a partial update is invisible to the caller, which still gets a 200                                 |
+| `src/server/users/delete-user.ts`                                 | `clients`, `staffs`, `users`               | soft-deletes both satellites then **hard**-deletes the `User`; a crash between steps leaves soft-deleted profiles pointing at a live user, or an orphaned clinical graph |
+| `src/server/consultation-requests/create-consultation-request.ts` | `consultationrequests`, `users`, `clients` | three identity-resolution branches, no atomicity; always answers `{success:true}` so a partial write is silent by design                                                 |
+| `src/server/interactions/create-client-interaction.ts`            | `clientinteractions`, `clients`            | write-through of `lastContactedAt`/`nextFollowUpAt`; a failed second write leaves the CRM cache permanently stale                                                        |
+| `src/server/books/publishing/publish-book-edition.ts`             | `books`, `bookeditions`                    | optimistic `contentRevision` locking mitigates but does not remove the window                                                                                            |
 
 None of these is currently tested. `create-client.ts`'s conflict and rollback
 branches in particular are the highest-risk untested code in the repository
@@ -84,9 +84,9 @@ after the nutrition engine.
 1. **MongoDB transactions require a replica set or a sharded cluster.** A
    standalone `mongod` rejects `startTransaction` with
    `IllegalOperation: Transaction numbers are only allowed on a replica set
-   member or mongos`. Local development against a plain `mongod` will therefore
-   *fail loudly* the moment a transaction is attempted. This is a setup
-   requirement, not an edge case — see *Deployment and local development* below.
+member or mongos`. Local development against a plain `mongod` will therefore
+   _fail loudly_ the moment a transaction is attempted. This is a setup
+   requirement, not an edge case — see _Deployment and local development_ below.
 2. **The app uses the global mongoose singleton.**
    `src/server/core/db/connect.ts` calls `mongoose.connect(...)` and caches the
    result on `global.mongooseConnection`; `createMongoModel` defaults to
@@ -120,7 +120,7 @@ Two exports, one concept:
  */
 export function withTransaction<T>(
   fn: (tx: TransactionContext) => Promise<T>,
-  options?: WithTransactionOptions
+  options?: WithTransactionOptions,
 ): Promise<T>;
 
 /** The active transaction, or `null` when not inside one. */
@@ -190,7 +190,7 @@ Call sites read like this — no session variable, no `try`, no `finally`:
 ```ts
 export async function registerPatient(dto: RegisterPatientDto, actor: Actor) {
   return withTransaction(async () => {
-    const user    = await userRepository.save({ name: dto.name, phone: dto.phone });
+    const user = await userRepository.save({ name: dto.name, phone: dto.phone });
     const patient = await patientRepository.save({
       userId: user._id,
       mrn: await allocateMrn(actor.organizationId),
@@ -224,10 +224,10 @@ called by the seven executors that already accept a session. The public
 
 Two safety rules on that resolution, both from the review:
 
-- **A *different* explicit session inside an ambient transaction is rejected.**
+- **A _different_ explicit session inside an ambient transaction is rejected.**
   `criteria.session ?? ambient` would otherwise let a caller silently split one
   logical operation across two transactions. If an ambient context exists, an
-  explicit `criteria.session` must be the *same* session by identity, or the
+  explicit `criteria.session` must be the _same_ session by identity, or the
   repository throws. Passing the ambient session explicitly stays legal.
 - **The Node runtime is declared, not assumed.** `AsyncLocalStorage` does not
   exist on Next's Edge runtime. Every route here is Node today (mongoose,
@@ -239,12 +239,12 @@ Two safety rules on that resolution, both from the review:
 
 Why this mechanism and not the alternatives:
 
-| Option | Verdict |
-|---|---|
-| **AsyncLocalStorage ambient context** ✅ | Zero boilerplate; works through arbitrary call depth; explicit `criteria.session` still wins; no repository signature changes; no DI container needed. Requires the Node runtime (satisfied — every package declares `engines.node >= 18`, and these route handlers already require Node for `mongoose` and `puppeteer`). |
-| Thread `session` explicitly everywhere | This is what the codebase does today via `criteria.session`, and it is precisely the boilerplate to be removed. It also cannot work for helpers like `allocateMrn` or `recordAuditEvent` without polluting every signature. |
-| Transaction-scoped repository instances (`repo.withSession(s)`) | Repositories are **module-level consts** (`export const clientProfileRepository = createMongooseRepository({...})`) with no DI container. Introducing per-request instances is a much larger architectural change, and every call site would have to be rewritten to obtain its repository from a context. |
-| Inject the session through the route-factory context | `RouteHandlerContext` is `{body, query, params, user, request}` and nothing else. Adding a session there only relocates the threading problem — it does not remove it, and it forces every service to accept a context argument. |
+| Option                                                          | Verdict                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AsyncLocalStorage ambient context** ✅                        | Zero boilerplate; works through arbitrary call depth; explicit `criteria.session` still wins; no repository signature changes; no DI container needed. Requires the Node runtime (satisfied — every package declares `engines.node >= 18`, and these route handlers already require Node for `mongoose` and `puppeteer`). |
+| Thread `session` explicitly everywhere                          | This is what the codebase does today via `criteria.session`, and it is precisely the boilerplate to be removed. It also cannot work for helpers like `allocateMrn` or `recordAuditEvent` without polluting every signature.                                                                                               |
+| Transaction-scoped repository instances (`repo.withSession(s)`) | Repositories are **module-level consts** (`export const clientProfileRepository = createMongooseRepository({...})`) with no DI container. Introducing per-request instances is a much larger architectural change, and every call site would have to be rewritten to obtain its repository from a context.                |
+| Inject the session through the route-factory context            | `RouteHandlerContext` is `{body, query, params, user, request}` and nothing else. Adding a session there only relocates the threading problem — it does not remove it, and it forces every service to accept a context argument.                                                                                          |
 
 **The Edge-runtime caveat, stated plainly:** `AsyncLocalStorage` is a Node API.
 It is unavailable in Next's Edge runtime. Every route in this app is Node
@@ -279,8 +279,8 @@ Rules:
 3. **A nested frame that throws marks the shared context rollback-only.** The
    inner `withTransaction` catches, calls `markRollbackOnly(error)` on the
    shared context, and rethrows. So even if an intermediate caller swallows the
-   rethrown error, the outermost frame still aborts. This is *nested
-   poisoning*, and it is only one of **four** layers — see the section below.
+   rethrown error, the outermost frame still aborts. This is _nested
+   poisoning_, and it is only one of **four** layers — see the section below.
 4. **`onCommit` / `onAbort` are registered on the outermost context** regardless
    of the depth that registers them, and run **after** the commit or abort
    completes — never inside the transaction. This is where side effects that
@@ -289,7 +289,7 @@ Rules:
    logged and never turns a committed transaction into a failure.
 5. **A transaction must never wrap an external call.** No HTTP, no Cloudinary
    upload, no Puppeteer render inside `fn`. MongoDB's default transaction
-   lifetime is 60s and a held transaction blocks. Asset uploads happen *before*
+   lifetime is 60s and a held transaction blocks. Asset uploads happen _before_
    the transaction; asset cleanup happens in `onAbort`.
 
 ### Retry semantics — attempt-local versus final
@@ -300,17 +300,17 @@ the database, across attempts. Unspecified, the first failed attempt's `onAbort`
 would delete an asset the retry still needs, and an `onCommit` registered on
 attempt 1 would fire twice.
 
-| Concern | Rule |
-|---|---|
-| `onCommit` / `onAbort` registrations | **Cleared before every retry.** Only the final attempt's registrations run. |
-| `onAttemptFailed` | Runs after every failed attempt, including retried ones. The only hook for attempt-local cleanup. |
-| Asset uploads and other external side effects | Happen **before** `withTransaction`, never inside. Compensating deletion is registered on `onAbort` (final), never `onAttemptFailed`. |
-| Values that must be stable across attempts | Generated ids, timestamps, and anything random or clock-derived are computed **before** the retry loop and closed over — never inside `fn`. |
+| Concern                                              | Rule                                                                                                                                                                                                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onCommit` / `onAbort` registrations                 | **Cleared before every retry.** Only the final attempt's registrations run.                                                                                                                                                         |
+| `onAttemptFailed`                                    | Runs after every failed attempt, including retried ones. The only hook for attempt-local cleanup.                                                                                                                                   |
+| Asset uploads and other external side effects        | Happen **before** `withTransaction`, never inside. Compensating deletion is registered on `onAbort` (final), never `onAttemptFailed`.                                                                                               |
+| Values that must be stable across attempts           | Generated ids, timestamps, and anything random or clock-derived are computed **before** the retry loop and closed over — never inside `fn`.                                                                                         |
 | Sequence allocation (MRN, invoice, encounter number) | Allocated inside `fn`. A rolled-back attempt rolls back the `$inc`, so a retry re-allocates cleanly. Safe **only** because allocation is a transactional document write; it would not be safe against an external sequence service. |
-| Non-idempotent work | Must not be inside `fn`. If it cannot move out, it belongs in `onCommit`. |
-| `fn` contract | **`fn` must be idempotent** — a documented precondition, not a hope. |
-| Backoff | Exponential with jitter, strict attempt budget (default 3), and a retry-count metric so a contention pathology is visible rather than silent. |
-| Parallel work inside `fn` | **Forbidden.** One Mongoose session cannot safely run concurrent operations. |
+| Non-idempotent work                                  | Must not be inside `fn`. If it cannot move out, it belongs in `onCommit`.                                                                                                                                                           |
+| `fn` contract                                        | **`fn` must be idempotent** — a documented precondition, not a hope.                                                                                                                                                                |
+| Backoff                                              | Exponential with jitter, strict attempt budget (default 3), and a retry-count metric so a contention pathology is visible rather than silent.                                                                                       |
+| Parallel work inside `fn`                            | **Forbidden.** One Mongoose session cannot safely run concurrent operations.                                                                                                                                                        |
 
 `depth` and `attempt` are frame-local metadata, not shared mutable counters — the
 first draft's mutable `depth` would have been corrupted by two parallel nested
@@ -360,7 +360,7 @@ selective was considered and rejected — classifying which write failures leave
 transaction usable is exactly the judgement call that produces silent partial
 commits when someone gets it wrong.
 This closes the common shape of the example above: if the throwing service
-failed *at a repository write*, the transaction is already marked, and swallowing
+failed _at a repository write_, the transaction is already marked, and swallowing
 the error changes nothing. This is the layer that does the most work in practice,
 because inside a transaction most failures are write failures — duplicate keys,
 validation errors, write conflicts.
@@ -371,7 +371,7 @@ themselves transactional.
 
 **Layer 3 — explicit `tx.markRollbackOnly(error)`.**
 For everything the first two layers cannot see: a failure in pure application
-logic *after* a successful write, an external call, a validation the code
+logic _after_ a successful write, an external call, a validation the code
 performs itself and decides to swallow. This is the caller's responsibility, and
 it is the only part of the mechanism that depends on discipline.
 
@@ -390,7 +390,7 @@ await withTransaction(async (tx) => {
 **Layer 4 — explicit completion for write transactions.**
 The review made a point the first draft missed: the residual gap is wider than
 "a swallowed non-write failure". It also covers failures swallowed several frames
-down, failed *reads*, invariant checks that return a sentinel instead of
+down, failed _reads_, invariant checks that return a sentinel instead of
 throwing, an early `return` on a branch the author forgot, and writes made
 outside the repository executors.
 
@@ -427,7 +427,7 @@ a discipline problem rather than a technical one.
 2. **If you must catch, call `tx.markRollbackOnly(error)` in the same catch
    block**, before anything else. There is no third option.
 3. **Never catch in order to "continue with partial success."** A transaction
-   has no partial success. If a step is genuinely optional, do it *outside* the
+   has no partial success. If a step is genuinely optional, do it _outside_ the
    transaction — before it, or in an `onCommit` callback.
 4. **Never call `session.commitTransaction()` / `abortTransaction()` /
    `startSession()` directly.** `withTransaction` owns the lifecycle.
@@ -441,7 +441,7 @@ a discipline problem rather than a technical one.
 8. **A write transaction must end with `tx.complete(value)`.** An early return
    or a forgotten acknowledgement aborts.
 9. **Do not try to recover from a repository error inside a transaction.**
-   Probing a unique constraint and picking another value is legitimate *outside*
+   Probing a unique constraint and picking another value is legitimate _outside_
    a transaction and a defect inside one — layer 1 has already poisoned the
    transaction by the time you catch it. Move the probe before the transaction.
 
@@ -454,23 +454,23 @@ safety net over the rules, not a substitute for them.
 
 ### Error and rollback behaviour
 
-| Situation | Behaviour |
-|---|---|
-| `fn` resolves, nothing poisoned | `commitTransaction()`, then `endSession()`, then run `onCommit` callbacks, then return `fn`'s value |
-| `fn` throws | `abortTransaction()`, then `endSession()`, then run `onAbort(error)` callbacks, then **rethrow the original error unchanged** |
-| `fn` resolves but the context is rollback-only | `abortTransaction()`, run `onAbort(rollbackCause)`, then throw `TransactionAbortedError` with `cause` set to the **first retained cause** — never a silent partial commit, and never a lost diagnostic |
-| `markRollbackOnly` called more than once | Only the first cause is retained; later calls are no-ops on the cause. The abort happens once. |
-| `markRollbackOnly` called with no cause | Aborts and throws `TransactionAbortedError` with a message naming the call site's absence of a cause, so a bare `markRollbackOnly()` is still diagnosable |
-| `commitTransaction()` throws `UnknownTransactionCommitResult` | Retry the commit up to `maxRetries`; the label is explicitly retry-safe |
-| Any op throws `TransientTransactionError` (e.g. write conflict) | Abort, then retry the **entire** `fn` from the start, up to `maxRetries`, with jittered backoff. `fn` must therefore be idempotent — documented as a hard requirement on the abstraction |
-| Retries exhausted | Throw a **`ServiceUnavailableError` (503)** with a retryable code. **Not** 409 — a primary election, a timeout or cache pressure is not a business conflict, and reporting it as one misleads the caller and the operator alike. A genuine 409 is thrown by domain code *after* a successful retry finds a real conflict. |
-| Transactions unsupported by the server (standalone `mongod`) | Throw `ConfigurationError` with the message naming the replica-set requirement and the local-dev fix. **Never silently run non-transactionally** |
-| `abortTransaction()` itself throws | Log loudly and rethrow the *original* error, not the abort error — the original is the diagnostic one |
-| `endSession()` throws | Logged, swallowed; it cannot change the committed/aborted outcome |
+| Situation                                                       | Behaviour                                                                                                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fn` resolves, nothing poisoned                                 | `commitTransaction()`, then `endSession()`, then run `onCommit` callbacks, then return `fn`'s value                                                                                                                                                                                                                       |
+| `fn` throws                                                     | `abortTransaction()`, then `endSession()`, then run `onAbort(error)` callbacks, then **rethrow the original error unchanged**                                                                                                                                                                                             |
+| `fn` resolves but the context is rollback-only                  | `abortTransaction()`, run `onAbort(rollbackCause)`, then throw `TransactionAbortedError` with `cause` set to the **first retained cause** — never a silent partial commit, and never a lost diagnostic                                                                                                                    |
+| `markRollbackOnly` called more than once                        | Only the first cause is retained; later calls are no-ops on the cause. The abort happens once.                                                                                                                                                                                                                            |
+| `markRollbackOnly` called with no cause                         | Aborts and throws `TransactionAbortedError` with a message naming the call site's absence of a cause, so a bare `markRollbackOnly()` is still diagnosable                                                                                                                                                                 |
+| `commitTransaction()` throws `UnknownTransactionCommitResult`   | Retry the commit up to `maxRetries`; the label is explicitly retry-safe                                                                                                                                                                                                                                                   |
+| Any op throws `TransientTransactionError` (e.g. write conflict) | Abort, then retry the **entire** `fn` from the start, up to `maxRetries`, with jittered backoff. `fn` must therefore be idempotent — documented as a hard requirement on the abstraction                                                                                                                                  |
+| Retries exhausted                                               | Throw a **`ServiceUnavailableError` (503)** with a retryable code. **Not** 409 — a primary election, a timeout or cache pressure is not a business conflict, and reporting it as one misleads the caller and the operator alike. A genuine 409 is thrown by domain code _after_ a successful retry finds a real conflict. |
+| Transactions unsupported by the server (standalone `mongod`)    | Throw `ConfigurationError` with the message naming the replica-set requirement and the local-dev fix. **Never silently run non-transactionally**                                                                                                                                                                          |
+| `abortTransaction()` itself throws                              | Log loudly and rethrow the _original_ error, not the abort error — the original is the diagnostic one                                                                                                                                                                                                                     |
+| `endSession()` throws                                           | Logged, swallowed; it cannot change the committed/aborted outcome                                                                                                                                                                                                                                                         |
 
 Two error classes are needed and do not exist: `TransactionAbortedError`
 (500, `TRANSACTION_ABORTED`) and **`ServiceUnavailableError` (503,
-`SERVICE_UNAVAILABLE`)** for exhausted transient retries — *not* `ConflictError`,
+`SERVICE_UNAVAILABLE`)** for exhausted transient retries — _not_ `ConflictError`,
 which is reserved for a genuine business conflict found after a successful retry.
 `backend-toolkit-core/src/errors/` currently has 13 classes and no 429/422/402/503
 — see [19](19-toolkit-and-package-changes.md).
@@ -479,17 +479,17 @@ which is reserved for a genuine business conflict found after a successful retry
 
 The abstraction spans two packages, deliberately:
 
-| Package | What goes in it | Why |
-|---|---|---|
-| **`@kira-joo/backend-toolkit-mongoose`** | `withTransaction`, `getActiveTransaction`, `TransactionContext` (incl. `markRollbackOnly`), the `AsyncLocalStorage` store, `resolveSession()`, the wiring of `resolveSession` into the seven executors, and the layer-1 auto-marking in the five write executors | `mongoose.ClientSession` is a Mongoose type. This package already owns every session-accepting code path, already has `mongoose` as a peer, and already has the `MongoMemoryReplSet` test harness. Putting it here means zero new dependencies anywhere. |
-| **`@kira-joo/backend-toolkit-core`** | `TransactionAbortedError`; and the *contract* documentation on `FindCriteria.session` updated to say an ambient session may supply it | Core is ODM-agnostic and cannot reference `ClientSession`. It owns error classes. |
-| **`@kira-joo/backend-toolkit-next`** | Nothing required. Optionally a `transaction: true` route-factory option in a later wave | Deliberately kept out of wave A: making the route factory open a transaction for every request would wrap reads in transactions for no benefit and would put revalidation inside the transaction. Transaction boundaries belong to the domain operation, not the HTTP layer. |
+| Package                                  | What goes in it                                                                                                                                                                                                                                                  | Why                                                                                                                                                                                                                                                                          |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`@kira-joo/backend-toolkit-mongoose`** | `withTransaction`, `getActiveTransaction`, `TransactionContext` (incl. `markRollbackOnly`), the `AsyncLocalStorage` store, `resolveSession()`, the wiring of `resolveSession` into the seven executors, and the layer-1 auto-marking in the five write executors | `mongoose.ClientSession` is a Mongoose type. This package already owns every session-accepting code path, already has `mongoose` as a peer, and already has the `MongoMemoryReplSet` test harness. Putting it here means zero new dependencies anywhere.                     |
+| **`@kira-joo/backend-toolkit-core`**     | `TransactionAbortedError`; and the _contract_ documentation on `FindCriteria.session` updated to say an ambient session may supply it                                                                                                                            | Core is ODM-agnostic and cannot reference `ClientSession`. It owns error classes.                                                                                                                                                                                            |
+| **`@kira-joo/backend-toolkit-next`**     | Nothing required. Optionally a `transaction: true` route-factory option in a later wave                                                                                                                                                                          | Deliberately kept out of wave A: making the route factory open a transaction for every request would wrap reads in transactions for no benefit and would put revalidation inside the transaction. Transaction boundaries belong to the domain operation, not the HTTP layer. |
 
 **Rejected placement:** a new `@kira-joo/backend-toolkit-transactions` package.
 It would need `mongoose` as a peer, would have exactly one consumer, and would
 split the session contract across a package boundary for no gain. The
-`toolkit-first-development` skill's test — *"could an unrelated project use this
-without knowing what a patient is?"* — is satisfied by putting it in
+`toolkit-first-development` skill's test — _"could an unrelated project use this
+without knowing what a patient is?"_ — is satisfied by putting it in
 `backend-toolkit-mongoose`, which is already that generic.
 
 ### API surface changes, precisely
@@ -529,88 +529,71 @@ tests reuse that exact pattern, so there is no new infrastructure cost.
 `with-transaction.test.ts` — required cases:
 
 **Commit**
+
 1. Two writes to two different collections inside one `withTransaction` are both
    visible after it resolves.
 2. A read inside the transaction sees a write made earlier in the same
    transaction (already proven for explicit sessions; re-prove for ambient).
-3. A read *outside* the transaction, taken while it is open, does **not** see
+3. A read _outside_ the transaction, taken while it is open, does **not** see
    the uncommitted write.
 4. `onCommit` callbacks run once, after the commit, in registration order.
 5. `withTransaction` returns `fn`'s resolved value unchanged.
 
-**Rollback**
-6. A throw after two successful writes leaves **both** collections unchanged.
-7. The original error is rethrown, with its identity and type preserved
-   (`instanceof`, message, `statusCode`), not wrapped.
-8. `onAbort` receives that same error; `onCommit` callbacks do **not** run.
-9. A `NotFoundError` thrown by `repository.findOne` mid-transaction aborts it.
-10. A `DuplicateKeyError` from a `@Unique()` collision aborts it, and the
-    translated 409 still reaches the caller.
+**Rollback** 6. A throw after two successful writes leaves **both** collections unchanged. 7. The original error is rethrown, with its identity and type preserved
+(`instanceof`, message, `statusCode`), not wrapped. 8. `onAbort` receives that same error; `onCommit` callbacks do **not** run. 9. A `NotFoundError` thrown by `repository.findOne` mid-transaction aborts it. 10. A `DuplicateKeyError` from a `@Unique()` collision aborts it, and the
+translated 409 still reaches the caller.
 
-**Ambient propagation**
-11. A repository call made three function frames deep, with no `session`
-    argument anywhere, joins the transaction.
-12. An explicit `criteria.session` overrides the ambient one.
-13. Outside any `withTransaction`, `getActiveTransaction()` is `null` and
-    repositories behave exactly as they do today (regression guard).
-14. Two concurrent `withTransaction` calls (`Promise.all`) do not see each
-    other's sessions — the `AsyncLocalStorage` isolation test. This is the test
-    that would catch a module-level-variable implementation mistake.
+**Ambient propagation** 11. A repository call made three function frames deep, with no `session`
+argument anywhere, joins the transaction. 12. An explicit `criteria.session` overrides the ambient one. 13. Outside any `withTransaction`, `getActiveTransaction()` is `null` and
+repositories behave exactly as they do today (regression guard). 14. Two concurrent `withTransaction` calls (`Promise.all`) do not see each
+other's sessions — the `AsyncLocalStorage` isolation test. This is the test
+that would catch a module-level-variable implementation mistake.
 
-**Nesting**
-15. A nested `withTransaction` reports `depth === 2` and shares the outer
-    `session` object identity.
-16. The nested call commits nothing; only the outer frame commits.
-17. A throw inside the nested call rolls back writes made by the *outer* frame
-    before it.
-18. **Nested poisoning:** an inner `withTransaction` frame throws, an
-    intermediate caller catches and swallows it, `fn` resolves — the transaction
-    aborts and `TransactionAbortedError` is thrown. No partial commit.
+**Nesting** 15. A nested `withTransaction` reports `depth === 2` and shares the outer
+`session` object identity. 16. The nested call commits nothing; only the outer frame commits. 17. A throw inside the nested call rolls back writes made by the _outer_ frame
+before it. 18. **Nested poisoning:** an inner `withTransaction` frame throws, an
+intermediate caller catches and swallows it, `fn` resolves — the transaction
+aborts and `TransactionAbortedError` is thrown. No partial commit.
 
 **Rollback-only (layers 1 and 3)**
 18a. **Layer 1:** a repository write fails, the caller swallows the error, `fn`
-     resolves — the transaction aborts. Asserts the earlier successful write in
-     the same transaction is **not** present afterwards. This is the exact case
-     a naive design commits.
+resolves — the transaction aborts. Asserts the earlier successful write in
+the same transaction is **not** present afterwards. This is the exact case
+a naive design commits.
 18b. **Layer 3:** `tx.markRollbackOnly(error)` in a catch block causes an abort
-     even though `fn` resolved, and `TransactionAbortedError.cause` is the
-     error that was passed.
+even though `fn` resolved, and `TransactionAbortedError.cause` is the
+error that was passed.
 18c. Only the **first** cause is retained across repeated `markRollbackOnly`
-     calls at different depths.
+calls at different depths.
 18d. `markRollbackOnly()` with no cause still aborts and still produces a
-     diagnosable error.
+diagnosable error.
 18e. `tx.isRollbackOnly` reads `false` before and `true` after.
 18f. A rollback-only transaction runs `onAbort` and does **not** run `onCommit`.
-18g. `markRollbackOnly` called at depth 2 aborts the depth-1 transaction.
-19. `onCommit` registered at depth 2 runs after the depth-1 commit.
+18g. `markRollbackOnly` called at depth 2 aborts the depth-1 transaction. 19. `onCommit` registered at depth 2 runs after the depth-1 commit.
 
 **Layer 4 — explicit completion**
 19a. A write transaction whose `fn` resolves **without** `tx.complete()` aborts
-     and throws; the write is absent afterwards. The early-return test.
+and throws; the write is absent afterwards. The early-return test.
 19b. A read-only transaction needs no `tx.complete()` and commits normally.
 19c. `tx.complete(value)` returns `value` unchanged to the caller.
 
-**Retry**
-20. A simulated `TransientTransactionError` on the first attempt causes `fn` to
-    re-run and then succeed; the invocation count is asserted.
-21. `maxRetries: 0` disables retry.
-22. Exhausted retries surface as **`ServiceUnavailableError` (503)**, not 409.
+**Retry** 20. A simulated `TransientTransactionError` on the first attempt causes `fn` to
+re-run and then succeed; the invocation count is asserted. 21. `maxRetries: 0` disables retry. 22. Exhausted retries surface as **`ServiceUnavailableError` (503)**, not 409.
 22a. `onCommit` registered during a retried attempt fires **exactly once**.
 22b. `onAbort` does **not** fire after an attempt that will be retried;
-     `onAttemptFailed` does.
+`onAttemptFailed` does.
 22c. A sequence `$inc` inside a retried `fn` consumes exactly one number.
 22d. An explicit `criteria.session` differing from the ambient session throws.
 22e. `Promise.all` over two repository writes inside a transaction is rejected by
-     the QA check (static, not runtime).
+the QA check (static, not runtime).
 
-**Environment**
-23. Against a standalone (non-replica-set) `MongoMemoryServer`,
-    `withTransaction` throws `ConfigurationError` naming the replica-set
-    requirement — and does **not** fall through to a non-transactional write.
+**Environment** 23. Against a standalone (non-replica-set) `MongoMemoryServer`,
+`withTransaction` throws `ConfigurationError` naming the replica-set
+requirement — and does **not** fall through to a non-transactional write.
 
 Application-side tests (Phase 0A brings the Node test project that makes these
 possible — see [22](22-testing-and-qa.md)): each workflow in the table below
-gets one commit test and one rollback test asserting that *no* collection
+gets one commit test and one rollback test asserting that _no_ collection
 retains a partial write.
 
 ## Which first medical workflows require transactions
@@ -618,22 +601,22 @@ retains a partial write.
 Ordered by risk. "Required" means the workflow must not ship without
 `withTransaction`; the phase column says when it lands.
 
-| # | Workflow | Collections written | Why it is mandatory | Phase |
-|---|---|---|---|---|
-| 1 | **Register patient** (identity + patient record + MRN allocation + audit) | `users`, `patients`, `mrnsequences`, `auditevents` | Today's `create-client.ts` compensating-delete is the exact defect this removes. MRN allocation must not burn a number on a failed registration, and must not hand two patients the same number. | 5 |
-| 2 | **MRN allocation** | `mrnsequences` (+ the patient write) | A per-organization human-readable sequence. `findOneAndUpdate` with `$inc` is atomic on its own, but the allocation and the patient insert must succeed or fail together, or the sequence leaks. | 5 |
-| 3 | **Update patient across identity + record** | `users`, `patients`, `auditevents` | `update-client.ts:24-33` splits one DTO across two collections and returns 200 on a half-write today. | 5 |
-| 4 | **Delete / deactivate patient** | `patients`, `users`, `auditevents` | `delete-user.ts` currently soft-deletes satellites then hard-deletes the identity. With `User` gaining soft delete (M3) this becomes a coordinated state change across three collections. | 5 |
-| 5 | **Book / reschedule appointment** | `appointments`, `auditevents`, (`waitinglist`) | Slot-conflict check and the write must be one atomic unit, or two receptionists double-book the same slot. The uniqueness constraint alone cannot express "no overlapping interval for this practitioner". | 6 |
-| 6 | **Check-in** | `appointments`, `encounters`, `auditevents` | Check-in creates the `Encounter` and moves the `Appointment` state. An orphaned encounter with no appointment state change is a patient standing in a waiting room the system cannot see. | 6 |
-| 7 | **Finalise / sign encounter** | `encounters`, `observations`, `diagnoses`, `prescriptions`, `patients` (alert denormalisation), `auditevents` | The widest write in the product, and the one where a partial commit is a clinical-safety issue: a signed encounter whose diagnoses did not persist. | 7 |
-| 8 | **Record vitals / observations batch** | `observations`, `patients` (latest-value cache) | Write-through of latest values must match the observation rows. | 7 |
-| 9 | **Nutrition calculation assignment** | `nutritioncalculations`, `encounters`, `auditevents` | The immutable-snapshot invariant depends on the snapshot and its link landing together. | 8 |
-| 10 | **Log interaction with follow-up** | `contactattempts`, `patients` (`lastContactedAt`, `nextFollowUpAt`), `auditevents` | Exactly the stale-cache failure `create-client-interaction.ts` has today. | 9 |
-| 11 | **Issue invoice** | `invoices`, `invoicelines`, `patients` (balance), `auditevents` | A header without lines, or lines without a balance update, is a billing dispute. | 10 |
-| 12 | **Record payment** | `payments`, `invoices` (status + paid amount), `patients` (balance), `auditevents` | Money. Non-negotiable. | 10 |
-| 13 | **Void / refund** | `payments`, `invoices`, `patients`, `auditevents` | Reversal must be all-or-nothing. | 10 |
-| 14 | **Publish book edition** *(existing)* | `books`, `bookeditions` | Already guarded by optimistic `contentRevision` locking; retrofitting `withTransaction` closes the remaining window. Low priority, listed for completeness. | 12 |
+| #   | Workflow                                                                  | Collections written                                                                                           | Why it is mandatory                                                                                                                                                                                        | Phase |
+| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1   | **Register patient** (identity + patient record + MRN allocation + audit) | `users`, `patients`, `mrnsequences`, `auditevents`                                                            | Today's `create-client.ts` compensating-delete is the exact defect this removes. MRN allocation must not burn a number on a failed registration, and must not hand two patients the same number.           | 5     |
+| 2   | **MRN allocation**                                                        | `mrnsequences` (+ the patient write)                                                                          | A per-organization human-readable sequence. `findOneAndUpdate` with `$inc` is atomic on its own, but the allocation and the patient insert must succeed or fail together, or the sequence leaks.           | 5     |
+| 3   | **Update patient across identity + record**                               | `users`, `patients`, `auditevents`                                                                            | `update-client.ts:24-33` splits one DTO across two collections and returns 200 on a half-write today.                                                                                                      | 5     |
+| 4   | **Delete / deactivate patient**                                           | `patients`, `users`, `auditevents`                                                                            | `delete-user.ts` currently soft-deletes satellites then hard-deletes the identity. With `User` gaining soft delete (M3) this becomes a coordinated state change across three collections.                  | 5     |
+| 5   | **Book / reschedule appointment**                                         | `appointments`, `auditevents`, (`waitinglist`)                                                                | Slot-conflict check and the write must be one atomic unit, or two receptionists double-book the same slot. The uniqueness constraint alone cannot express "no overlapping interval for this practitioner". | 6     |
+| 6   | **Check-in**                                                              | `appointments`, `encounters`, `auditevents`                                                                   | Check-in creates the `Encounter` and moves the `Appointment` state. An orphaned encounter with no appointment state change is a patient standing in a waiting room the system cannot see.                  | 6     |
+| 7   | **Finalise / sign encounter**                                             | `encounters`, `observations`, `diagnoses`, `prescriptions`, `patients` (alert denormalisation), `auditevents` | The widest write in the product, and the one where a partial commit is a clinical-safety issue: a signed encounter whose diagnoses did not persist.                                                        | 7     |
+| 8   | **Record vitals / observations batch**                                    | `observations`, `patients` (latest-value cache)                                                               | Write-through of latest values must match the observation rows.                                                                                                                                            | 7     |
+| 9   | **Nutrition calculation assignment**                                      | `nutritioncalculations`, `encounters`, `auditevents`                                                          | The immutable-snapshot invariant depends on the snapshot and its link landing together.                                                                                                                    | 8     |
+| 10  | **Log interaction with follow-up**                                        | `contactattempts`, `patients` (`lastContactedAt`, `nextFollowUpAt`), `auditevents`                            | Exactly the stale-cache failure `create-client-interaction.ts` has today.                                                                                                                                  | 9     |
+| 11  | **Issue invoice**                                                         | `invoices`, `invoicelines`, `patients` (balance), `auditevents`                                               | A header without lines, or lines without a balance update, is a billing dispute.                                                                                                                           | 10    |
+| 12  | **Record payment**                                                        | `payments`, `invoices` (status + paid amount), `patients` (balance), `auditevents`                            | Money. Non-negotiable.                                                                                                                                                                                     | 10    |
+| 13  | **Void / refund**                                                         | `payments`, `invoices`, `patients`, `auditevents`                                                             | Reversal must be all-or-nothing.                                                                                                                                                                           | 10    |
+| 14  | **Publish book edition** _(existing)_                                     | `books`, `bookeditions`                                                                                       | Already guarded by optimistic `contentRevision` locking; retrofitting `withTransaction` closes the remaining window. Low priority, listed for completeness.                                                | 12    |
 
 Workflows that deliberately **do not** get a transaction: every read; every
 single-collection write (`save` on one document is already atomic); asset
@@ -647,11 +630,11 @@ regression); PDF generation.
 Transactions require a replica set. This changes the local-dev story and must
 be documented before Phase 3, not discovered during it.
 
-| Environment | Requirement |
-|---|---|
-| Local dev | A single-node replica set. Either `mongod --replSet rs0` plus a one-time `rs.initiate()`, or a `docker compose` service with `--replSet`. To be added to `nutrition-staff/README.md` and `.env.example` guidance as part of Phase 0C. There is currently **no** container definition in any repo. |
-| Tests | Already solved — `MongoMemoryReplSet`, already a devDependency and already in use. |
-| Production | MongoDB Atlas and any managed replica set support transactions natively. A single self-managed `mongod` does not. This is a deployment prerequisite to record now, since no CI or infra config exists in any of the nine repos. |
+| Environment | Requirement                                                                                                                                                                                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local dev   | A single-node replica set. Either `mongod --replSet rs0` plus a one-time `rs.initiate()`, or a `docker compose` service with `--replSet`. To be added to `nutrition-staff/README.md` and `.env.example` guidance as part of Phase 0C. There is currently **no** container definition in any repo. |
+| Tests       | Already solved — `MongoMemoryReplSet`, already a devDependency and already in use.                                                                                                                                                                                                                |
+| Production  | MongoDB Atlas and any managed replica set support transactions natively. A single self-managed `mongod` does not. This is a deployment prerequisite to record now, since no CI or infra config exists in any of the nine repos.                                                                   |
 
 `withTransaction` failing loudly on a standalone server (test case 23) is what
 turns this from a silent-corruption risk into a setup error someone fixes in
@@ -725,22 +708,22 @@ meet their acceptance gates without this. Release wave A-backend must ship
 **Reviewed 2026-08-22. Verdict: FLAWED — mechanism sound, semantics
 underspecified. Amended.**
 
-| # | Finding | Sev | Analysis | Resolution |
-|---|---|---|---|---|
-| 1 | `AsyncLocalStorage` is viable in Node App Router handlers; module-level repository singletons do not break it, because context resolves at call time. | — | Confirms the core choice. | No change. |
-| 2 | "Every route is Node runtime" is an assumption, not an enforced invariant. | MAJOR | Correct — verified, `src/app/api/clients/route.ts:8` declares only `dynamic`. | **Accepted.** `runtime = "nodejs"` convention plus a static check, in Phase 0C. |
-| 3 | `criteria.session ?? ambient` lets a caller inject a *different* session and silently split one operation across two transactions. | MAJOR | Correct, and a nasty failure mode. | **Accepted.** A differing explicit session now throws. |
-| 4 | Propagation must cover populate, aggregation, bulk ops and raw model calls; a missed executor escapes. | MAJOR | Correct. Populate inherits the root query's session, but the newly proposed `aggregate`/`bulkWrite` surface would not without care. | **Accepted.** `resolveSession` applied at the lowest execution boundary; every new API in [19](19-toolkit-and-package-changes.md) must route through it. `tx.session` stays the documented raw escape hatch. |
-| 5 | Auto-poisoning on every write error is overbroad — it breaks "probe a unique constraint, pick another value". | MAJOR | Correct that it is overbroad. But a selective version requires classifying which write failures leave a transaction usable, and a wrong classification produces exactly the silent partial commit this design exists to prevent. | **Accepted in part.** Overbreadth kept deliberately; rule 9 states the consequence plainly rather than leaving it to be discovered. |
-| 6 | The residual gap is wider than stated — swallowed failures frames down, failed reads, sentinel returns, early returns. A fourth mechanism (explicit completion) would catch more. | MAJOR | Correct on both counts, and materially better than the first draft. | **Accepted.** Layer 4 `tx.complete()` added, with tests 19a–19c. |
-| 7 | Mutable shared `depth` is corrupted by parallel nested frames; MongoDB cannot run parallel ops on one session anyway. | MAJOR | Correct. | **Accepted.** Parallel database work forbidden (rule 7) and checked; `depth`/`attempt` frame-local. |
-| 8 | Retry semantics underspecified: hooks across attempts, generated ids, timestamps, sequence allocation. A first attempt's `onAbort` could delete an asset the retry needs. | CRITICAL | Correct, and the most useful finding here. The first draft said "must be idempotent" and left every practical consequence unstated. | **Accepted.** New *Retry semantics* section; `onAttemptFailed` added; hooks cleared per attempt; stable values hoisted out of the loop; sequence allocation analysed explicitly. |
-| 9 | Hand-rolling the driver's retry loop is unnecessary risk. | MINOR | Correct — especially for `UnknownTransactionCommitResult`. | **Accepted.** The abstraction wraps `Connection#transaction()` and adds only ambient context, rollback-only, and hooks. |
+| #   | Finding                                                                                                                                                                           | Sev      | Analysis                                                                                                                                                                                                                         | Resolution                                                                                                                                                                                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `AsyncLocalStorage` is viable in Node App Router handlers; module-level repository singletons do not break it, because context resolves at call time.                             | —        | Confirms the core choice.                                                                                                                                                                                                        | No change.                                                                                                                                                                                                   |
+| 2   | "Every route is Node runtime" is an assumption, not an enforced invariant.                                                                                                        | MAJOR    | Correct — verified, `src/app/api/clients/route.ts:8` declares only `dynamic`.                                                                                                                                                    | **Accepted.** `runtime = "nodejs"` convention plus a static check, in Phase 0C.                                                                                                                              |
+| 3   | `criteria.session ?? ambient` lets a caller inject a _different_ session and silently split one operation across two transactions.                                                | MAJOR    | Correct, and a nasty failure mode.                                                                                                                                                                                               | **Accepted.** A differing explicit session now throws.                                                                                                                                                       |
+| 4   | Propagation must cover populate, aggregation, bulk ops and raw model calls; a missed executor escapes.                                                                            | MAJOR    | Correct. Populate inherits the root query's session, but the newly proposed `aggregate`/`bulkWrite` surface would not without care.                                                                                              | **Accepted.** `resolveSession` applied at the lowest execution boundary; every new API in [19](19-toolkit-and-package-changes.md) must route through it. `tx.session` stays the documented raw escape hatch. |
+| 5   | Auto-poisoning on every write error is overbroad — it breaks "probe a unique constraint, pick another value".                                                                     | MAJOR    | Correct that it is overbroad. But a selective version requires classifying which write failures leave a transaction usable, and a wrong classification produces exactly the silent partial commit this design exists to prevent. | **Accepted in part.** Overbreadth kept deliberately; rule 9 states the consequence plainly rather than leaving it to be discovered.                                                                          |
+| 6   | The residual gap is wider than stated — swallowed failures frames down, failed reads, sentinel returns, early returns. A fourth mechanism (explicit completion) would catch more. | MAJOR    | Correct on both counts, and materially better than the first draft.                                                                                                                                                              | **Accepted.** Layer 4 `tx.complete()` added, with tests 19a–19c.                                                                                                                                             |
+| 7   | Mutable shared `depth` is corrupted by parallel nested frames; MongoDB cannot run parallel ops on one session anyway.                                                             | MAJOR    | Correct.                                                                                                                                                                                                                         | **Accepted.** Parallel database work forbidden (rule 7) and checked; `depth`/`attempt` frame-local.                                                                                                          |
+| 8   | Retry semantics underspecified: hooks across attempts, generated ids, timestamps, sequence allocation. A first attempt's `onAbort` could delete an asset the retry needs.         | CRITICAL | Correct, and the most useful finding here. The first draft said "must be idempotent" and left every practical consequence unstated.                                                                                              | **Accepted.** New _Retry semantics_ section; `onAttemptFailed` added; hooks cleared per attempt; stable values hoisted out of the loop; sequence allocation analysed explicitly.                             |
+| 9   | Hand-rolling the driver's retry loop is unnecessary risk.                                                                                                                         | MINOR    | Correct — especially for `UnknownTransactionCommitResult`.                                                                                                                                                                       | **Accepted.** The abstraction wraps `Connection#transaction()` and adds only ambient context, rollback-only, and hooks.                                                                                      |
 
 **Also accepted from Area 1 of the review:** exhausted transient retries return
 **503**, not 409.
 
-**Still open:** whether `tx.complete()` should be required for *all* transactions
+**Still open:** whether `tx.complete()` should be required for _all_ transactions
 rather than only write transactions — universal is simpler to teach, noisier for
 read-only use.
 

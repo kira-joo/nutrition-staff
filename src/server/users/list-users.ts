@@ -20,7 +20,7 @@ async function userIdSet(rows: { userId: unknown }[]): Promise<Set<string>> {
 function buildProfileTypeWhere(
   profileType: ProfileType,
   clientUserIds: Set<string>,
-  staffUserIds: Set<string>
+  staffUserIds: Set<string>,
 ): Record<string, unknown> {
   switch (profileType) {
     case ProfileType.BOTH:

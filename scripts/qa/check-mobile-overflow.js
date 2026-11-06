@@ -116,7 +116,7 @@ async function main() {
     const status = r.error ? `ERROR: ${r.error}` : r.horizontalOverflow || r.verticalOverflow ? "OVERFLOW" : "ok";
     console.log(
       `${r.viewport.padEnd(14)} ${r.page.padEnd(20)} | W ${r.innerWidth ?? "-"} -> ${r.docScrollWidth ?? "-"}` +
-        ` | H ${r.innerHeight ?? "-"} -> ${r.docScrollHeight ?? "-"} | ${status}`
+        ` | H ${r.innerHeight ?? "-"} -> ${r.docScrollHeight ?? "-"} | ${status}`,
     );
   }
 

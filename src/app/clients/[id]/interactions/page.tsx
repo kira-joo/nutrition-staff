@@ -24,7 +24,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, use } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { InteractionType } from "src/common/enums";
@@ -48,7 +48,8 @@ const TYPE_ICONS: Record<InteractionType, typeof Phone> = {
   [InteractionType.OTHER]: MoreHorizontal,
 };
 
-export default function ClientInteractionsPage({ params }: { params: { id: string } }) {
+export default function ClientInteractionsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const { can } = usePermissions();
   const [dialogState, setDialogState] = useState<{ open: boolean; interaction?: ClientInteraction }>({ open: false });
 

@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 export const GET = createGetRoute({
   query: ListClientMeasurementsQueryDto,
   auth: { permissions: [AppPermission.CLIENT_MEASUREMENT.READ] },
-  handler: async ({ query }) => clientMeasurementRepository.findAllAndCountPublic({ query, relations: ["recordedByUserId"] }),
+  handler: async ({ query }) =>
+    clientMeasurementRepository.findAllAndCountPublic({ query, relations: ["recordedByUserId"] }),
 });
 
 export const POST = createPostRoute({

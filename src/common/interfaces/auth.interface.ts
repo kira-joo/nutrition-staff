@@ -26,8 +26,14 @@ export interface CurrentUser extends AuthUser {
   email: string;
 }
 
+/**
+ * What login and signup return.
+ *
+ * **No token.** The session is an HttpOnly cookie the backend sets with
+ * `Set-Cookie`; returning it in the body as well would hand JavaScript a copy
+ * of the exact credential the cookie exists to keep out of reach.
+ */
 export interface AuthResponse {
-  accessToken: string;
   user: CurrentUser;
 }
 

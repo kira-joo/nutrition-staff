@@ -28,17 +28,26 @@ import { bookEditionRepository } from "src/server/books/editions/book-editions.r
  * unlikely — and when it does happen, a loud error is preferable to an
  * invisible global no-delete policy.
  */
-export async function destroyAssetUnlessPublished(provider: AssetProvider, publicId: string, resourceType: AssetResourceType): Promise<void> {
+export async function destroyAssetUnlessPublished(
+  provider: AssetProvider,
+  publicId: string,
+  resourceType: AssetResourceType,
+): Promise<void> {
   let referenced = 0;
   try {
     referenced = await bookEditionRepository.count({ where: { referencedAssetPublicIds: publicId } });
   } catch (error) {
-    console.error(`destroyAssetUnlessPublished: failed to check published-edition references for "${publicId}" — destroying normally.`, error);
+    console.error(
+      `destroyAssetUnlessPublished: failed to check published-edition references for "${publicId}" — destroying normally.`,
+      error,
+    );
     referenced = 0;
   }
 
   if (referenced > 0) {
-    console.info(`destroyAssetUnlessPublished: preserving "${publicId}" — referenced by ${referenced} published edition(s).`);
+    console.info(
+      `destroyAssetUnlessPublished: preserving "${publicId}" — referenced by ${referenced} published edition(s).`,
+    );
     return;
   }
 

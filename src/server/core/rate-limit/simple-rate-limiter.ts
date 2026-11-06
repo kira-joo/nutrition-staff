@@ -20,7 +20,10 @@ export interface RateLimitResult {
 }
 
 /** `key` is caller-supplied (e.g. `${routeName}:${ip}`) so one process-wide Map can serve multiple call sites without collisions. */
-export function checkRateLimit(key: string, { maxRequests, windowMs }: { maxRequests: number; windowMs: number }): RateLimitResult {
+export function checkRateLimit(
+  key: string,
+  { maxRequests, windowMs }: { maxRequests: number; windowMs: number },
+): RateLimitResult {
   const now = Date.now();
   const existing = buckets.get(key);
 

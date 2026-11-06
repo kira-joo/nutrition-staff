@@ -137,13 +137,13 @@ writable once slots exist.
 row records the grid it was created on. That is what makes a change tractable
 rather than corrupting.
 
-| Situation | Rule |
-|---|---|
-| No materialized slots exist | The setting is freely editable. |
-| Slots exist, none consumed | Re-materialize: delete unconsumed slots on the old grid, materialize the horizon on the new one. Single transaction per practitioner-day. |
-| Slots exist and some are consumed | The change applies **from a cutover instant only** — by default the start of the next day beyond the last existing booking. Slots before the cutover keep their old `slotMinutes` and are never rewritten; slots after it are re-materialized on the new grid. Existing bookings are never re-bucketed, because re-bucketing a claimed interval cannot be done without either dropping a claim or fabricating one. |
-| An appointment straddles the cutover | Rejected at validation. The cutover is chosen at a day boundary precisely so this is rare, and refusing is better than splitting a claim across two grids. |
-| An `AppointmentType` duration is not a multiple of the new value | The migration **fails and reports** before touching anything. Durations are reconciled first, as an explicit product decision, never silently rounded. |
+| Situation                                                        | Rule                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| No materialized slots exist                                      | The setting is freely editable.                                                                                                                                                                                                                                                                                                                                                                                    |
+| Slots exist, none consumed                                       | Re-materialize: delete unconsumed slots on the old grid, materialize the horizon on the new one. Single transaction per practitioner-day.                                                                                                                                                                                                                                                                          |
+| Slots exist and some are consumed                                | The change applies **from a cutover instant only** — by default the start of the next day beyond the last existing booking. Slots before the cutover keep their old `slotMinutes` and are never rewritten; slots after it are re-materialized on the new grid. Existing bookings are never re-bucketed, because re-bucketing a claimed interval cannot be done without either dropping a claim or fabricating one. |
+| An appointment straddles the cutover                             | Rejected at validation. The cutover is chosen at a day boundary precisely so this is rare, and refusing is better than splitting a claim across two grids.                                                                                                                                                                                                                                                         |
+| An `AppointmentType` duration is not a multiple of the new value | The migration **fails and reports** before touching anything. Durations are reconciled first, as an explicit product decision, never silently rounded.                                                                                                                                                                                                                                                             |
 
 Two consequences stated plainly: `bucketsFor(appointment)` must read
 `slotMinutes` from the slots it is claiming rather than from the current setting,
@@ -188,7 +188,7 @@ availability-write hook) materializes slots for the published scheduling horizon
 Materialization is idempotent and upserts happen **outside** any booking
 transaction, where an `E11000` is simply "already exists" rather than a lost
 booking. A booking for an instant with no slot row is not a conflict, it is
-*outside published availability*, and returns a distinct 422 — which is more
+_outside published availability_, and returns a distinct 422 — which is more
 correct than the old design's answer, because it distinguishes "already taken"
 from "never bookable".
 
@@ -218,15 +218,15 @@ contends, which is exactly the invariant.
 
 #### Rejected alternatives
 
-| Alternative | Why not |
-|---|---|
-| Overlap query inside a transaction, nothing else | **Does not work.** Snapshot isolation does not serialize inserts of distinct documents. The original flaw. |
-| Per-practitioner-per-day version document | **Rejected after review** — depends on a nonexistent `upsert`, races on first use with a non-retryable `E11000`, and serializes every booking for a busy practitioner-day into false 409s under burst. |
-| `findOneAndUpdate` on the appointments collection as a pseudo-lock | Nothing exists to lock before the first booking, and a sentinel pollutes the collection. |
-| An in-process mutex | The existing rate limiter's own comment says a process-local `Map` must be replaced if the deploy becomes multi-instance — and a Vercel-shaped deployment is multi-instance by default. |
-| A distributed lock (Redis) | New infrastructure for something MongoDB can serialize. |
-| `readConcern: "snapshot"` / `writeConcern` tuning | Neither turns snapshot isolation into serializability for distinct-document inserts. |
-| Arbitrary-precision interval reservations inside one document | Needed only if sub-bucket durations are genuinely required. `SLOT_MINUTES` as a setting covers every clinic pattern in the brief; recorded as the escape hatch. |
+| Alternative                                                        | Why not                                                                                                                                                                                                |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Overlap query inside a transaction, nothing else                   | **Does not work.** Snapshot isolation does not serialize inserts of distinct documents. The original flaw.                                                                                             |
+| Per-practitioner-per-day version document                          | **Rejected after review** — depends on a nonexistent `upsert`, races on first use with a non-retryable `E11000`, and serializes every booking for a busy practitioner-day into false 409s under burst. |
+| `findOneAndUpdate` on the appointments collection as a pseudo-lock | Nothing exists to lock before the first booking, and a sentinel pollutes the collection.                                                                                                               |
+| An in-process mutex                                                | The existing rate limiter's own comment says a process-local `Map` must be replaced if the deploy becomes multi-instance — and a Vercel-shaped deployment is multi-instance by default.                |
+| A distributed lock (Redis)                                         | New infrastructure for something MongoDB can serialize.                                                                                                                                                |
+| `readConcern: "snapshot"` / `writeConcern` tuning                  | Neither turns snapshot isolation into serializability for distinct-document inserts.                                                                                                                   |
+| Arbitrary-precision interval reservations inside one document      | Needed only if sub-bucket durations are genuinely required. `SLOT_MINUTES` as a setting covers every clinic pattern in the brief; recorded as the escape hatch.                                        |
 
 #### Overbooking
 
@@ -342,8 +342,8 @@ own guards, side effects and audit action. A generic status PUT would make every
 one of them optional.
 
 **Booking, rescheduling and check-in require an `Idempotency-Key`**
-([04](04-domain-model.md) §8). The slot-claim mechanism serializes *concurrent*
-requests; it does nothing about a *retransmitted* one — a receptionist
+([04](04-domain-model.md) §8). The slot-claim mechanism serializes _concurrent_
+requests; it does nothing about a _retransmitted_ one — a receptionist
 double-clicking "Book" or a client retrying after a timeout is two distinct HTTP
 requests, each of which would legitimately claim its own slots. A replayed key
 returns the stored response instead of re-executing.
@@ -396,8 +396,8 @@ Run against `MongoMemoryReplSet`, the harness already proven in
 `backend-toolkit-mongoose`'s own tests
 (`create-mongoose-repository.test.ts:606`).
 
-1. **The decisive test.** Two `Promise.all` bookings for the *same* practitioner
-   and an *exactly overlapping* interval: exactly one commits, one 409s, exactly
+1. **The decisive test.** Two `Promise.all` bookings for the _same_ practitioner
+   and an _exactly overlapping_ interval: exactly one commits, one 409s, exactly
    one appointment exists, and the claimed slots' `consumed` equals 1. Repeated
    ~50 times, because a timing-dependent bug passes once.
 2. Same, for two **partially** overlapping intervals — asserts the shared
@@ -455,16 +455,16 @@ provides the guarantee rather than the test passing incidentally.
 
 **Reviewed 2026-08-22. Verdict on the original design: FATALLY FLAWED. Rewritten.**
 
-| # | Finding | Severity | Analysis | Resolution |
-|---|---|---|---|---|
-| 1 | The pseudocode called `repository.update(..., {$inc})` with "upsert on first use", but the repository has no `upsert` option — `updateImpl` forwards only `session` to a plain `findOneAndUpdate`. | CRITICAL | **Verified** in `create-mongoose-repository.ts:278` and `write/execute-update.ts:36`. Correct; the design depended on an API that does not exist. | **Accepted.** Design rewritten around pre-materialized slots and a conditional `claim`, so no upsert occurs on the booking path at all. |
-| 2 | Concurrent *first-use* upserts race to insert the same unique key and produce `E11000`, not `TransientTransactionError` — and from MongoDB 8.1 a duplicate-key upsert inside a transaction is not auto-retried. | CRITICAL | Correct, and it was the worst case: the very first booking of a practitioner-day was the one the mechanism handled least well. | **Accepted.** Materialization moved off the hot path entirely and made idempotent outside any booking transaction. |
-| 3 | Converting every exhausted transient retry into a 409 is semantically false — primary elections and timeouts are not appointment conflicts. | MAJOR | Correct. | **Accepted.** Exhausted infrastructure retries return **503**; 409 only after a successful retry finds a real conflict. Also amended in [05](05-transactions-and-data-integrity.md). |
-| 4 | Per-day locking is pathological: 100 bookings for one practitioner serialize, and a bounded retry budget turns a burst into false 409s on non-overlapping slots. | MAJOR | Correct, and more serious than the doc's "negligible, one retry" claim. Rejecting valid work is the worst failure mode available. | **Accepted.** Granularity moved to fixed `SLOT_MINUTES` buckets; non-overlapping bookings now touch disjoint documents. |
-| 5 | `allowOverlap` as a boolean weakens the invariant globally — later bookings cannot distinguish an intentional overlap from a forbidden one. | MAJOR | Correct. | **Accepted.** Overbooking is now `capacity` plus an audited `SlotCapacityOverride`; the claim path is identical for every booking. |
-| 6 | Deterministic key order prevents deadlock but not a thundering herd; needs backoff and a retry budget. | MAJOR | Correct in general, largely dissolved by the granularity fix. | **Accepted in part.** Order retained; exponential backoff with jitter and a strict budget specified in [05](05-transactions-and-data-integrity.md). |
-| 7 | Materialized slot claims are a simpler and stronger mechanism. | MAJOR | Agreed — this was recorded as the "upgrade path" and should have been the primary design. The reasoning that talked me out of it (document count, cleanup) was outweighed by correctness. | **Accepted.** It is now the primary design. |
-| 8 | Retry + `onAbort`/`onCommit` interaction is undefined: a first failed attempt's `onAbort` could delete an asset the retry needs. | MAJOR | Correct and a real hole. | **Accepted**, fixed in [05](05-transactions-and-data-integrity.md) with attempt-local vs. final hooks. |
+| #   | Finding                                                                                                                                                                                                         | Severity | Analysis                                                                                                                                                                                  | Resolution                                                                                                                                                                           |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | The pseudocode called `repository.update(..., {$inc})` with "upsert on first use", but the repository has no `upsert` option — `updateImpl` forwards only `session` to a plain `findOneAndUpdate`.              | CRITICAL | **Verified** in `create-mongoose-repository.ts:278` and `write/execute-update.ts:36`. Correct; the design depended on an API that does not exist.                                         | **Accepted.** Design rewritten around pre-materialized slots and a conditional `claim`, so no upsert occurs on the booking path at all.                                              |
+| 2   | Concurrent _first-use_ upserts race to insert the same unique key and produce `E11000`, not `TransientTransactionError` — and from MongoDB 8.1 a duplicate-key upsert inside a transaction is not auto-retried. | CRITICAL | Correct, and it was the worst case: the very first booking of a practitioner-day was the one the mechanism handled least well.                                                            | **Accepted.** Materialization moved off the hot path entirely and made idempotent outside any booking transaction.                                                                   |
+| 3   | Converting every exhausted transient retry into a 409 is semantically false — primary elections and timeouts are not appointment conflicts.                                                                     | MAJOR    | Correct.                                                                                                                                                                                  | **Accepted.** Exhausted infrastructure retries return **503**; 409 only after a successful retry finds a real conflict. Also amended in [05](05-transactions-and-data-integrity.md). |
+| 4   | Per-day locking is pathological: 100 bookings for one practitioner serialize, and a bounded retry budget turns a burst into false 409s on non-overlapping slots.                                                | MAJOR    | Correct, and more serious than the doc's "negligible, one retry" claim. Rejecting valid work is the worst failure mode available.                                                         | **Accepted.** Granularity moved to fixed `SLOT_MINUTES` buckets; non-overlapping bookings now touch disjoint documents.                                                              |
+| 5   | `allowOverlap` as a boolean weakens the invariant globally — later bookings cannot distinguish an intentional overlap from a forbidden one.                                                                     | MAJOR    | Correct.                                                                                                                                                                                  | **Accepted.** Overbooking is now `capacity` plus an audited `SlotCapacityOverride`; the claim path is identical for every booking.                                                   |
+| 6   | Deterministic key order prevents deadlock but not a thundering herd; needs backoff and a retry budget.                                                                                                          | MAJOR    | Correct in general, largely dissolved by the granularity fix.                                                                                                                             | **Accepted in part.** Order retained; exponential backoff with jitter and a strict budget specified in [05](05-transactions-and-data-integrity.md).                                  |
+| 7   | Materialized slot claims are a simpler and stronger mechanism.                                                                                                                                                  | MAJOR    | Agreed — this was recorded as the "upgrade path" and should have been the primary design. The reasoning that talked me out of it (document count, cleanup) was outweighed by correctness. | **Accepted.** It is now the primary design.                                                                                                                                          |
+| 8   | Retry + `onAbort`/`onCommit` interaction is undefined: a first failed attempt's `onAbort` could delete an asset the retry needs.                                                                                | MAJOR    | Correct and a real hole.                                                                                                                                                                  | **Accepted**, fixed in [05](05-transactions-and-data-integrity.md) with attempt-local vs. final hooks.                                                                               |
 
 > ### ⛔ MANDATORY GATE — Phase 6 must not start before this
 >

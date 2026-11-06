@@ -4,8 +4,8 @@ import { AppLink, Card, CustomForm, FieldType, type FormFieldConfig } from "@kir
 import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { FieldValues } from "react-hook-form";
-import { setAccessToken } from "src/common/auth/token-storage";
 import type { SignupDto } from "src/common/interfaces/auth.interface";
+import { queryClient } from "src/providers/app-provider";
 import { AppRoute } from "src/common/routes/app-route";
 import { GuestGuard } from "src/components/auth/guest-guard";
 import { PasswordInput } from "src/components/auth/password-input";
@@ -65,8 +65,11 @@ export default function SignupPage() {
               submitButtonText="Create account"
               // confirmPassword is frontend-only validation — never sent to the API.
               transformValues={(values) => ({ name: values.name, email: values.email, password: values.password })}
-              onSuccess={(data) => {
-                setAccessToken(data.accessToken);
+              onSuccess={() => {
+                // Nothing to store — the backend set the session cookie. The
+                // cached /auth/me result predates the session, so it is
+                // invalidated rather than trusted.
+                void queryClient.invalidateQueries();
                 router.push(AppRoute.users);
               }}
             />

@@ -9,9 +9,9 @@ A motion contract for **operational medical software** — where motion earns it
 place by communicating state, direction and causality, and where a decorative
 animation is a defect.
 
-The brief is unambiguous: *"Motion should serve clarity and state, especially in
-medical operational interfaces"* and *"Do not turn operational medical screens
-into cinematic marketing pages."* It also forbids treating animation as a final
+The brief is unambiguous: _"Motion should serve clarity and state, especially in
+medical operational interfaces"_ and _"Do not turn operational medical screens
+into cinematic marketing pages."_ It also forbids treating animation as a final
 cosmetic pass, which is why this is a Phase 2 foundation rather than a Phase 12
 polish.
 
@@ -19,13 +19,13 @@ polish.
 
 Effectively nothing, and nothing to migrate from.
 
-| Fact | Measurement |
-|---|---|
-| `motion` / `framer-motion` in `nutrition-staff` | **not a dependency** |
-| Animation utilities in the app | **3** — two `transition-colors`, one false positive |
-| `animate-*`, keyframes, `globals.css` animation | **0** |
-| `prefers-reduced-motion` / `motion-safe:` / `motion-reduce:` | **0 occurrences** |
-| Motion the user actually sees | the toolkit's sidebar drawer `transition-transform duration-200`, and whatever the spinner/skeleton/toast do internally — none of it reduced-motion gated at the app level |
+| Fact                                                         | Measurement                                                                                                                                                                |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `motion` / `framer-motion` in `nutrition-staff`              | **not a dependency**                                                                                                                                                       |
+| Animation utilities in the app                               | **3** — two `transition-colors`, one false positive                                                                                                                        |
+| `animate-*`, keyframes, `globals.css` animation              | **0**                                                                                                                                                                      |
+| `prefers-reduced-motion` / `motion-safe:` / `motion-reduce:` | **0 occurrences**                                                                                                                                                          |
+| Motion the user actually sees                                | the toolkit's sidebar drawer `transition-transform duration-200`, and whatever the spinner/skeleton/toast do internally — none of it reduced-motion gated at the app level |
 
 For contrast, `nutrition-client` has `motion@^12.43.0`, `predev`/`prebuild` hooks
 generating motion CSS from a token file, and a documented six-layer motion
@@ -76,7 +76,7 @@ Reduced motion: durations → 0; the end state still applies.
 ### Layer 2 — State transition (CSS or Motion, 140–220 ms)
 
 The workhorse layer, and the one that carries clinical meaning. A change in the
-*status of something real*: an appointment moving `WAITING → WITH_PRACTITIONER`
+_status of something real_: an appointment moving `WAITING → WITH_PRACTITIONER`
 on the board · an alert appearing on the patient banner · an invoice becoming
 paid · a task completing · an observation flagged abnormal.
 
@@ -85,7 +85,7 @@ board columns animates its position so the eye follows it; it does not fade out
 and fade in somewhere else, because that loses the causal link — which on a
 waiting board is the entire information content.
 
-Motion is used here (not CSS) where an element must animate *between containers*
+Motion is used here (not CSS) where an element must animate _between containers_
 — `layoutId` / shared-layout is the one thing CSS cannot do.
 
 Reduced motion: **the position change is instant, and a brief non-motion
@@ -178,18 +178,18 @@ table above. The rule that governs all of it:
 
 ## Where motion earns its place — the specific cases
 
-| Surface | Layer | What it communicates |
-|---|---|---|
-| Waiting board card moving between columns | 2 (shared layout) | *This* patient is now with *that* doctor. The highest-value motion in the product. |
-| Wait-duration badge escalating severity | 2 | This has been waiting too long |
-| Patient banner alert appearing | 2 | A safety-critical fact just became true |
-| Drawer / modal / palette entry and exit | 3 | Where this surface came from, and that it is layered over context |
-| Optimistic mutation feedback | 1–2 | The action registered, before the server confirms |
-| Timeline "load older" | 4 | New content arrived below, not replaced |
-| Calendar drag-to-reschedule | 2 | Direct manipulation; the block follows the pointer |
-| Toast entry | 3 | Something happened, non-blocking |
-| Skeleton → content | 1 | Loading resolved. Opacity only, matched geometry, no shift |
-| Sort / filter reorder | 4, budgeted | The same rows, in a new order |
+| Surface                                   | Layer             | What it communicates                                                               |
+| ----------------------------------------- | ----------------- | ---------------------------------------------------------------------------------- |
+| Waiting board card moving between columns | 2 (shared layout) | _This_ patient is now with _that_ doctor. The highest-value motion in the product. |
+| Wait-duration badge escalating severity   | 2                 | This has been waiting too long                                                     |
+| Patient banner alert appearing            | 2                 | A safety-critical fact just became true                                            |
+| Drawer / modal / palette entry and exit   | 3                 | Where this surface came from, and that it is layered over context                  |
+| Optimistic mutation feedback              | 1–2               | The action registered, before the server confirms                                  |
+| Timeline "load older"                     | 4                 | New content arrived below, not replaced                                            |
+| Calendar drag-to-reschedule               | 2                 | Direct manipulation; the block follows the pointer                                 |
+| Toast entry                               | 3                 | Something happened, non-blocking                                                   |
+| Skeleton → content                        | 1                 | Loading resolved. Opacity only, matched geometry, no shift                         |
+| Sort / filter reorder                     | 4, budgeted       | The same rows, in a new order                                                      |
 
 ## Testing and verification
 

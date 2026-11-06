@@ -1,4 +1,10 @@
-import { AssetKind, faviconImagePolicy, logoImagePolicy, ogImagePolicy, type AssetFieldConfig } from "src/server/core/assets";
+import {
+  AssetKind,
+  faviconImagePolicy,
+  logoImagePolicy,
+  ogImagePolicy,
+  type AssetFieldConfig,
+} from "src/server/core/assets";
 
 export const SITE_SETTINGS_ASSET_FIELDS: readonly AssetFieldConfig[] = [
   { name: "logo", kind: AssetKind.IMAGE, policy: logoImagePolicy },

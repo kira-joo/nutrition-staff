@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -8,7 +9,8 @@ import { BookBlockList } from "src/common/book-blocks/book-block-list";
 import { useBookContentQueue } from "src/common/books/use-book-content-queue";
 import { useUnsavedChangesGuard } from "src/common/books/use-unsaved-changes-guard";
 
-export default function BookBackMatterPage({ params }: { params: { id: string } }) {
+export default function BookBackMatterPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const bookQuery = useRequesterQuery({ endpoint: getBookByIdEndpoint, options: { params: { id: params.id } } });
 
   return <QueryState query={bookQuery}>{(book) => <BackMatterEditor key={book._id} initialBook={book} />}</QueryState>;
@@ -22,7 +24,9 @@ function BackMatterEditor({ initialBook }: { initialBook: Book }) {
     <div className="flex flex-col gap-6">
       {isSaving ? <p className="text-xs text-slate-500">Saving…</p> : null}
       <section>
-        <h3 className="mb-2 font-semibold" dir="rtl">الخاتمة (Conclusion)</h3>
+        <h3 className="mb-2 font-semibold" dir="rtl">
+          الخاتمة (Conclusion)
+        </h3>
         <BookBlockList
           bookId={initialBook._id}
           book={book}

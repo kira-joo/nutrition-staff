@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default function ClientDetailsRedirectPage({ params }: { params: { id: string } }) {
+export default async function ClientDetailsRedirectPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   redirect(`/clients/${params.id}/overview`);
 }

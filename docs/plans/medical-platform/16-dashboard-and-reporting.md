@@ -24,7 +24,7 @@ uniform "never flag on day one" grace-window rule.
 via the `toolkit-common` zone helpers, zero-fills gaps, and offers cumulative
 series. There is genuine field-level permission awareness:
 `dashboard-permissions.util.ts` resolves `canViewMeasurements` /
-`canViewAssessments` / `canViewCalculations` and *omits* those slices rather than
+`canViewAssessments` / `canViewCalculations` and _omits_ those slices rather than
 failing.
 
 **And it will not survive.** `get-dashboard-attention.ts` loads **all** active

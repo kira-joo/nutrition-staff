@@ -22,7 +22,14 @@ export interface OverrideFieldProps {
  * nothing is copied until the doctor asks, and the copy is on screen, per
  * the plan's explicit "do not copy defaults invisibly" requirement.
  */
-export function OverrideField({ label, isOverridden, renderDefault, renderOverride, onOverride, onReset }: OverrideFieldProps) {
+export function OverrideField({
+  label,
+  isOverridden,
+  renderDefault,
+  renderOverride,
+  onOverride,
+  onReset,
+}: OverrideFieldProps) {
   return (
     <div className="rounded-lg border p-3">
       <div className="mb-2 flex items-center justify-between gap-2">

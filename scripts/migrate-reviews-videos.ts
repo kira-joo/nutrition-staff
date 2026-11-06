@@ -159,7 +159,8 @@ const SOURCE_REVIEWS: SourceReview[] = [
   {
     id: 1,
     image: "image1.jpg",
-    contentAr: "حرفيا احنا عملنا إنجاز من 43 كيلو وجرثومة معدة ل 53 زياده صحية بدون دهون ولا شكل جسم مش صحي بفضل الله ♥️",
+    contentAr:
+      "حرفيا احنا عملنا إنجاز من 43 كيلو وجرثومة معدة ل 53 زياده صحية بدون دهون ولا شكل جسم مش صحي بفضل الله ♥️",
     sourceUrl: "https://www.facebook.com/share/p/5wQbix2K6zmaPXp8/",
   },
   {
@@ -190,7 +191,8 @@ const SOURCE_REVIEWS: SourceReview[] = [
   {
     id: 6,
     image: "image6.jpg",
-    contentAr: "وكان فضل الله عليك عظيما ♥️\nمبسوطة بتواصل اخواتنا ف كل البلاد العربية الشقيقة ويارب دايما عند حسن ظنكم ♥️",
+    contentAr:
+      "وكان فضل الله عليك عظيما ♥️\nمبسوطة بتواصل اخواتنا ف كل البلاد العربية الشقيقة ويارب دايما عند حسن ظنكم ♥️",
     sourceUrl: "https://www.facebook.com/share/p/17ZCHEdraj/",
   },
   {
@@ -216,7 +218,10 @@ async function migrateReviews(): Promise<void> {
 
     const imagePath = path.join(NUTRITION_CLIENT_PATH, "public/images", review.image);
     if (!fs.existsSync(imagePath)) {
-      report.reviews.invalid.push({ key: `review ${review.id}`, reason: `Referenced image missing on disk: ${imagePath}` });
+      report.reviews.invalid.push({
+        key: `review ${review.id}`,
+        reason: `Referenced image missing on disk: ${imagePath}`,
+      });
       continue;
     }
 
@@ -233,7 +238,9 @@ async function migrateReviews(): Promise<void> {
     report.reviews.assetUploads++;
 
     if (DRY_RUN) {
-      console.log(`  [dry-run] would create review ${review.id} (Draft, sourceUrl: ${review.sourceUrl}, image: ${review.image})`);
+      console.log(
+        `  [dry-run] would create review ${review.id} (Draft, sourceUrl: ${review.sourceUrl}, image: ${review.image})`,
+      );
       report.reviews.created++;
       continue;
     }
@@ -245,7 +252,9 @@ async function migrateReviews(): Promise<void> {
 
     const created = await postMultipart("/api/reviews", form);
     report.reviews.created++;
-    report.draftRecords.push(`Review ${created._id} (sourceUrl: ${review.sourceUrl}) — no English translation exists in source`);
+    report.draftRecords.push(
+      `Review ${created._id} (sourceUrl: ${review.sourceUrl}) — no English translation exists in source`,
+    );
     console.log(`  created review ${review.id}: ${created._id}`);
   }
 }
@@ -263,14 +272,34 @@ interface SourceVideo {
 }
 
 const SOURCE_VIDEOS: SourceVideo[] = [
-  { id: 1, file: "video1.mp4", externalUrl: "https://www.facebook.com/reel/1597595514516227", title: { en: "Light Dinner", ar: "عشاء خفيف" } },
-  { id: 2, file: "video2.mp4", externalUrl: "https://www.facebook.com/reel/1886147435145097/", title: { en: "Recipes Without Bread", ar: "وصفات بدون عيش" } },
-  { id: 3, file: "video3.mp4", externalUrl: "https://www.facebook.com/reel/514983797787103/", title: { en: "Healthy Breakfast", ar: "فطار صحي" } },
+  {
+    id: 1,
+    file: "video1.mp4",
+    externalUrl: "https://www.facebook.com/reel/1597595514516227",
+    title: { en: "Light Dinner", ar: "عشاء خفيف" },
+  },
+  {
+    id: 2,
+    file: "video2.mp4",
+    externalUrl: "https://www.facebook.com/reel/1886147435145097/",
+    title: { en: "Recipes Without Bread", ar: "وصفات بدون عيش" },
+  },
+  {
+    id: 3,
+    file: "video3.mp4",
+    externalUrl: "https://www.facebook.com/reel/514983797787103/",
+    title: { en: "Healthy Breakfast", ar: "فطار صحي" },
+  },
   // Source id is a duplicate "3" (copy-paste bug — see the header comment);
   // corrected to 4 here, matching the otherwise-orphaned i18n "Lunchbox"
   // title and the genuinely distinct video4.mp4 file. externalUrl is left
   // exactly as the source has it (identical to video 3) — not invented.
-  { id: 4, file: "video4.mp4", externalUrl: "https://www.facebook.com/reel/514983797787103/", title: { en: "Lunchbox", ar: "لانش بوكس" } },
+  {
+    id: 4,
+    file: "video4.mp4",
+    externalUrl: "https://www.facebook.com/reel/514983797787103/",
+    title: { en: "Lunchbox", ar: "لانش بوكس" },
+  },
 ];
 
 async function migrateVideos(): Promise<void> {
@@ -289,7 +318,10 @@ async function migrateVideos(): Promise<void> {
 
     const videoPath = path.join(NUTRITION_CLIENT_PATH, "public/videos", video.file);
     if (!fs.existsSync(videoPath)) {
-      report.videos.invalid.push({ key: `video ${video.id}`, reason: `Referenced video file missing on disk: ${videoPath}` });
+      report.videos.invalid.push({
+        key: `video ${video.id}`,
+        reason: `Referenced video file missing on disk: ${videoPath}`,
+      });
       continue;
     }
 
@@ -326,7 +358,9 @@ async function migrateVideos(): Promise<void> {
 async function main() {
   console.log(`Migration source: ${NUTRITION_CLIENT_PATH}`);
   console.log(`Migration target: ${BASE_URL}`);
-  console.log(`Mode: ${DRY_RUN ? "DRY RUN — no writes will be performed" : "LIVE — will create real records and upload real assets"}`);
+  console.log(
+    `Mode: ${DRY_RUN ? "DRY RUN — no writes will be performed" : "LIVE — will create real records and upload real assets"}`,
+  );
 
   await login();
 

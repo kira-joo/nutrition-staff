@@ -18,7 +18,9 @@ import { faqSectionRepository } from "src/server/faq-sections/faq-sections.repos
  * draft or since-unpublished section would otherwise silently expose it
  * on the public site.
  */
-const BLOCK_REFERENCE_CHECK_BY_TYPE: Partial<Record<CampaignBlockType, (dto: Record<string, unknown>) => Promise<void>>> = {
+const BLOCK_REFERENCE_CHECK_BY_TYPE: Partial<
+  Record<CampaignBlockType, (dto: Record<string, unknown>) => Promise<void>>
+> = {
   [CampaignBlockType.FAQ_REF]: async (dto) => {
     const faqSectionId = dto.faqSectionId as string;
     const section = await faqSectionRepository.findOne({
@@ -26,10 +28,9 @@ const BLOCK_REFERENCE_CHECK_BY_TYPE: Partial<Record<CampaignBlockType, (dto: Rec
       skipThrowError: true,
     });
     if (!section) {
-      throw new BadRequestError(
-        `FAQ section "${faqSectionId}" does not exist, is deleted, or is not published.`,
-        { faqSectionId }
-      );
+      throw new BadRequestError(`FAQ section "${faqSectionId}" does not exist, is deleted, or is not published.`, {
+        faqSectionId,
+      });
     }
   },
 };

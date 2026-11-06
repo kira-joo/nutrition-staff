@@ -43,7 +43,8 @@ export interface GoalCaloriesResult {
  * an unsafe number.
  */
 export function calculateGoalCalories(params: CalculateGoalCaloriesParams): GoalCaloriesResult | null {
-  const { maintenanceCalories, goal, adjustmentPercent, adjustmentKcalOverride, sex, acknowledgeBelowSafeFloor } = params;
+  const { maintenanceCalories, goal, adjustmentPercent, adjustmentKcalOverride, sex, acknowledgeBelowSafeFloor } =
+    params;
 
   let delta: number;
   let method: GoalCaloriesResult["method"];

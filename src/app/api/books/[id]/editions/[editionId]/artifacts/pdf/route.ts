@@ -1,5 +1,11 @@
 import { NotFoundError, validateDto } from "@kira-joo/backend-toolkit-core";
-import { authenticateRequest, authorizeUser, createErrorResponse, createPdfResponse, getNextBackendToolkitConfig } from "@kira-joo/backend-toolkit-next";
+import {
+  authenticateRequest,
+  authorizeUser,
+  createErrorResponse,
+  createPdfResponse,
+  getNextBackendToolkitConfig,
+} from "@kira-joo/backend-toolkit-next";
 import type { NextRequest } from "next/server";
 import "reflect-metadata";
 import "src/server/core/toolkit.config";
@@ -31,7 +37,7 @@ const AUTH_OPTION = { permissions: [AppPermission.BOOK_ARTIFACT.READ] };
  * deliberately not distinguishing "exists but forbidden" from "doesn't
  * exist" to a caller who only has read access to begin with.
  */
-export async function GET(request: NextRequest, context: { params: { id: string; editionId: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string; editionId: string }> }) {
   try {
     const config = getNextBackendToolkitConfig();
     await config.database.connect();
@@ -39,7 +45,7 @@ export async function GET(request: NextRequest, context: { params: { id: string;
     const user = await authenticateRequest({ request, config, authOption: AUTH_OPTION });
     authorizeUser(user, AUTH_OPTION);
 
-    const params = await validateDto(FindEditionParamsDto, context.params);
+    const params = await validateDto(FindEditionParamsDto, await context.params);
 
     const book = await bookRepository.findOne({ where: { _id: params.id } });
     if (!book.allowPdfDownload) {
@@ -47,7 +53,10 @@ export async function GET(request: NextRequest, context: { params: { id: string;
     }
 
     const edition = await bookEditionRepository.findOne({ where: { _id: params.editionId, bookId: params.id } });
-    const artifact = await bookArtifactRepository.findOne({ where: { editionId: params.editionId, type: BookArtifactType.PDF }, skipThrowError: true });
+    const artifact = await bookArtifactRepository.findOne({
+      where: { editionId: params.editionId, type: BookArtifactType.PDF },
+      skipThrowError: true,
+    });
 
     const state = artifact ? resolveArtifactState(artifact, artifact.templateVersion) : "NOT_GENERATED";
     if (state !== "READY" && state !== "OUTDATED") {

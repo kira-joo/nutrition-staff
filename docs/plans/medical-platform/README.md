@@ -73,20 +73,20 @@ delivery. See [19](19-toolkit-and-package-changes.md).
 
 **4. Transactions are plumbed everywhere and started nowhere — and a
 transaction alone would not have been enough.**
-`session?: mongoose.ClientSession` is threaded through *every* read and write
+`session?: mongoose.ClientSession` is threaded through _every_ read and write
 path of `MongooseRepository`. But `startSession` appears in **zero** source files
 across all seven packages and all of `nutrition-staff` — only in the toolkit's own
 tests. Meanwhile six multi-collection write paths in the app do manual
-`catch`-and-rollback, and `create-client.ts:19` says so out loud: *"Not a real
+`catch`-and-rollback, and `create-client.ts:19` says so out loud: _"Not a real
 database transaction (this app has none … no precedent for Mongoose sessions
-anywhere in this codebase)."* For clinical and billing records that is a
+anywhere in this codebase)."_ For clinical and billing records that is a
 correctness defect, not a nicety. Transactions are therefore a Phase 0
 infrastructure workstream with its own document:
 [05](05-transactions-and-data-integrity.md).
 
 Several things the first drafts got wrong, all corrected and all worth stating
 because they are the kind of error that survives review by sounding right. **Snapshot isolation is not serializability:** an overlap check inside a
-transaction does *not* stop two concurrent bookings inserting two different
+transaction does _not_ stop two concurrent bookings inserting two different
 appointment documents, because there is no shared write to conflict on — so
 scheduling needs an explicit serialization point
 ([10](10-appointments-scheduling.md)). And **a transaction wrapper cannot observe
@@ -109,33 +109,33 @@ account.
 
 ## Documents
 
-| Doc | Workstream |
-|---|---|
-| [01-product-scope.md](01-product-scope.md) | First-release scope, non-goals, what "sellable" means here |
-| [02-audit-findings.md](02-audit-findings.md) | Verified current state: entities, routes, conventions, landmines |
-| [03-target-architecture.md](03-target-architecture.md) | The four-pillar `src/` structure and the import-boundary rules |
-| [04-domain-model.md](04-domain-model.md) | Every target entity, field, relationship, and state machine |
-| [05-transactions-and-data-integrity.md](05-transactions-and-data-integrity.md) | **Transaction abstraction, session context, rollback.** Gates every multi-write workflow. |
-| [06-organization-and-branches.md](06-organization-and-branches.md) | Organization/Branch/Room, org resolution, the path to SaaS tenancy |
-| [07-authorization-roles-permissions.md](07-authorization-roles-permissions.md) | Clinical role vocabulary, resource-scoped auth, the permission migration |
-| [08-platform-foundation.md](08-platform-foundation.md) | Settings, documents/files, notifications, global search, audit trail |
-| [09-patients.md](09-patients.md) | Patient identity, MRN, alerts, contacts, unified timeline |
-| [10-appointments-scheduling.md](10-appointments-scheduling.md) | Calendar, availability, booking lifecycle, check-in, waiting board |
-| [11-encounters-clinical-records.md](11-encounters-clinical-records.md) | Encounter model, vitals, diagnosis, prescriptions, attachments |
-| [12-vertical-extension-model.md](12-vertical-extension-model.md) | How a specialty extends the clinical core without entering it |
-| [13-nutrition-vertical.md](13-nutrition-vertical.md) | Nutrition extracted intact: assessments, anthropometry, the calc engine |
-| [14-crm-and-followup.md](14-crm-and-followup.md) | Follow-ups, tasks, contact attempts, missed-appointment recovery |
-| [15-billing-and-payments.md](15-billing-and-payments.md) | Service catalog, invoices, payments, discounts, balances |
-| [16-dashboard-and-reporting.md](16-dashboard-and-reporting.md) | Role-relevant dashboards and the aggregation problem behind them |
-| [17-ux-architecture-and-design-system.md](17-ux-architecture-and-design-system.md) | Workspace shell, role homes, patient context, tokens, typography |
-| [18-motion-system.md](18-motion-system.md) | Layered motion contract for operational medical software |
-| [19-toolkit-and-package-changes.md](19-toolkit-and-package-changes.md) | Per-package changes and the release waves that gate app work |
-| [20-migration-strategy.md](20-migration-strategy.md) | The `Client → Patient` rename and the `organizationId` backfill |
-| [21-migrations-and-seeding.md](21-migrations-and-seeding.md) | The migration framework itself, plus demo/seed data |
-| [22-testing-and-qa.md](22-testing-and-qa.md) | Backend test project, coverage targets, browser QA bar |
-| [23-site-cms-and-books-disposition.md](23-site-cms-and-books-disposition.md) | What happens to the Dr. Omnia website CMS and to Books |
-| [24-future-expansion.md](24-future-expansion.md) | Deferred hospital modules and the hooks left for them |
-| [25-risks-and-open-decisions.md](25-risks-and-open-decisions.md) | Open questions, alternatives considered, rejected options |
+| Doc                                                                                | Workstream                                                                                |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [01-product-scope.md](01-product-scope.md)                                         | First-release scope, non-goals, what "sellable" means here                                |
+| [02-audit-findings.md](02-audit-findings.md)                                       | Verified current state: entities, routes, conventions, landmines                          |
+| [03-target-architecture.md](03-target-architecture.md)                             | The four-pillar `src/` structure and the import-boundary rules                            |
+| [04-domain-model.md](04-domain-model.md)                                           | Every target entity, field, relationship, and state machine                               |
+| [05-transactions-and-data-integrity.md](05-transactions-and-data-integrity.md)     | **Transaction abstraction, session context, rollback.** Gates every multi-write workflow. |
+| [06-organization-and-branches.md](06-organization-and-branches.md)                 | Organization/Branch/Room, org resolution, the path to SaaS tenancy                        |
+| [07-authorization-roles-permissions.md](07-authorization-roles-permissions.md)     | Clinical role vocabulary, resource-scoped auth, the permission migration                  |
+| [08-platform-foundation.md](08-platform-foundation.md)                             | Settings, documents/files, notifications, global search, audit trail                      |
+| [09-patients.md](09-patients.md)                                                   | Patient identity, MRN, alerts, contacts, unified timeline                                 |
+| [10-appointments-scheduling.md](10-appointments-scheduling.md)                     | Calendar, availability, booking lifecycle, check-in, waiting board                        |
+| [11-encounters-clinical-records.md](11-encounters-clinical-records.md)             | Encounter model, vitals, diagnosis, prescriptions, attachments                            |
+| [12-vertical-extension-model.md](12-vertical-extension-model.md)                   | How a specialty extends the clinical core without entering it                             |
+| [13-nutrition-vertical.md](13-nutrition-vertical.md)                               | Nutrition extracted intact: assessments, anthropometry, the calc engine                   |
+| [14-crm-and-followup.md](14-crm-and-followup.md)                                   | Follow-ups, tasks, contact attempts, missed-appointment recovery                          |
+| [15-billing-and-payments.md](15-billing-and-payments.md)                           | Service catalog, invoices, payments, discounts, balances                                  |
+| [16-dashboard-and-reporting.md](16-dashboard-and-reporting.md)                     | Role-relevant dashboards and the aggregation problem behind them                          |
+| [17-ux-architecture-and-design-system.md](17-ux-architecture-and-design-system.md) | Workspace shell, role homes, patient context, tokens, typography                          |
+| [18-motion-system.md](18-motion-system.md)                                         | Layered motion contract for operational medical software                                  |
+| [19-toolkit-and-package-changes.md](19-toolkit-and-package-changes.md)             | Per-package changes and the release waves that gate app work                              |
+| [20-migration-strategy.md](20-migration-strategy.md)                               | The `Client → Patient` rename and the `organizationId` backfill                           |
+| [21-migrations-and-seeding.md](21-migrations-and-seeding.md)                       | The migration framework itself, plus demo/seed data                                       |
+| [22-testing-and-qa.md](22-testing-and-qa.md)                                       | Backend test project, coverage targets, browser QA bar                                    |
+| [23-site-cms-and-books-disposition.md](23-site-cms-and-books-disposition.md)       | What happens to the Dr. Omnia website CMS and to Books                                    |
+| [24-future-expansion.md](24-future-expansion.md)                                   | Deferred hospital modules and the hooks left for them                                     |
+| [25-risks-and-open-decisions.md](25-risks-and-open-decisions.md)                   | Open questions, alternatives considered, rejected options                                 |
 
 ## Conventions used in every workstream doc
 
@@ -219,23 +219,23 @@ exist for it.
 Small and verifiable, in dependency order. Every phase ends at a checkpoint
 with acceptance gates; no phase begins before its prerequisites are green.
 
-| Phase | Name | Gates on | Parallelizable within phase |
-|---|---|---|---|
-| **0** | Foundations & safety net | — | ✅ six independent tracks |
-| **1** | Toolkit release wave A (backend) | 0 | ✅ with 1F |
-| **1F** | Toolkit release wave A (frontend) | 0 | ✅ with 1 |
-| **2** | Design system, shell & motion foundation | 1F | ✅ tokens / shell / motion |
-| **3** | Organization, branches, practitioners | 1 | ❌ |
-| **4** | Authorization: roles, scoping, audit | 3 | ❌ |
-| **5** | Patient (rename + medical identity) | 4 | ✅ backend / UX tracks |
-| **6** | Appointments & scheduling | 5, 2, **+ the doc-10 review gate** | ✅ calendar bake-off / backend |
-| **7** | Encounters + vertical extension model | 6 | ❌ |
-| **8** | Nutrition vertical extraction | 7 | ✅ per nutrition module |
-| **9** | CRM & follow-up | 5 | ✅ with 8 |
-| — | **◆ COMMERCIAL CHECKPOINT** — a usable, sellable clinic-management product exists here | 0–7, 9 | — |
-| **10** | Billing & payments | 5, 6 | ✅ with 8/9 |
-| **11** | Dashboards & role workspaces | 6, 9, 10 | ✅ per role |
-| **12** | Toolkit release wave B + hardening | 11 | ✅ |
+| Phase  | Name                                                                                   | Gates on                           | Parallelizable within phase    |
+| ------ | -------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------ |
+| **0**  | Foundations & safety net                                                               | —                                  | ✅ six independent tracks      |
+| **1**  | Toolkit release wave A (backend)                                                       | 0                                  | ✅ with 1F                     |
+| **1F** | Toolkit release wave A (frontend)                                                      | 0                                  | ✅ with 1                      |
+| **2**  | Design system, shell & motion foundation                                               | 1F                                 | ✅ tokens / shell / motion     |
+| **3**  | Organization, branches, practitioners                                                  | 1                                  | ❌                             |
+| **4**  | Authorization: roles, scoping, audit                                                   | 3                                  | ❌                             |
+| **5**  | Patient (rename + medical identity)                                                    | 4                                  | ✅ backend / UX tracks         |
+| **6**  | Appointments & scheduling                                                              | 5, 2, **+ the doc-10 review gate** | ✅ calendar bake-off / backend |
+| **7**  | Encounters + vertical extension model                                                  | 6                                  | ❌                             |
+| **8**  | Nutrition vertical extraction                                                          | 7                                  | ✅ per nutrition module        |
+| **9**  | CRM & follow-up                                                                        | 5                                  | ✅ with 8                      |
+| —      | **◆ COMMERCIAL CHECKPOINT** — a usable, sellable clinic-management product exists here | 0–7, 9                             | —                              |
+| **10** | Billing & payments                                                                     | 5, 6                               | ✅ with 8/9                    |
+| **11** | Dashboards & role workspaces                                                           | 6, 9, 10                           | ✅ per role                    |
+| **12** | Toolkit release wave B + hardening                                                     | 11                                 | ✅                             |
 
 ### Dependency graph
 
@@ -279,7 +279,7 @@ that point, and both are planned to ship.
 **If schedule pressure appears, billing is the cleanest cut line.** It is the
 last feature phase with no downstream dependents other than reporting, its seams
 are already defined ([15](15-billing-and-payments.md)), and a clinic that already
-has its own invoicing loses least by waiting. Nutrition extraction is *not* a
+has its own invoicing loses least by waiting. Nutrition extraction is _not_ a
 good cut line — it is what makes the platform sellable to a non-nutrition clinic
 at all. This is a contingency, not a plan.
 
@@ -298,10 +298,10 @@ changes — see the parallel-agent policy in the workspace `CLAUDE.md`.
 Closing this roadmap does not wait on review quota. Starting these two phases
 does.
 
-| Gate | Blocks | Why |
-|---|---|---|
-| Second adversarial pass on the rewritten `ScheduleSlot` mechanism | **Phase 6** | The most correctness-critical mechanism in the plan, rewritten after the first review found the original fatally flawed, and not yet attacked in its new form. Specific queued questions in [10](10-appointments-scheduling.md) — the `consumed` vs `appointmentIds` source-of-truth question above all. |
-| Second adversarial pass on `withTransaction`'s `tx.complete()` and driver-wrapping | **Phase 0C** | Queued questions in [05](05-transactions-and-data-integrity.md). |
+| Gate                                                                               | Blocks       | Why                                                                                                                                                                                                                                                                                                      |
+| ---------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Second adversarial pass on the rewritten `ScheduleSlot` mechanism                  | **Phase 6**  | The most correctness-critical mechanism in the plan, rewritten after the first review found the original fatally flawed, and not yet attacked in its new form. Specific queued questions in [10](10-appointments-scheduling.md) — the `consumed` vs `appointmentIds` source-of-truth question above all. |
+| Second adversarial pass on `withTransaction`'s `tx.complete()` and driver-wrapping | **Phase 0C** | Queued questions in [05](05-transactions-and-data-integrity.md).                                                                                                                                                                                                                                         |
 
 The tenancy rewrite in [06](06-organization-and-branches.md) carries its own
 queued questions and should be reviewed before Phase 3, but its controls do not
@@ -309,11 +309,11 @@ depend on a single mechanism the way the two above do.
 
 ### Toolkit releases required before app work
 
-| Wave | Packages, in dependency order | Blocks |
-|---|---|---|
-| **A-backend** | `toolkit-common` → `backend-toolkit-core` → `backend-toolkit-mongoose` **0.4.0 (transactions)** → **0.5.0 (tenancy)** → **0.6.0 (the rest)** → `backend-toolkit-next` → `backend-toolkit-cloudinary` | Phases 3–5, 10 |
-| **A-frontend** | `toolkit-common` (shared with above) → `frontend-toolkit-core` → `frontend-toolkit-tailwind` | Phase 2 |
-| **B** | `frontend-toolkit-tailwind`, `backend-toolkit-mongoose` (saved views), and a calendar extraction **only if** the Phase 6 bake-off produces a proven interface | Phase 11+ |
+| Wave           | Packages, in dependency order                                                                                                                                                                        | Blocks         |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| **A-backend**  | `toolkit-common` → `backend-toolkit-core` → `backend-toolkit-mongoose` **0.4.0 (transactions)** → **0.5.0 (tenancy)** → **0.6.0 (the rest)** → `backend-toolkit-next` → `backend-toolkit-cloudinary` | Phases 3–5, 10 |
+| **A-frontend** | `toolkit-common` (shared with above) → `frontend-toolkit-core` → `frontend-toolkit-tailwind`                                                                                                         | Phase 2        |
+| **B**          | `frontend-toolkit-tailwind`, `backend-toolkit-mongoose` (saved views), and a calendar extraction **only if** the Phase 6 bake-off produces a proven interface                                        | Phase 11+      |
 
 `backend-toolkit-mongoose` ships as three releases, each carrying one invariant,
 because the original single release bundled transactions, tenancy, auditing,
@@ -332,17 +332,17 @@ consumer — never a symlink, never a `node_modules` swap.
 
 ### Migrations and refactors required before feature work
 
-| # | Change | Phase | Reversible? |
-|---|---|---|---|
-| M1 | Migration framework + history collection | 0B | n/a |
-| M2 | Indexes on every clinical FK | 0D | ✅ |
-| M3 | `User` gains soft delete | 3 | ✅ |
-| M4 | `User.phone` sparse-unique → non-unique + `Patient`-scoped identity | 3 | ⚠️ index drop |
-| M5 | `Organization` + `Branch` created; `organizationId` backfilled everywhere | 3 | ✅ additive |
-| M6 | 4 settings singletons → org-scoped settings | 3 | ⚠️ |
-| M7 | Permission registry expands (custom actions); `Role.permissions` remap | 4 | ⚠️ |
-| M8 | `ClientProfile` → `Patient`: collection rename, permission re-seed, role remap, MRN backfill, allergy promotion as *unverified imported history* | 5 | ❌ **one-way** |
-| M9 | `ClientMeasurement` splits into platform `Observation` + nutrition anthropometry | 8 | ⚠️ |
+| #   | Change                                                                                                                                           | Phase | Reversible?    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----- | -------------- |
+| M1  | Migration framework + history collection                                                                                                         | 0B    | n/a            |
+| M2  | Indexes on every clinical FK                                                                                                                     | 0D    | ✅             |
+| M3  | `User` gains soft delete                                                                                                                         | 3     | ✅             |
+| M4  | `User.phone` sparse-unique → non-unique + `Patient`-scoped identity                                                                              | 3     | ⚠️ index drop  |
+| M5  | `Organization` + `Branch` created; `organizationId` backfilled everywhere                                                                        | 3     | ✅ additive    |
+| M6  | 4 settings singletons → org-scoped settings                                                                                                      | 3     | ⚠️             |
+| M7  | Permission registry expands (custom actions); `Role.permissions` remap                                                                           | 4     | ⚠️             |
+| M8  | `ClientProfile` → `Patient`: collection rename, permission re-seed, role remap, MRN backfill, allergy promotion as _unverified imported history_ | 5     | ❌ **one-way** |
+| M9  | `ClientMeasurement` splits into platform `Observation` + nutrition anthropometry                                                                 | 8     | ⚠️             |
 
 M8 and M9 are the two that need a rehearsal on a restored dump before they touch
 anything real. See [20](20-migration-strategy.md).
@@ -356,14 +356,14 @@ Every phase must satisfy all of these before the next begins:
    invariants (not smoke tests).
 3. For any multi-collection write introduced: a commit test **and** a rollback
    test, per [05](05-transactions-and-data-integrity.md).
-3a. For any uniqueness or non-overlap invariant introduced: a concurrency test
+   3a. For any uniqueness or non-overlap invariant introduced: a concurrency test
    proving two competing writes cannot both commit, **plus a negative control**
    that fails when the serialization is removed.
-3b. Route inventory byte-identical to the committed manifest, **plus** Next's
+   3b. Route inventory byte-identical to the committed manifest, **plus** Next's
    build-manifest diff and contract tests over the four hand-rolled binary
    handlers — no phase may change an existing API URL or its behaviour
    ([03](03-target-architecture.md)).
-3c. For any mutating route introduced: an idempotency-replay test and, where the
+   3c. For any mutating route introduced: an idempotency-replay test and, where the
    entity is concurrently editable, a stale-revision 409 test.
 4. For any UI introduced: measured DOM geometry at 375 / 768 / 1440 — no
    horizontal page overflow, computed contrast ≥ 4.5:1 for text and ≥ 3:1 for UI,
@@ -384,14 +384,14 @@ Every phase must satisfy all of these before the next begins:
 Each doc carries its own `**Status:**` line under its H1. This table is the
 programme roll-up and is the single place to look for "where are we".
 
-| Doc | Status |
-|---|---|
+| Doc   | Status                                                                                          |
+| ----- | ----------------------------------------------------------------------------------------------- |
 | 01–25 | **Approved 2026-08-22** — planning complete, internally consistent, approved for implementation |
 
 Fifteen of the twenty-five (03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 19, 20, 22,
 24, 25) were revised after the adversarial review before approval.
 
-Every revised document carries its own *Codex findings and resolution* table with
+Every revised document carries its own _Codex findings and resolution_ table with
 severity, analysis, and the accept/reject decision per finding.
 
 **One review gap, recorded rather than glossed:** the six rewritten designs
@@ -408,28 +408,28 @@ beside it, where the array is arguably the better source of truth.
 
 ### Settled architectural decisions — one answer each
 
-| Decision | Final answer |
-|---|---|
-| Tenancy | One `Organization` per deployment; `organizationId` on every schema; `User` **is** organization-bound; no `OrganizationMembership` in v1 |
-| Repo strategy | Evolve in place, four fenced pillars, extraction deferred with published triggers |
-| Patient entity | `ClientProfile` → `Patient`, via a four-release expand/contract rollout |
-| Booking serialization | Pre-materialized fixed-bucket `ScheduleSlot` claims with capacity |
-| `SLOT_MINUTES` | Organization setting with a documented change/re-materialization rule |
-| Transactions | `withTransaction` wrapping the driver helper; ambient session; **four** rollback-only layers incl. `tx.complete()` |
-| Exhausted transient retries | 503, never 409 |
-| Scope enforcement | Separate scoped/global repository factories; no opt-out; populate scoped at every depth |
-| Resource authorization | Post-validation guard as defence-in-depth; ownership **in the query filter** |
-| Permission deactivation | An explicit migration step; `syncPermissions` stays insert-only forever |
-| Document delivery | Both provider grants and proxy streaming, configurable; sensitive kinds default to proxy |
-| `DocumentAsset` | Opaque locator plus metadata; **no stored delivery URL** |
-| Calendar | Library bake-off, then app-local; no calendar in a shared package |
-| Money | `bigint` + ISO 4217 exponents in `toolkit-common`; formatting and parsing outside it |
-| Indexes | `@Index()` only; no `@Filterable` auto-indexing |
-| Encounter sections | `Mixed` payload with a mandatory `schemaVersion` and a schema-level validator |
-| Clinical status on migration | Every migrated patient `ACTIVE`; nothing inferred from `crmLifecycle` |
-| Imported allergy history | Immutable staging collection, clinician-promoted, visible on the banner |
-| CI | Minimal, Phase 0E, never publishes |
-| Commercial checkpoint | After Phase 9; billing is the cut line if pressure appears |
+| Decision                     | Final answer                                                                                                                             |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Tenancy                      | One `Organization` per deployment; `organizationId` on every schema; `User` **is** organization-bound; no `OrganizationMembership` in v1 |
+| Repo strategy                | Evolve in place, four fenced pillars, extraction deferred with published triggers                                                        |
+| Patient entity               | `ClientProfile` → `Patient`, via a four-release expand/contract rollout                                                                  |
+| Booking serialization        | Pre-materialized fixed-bucket `ScheduleSlot` claims with capacity                                                                        |
+| `SLOT_MINUTES`               | Organization setting with a documented change/re-materialization rule                                                                    |
+| Transactions                 | `withTransaction` wrapping the driver helper; ambient session; **four** rollback-only layers incl. `tx.complete()`                       |
+| Exhausted transient retries  | 503, never 409                                                                                                                           |
+| Scope enforcement            | Separate scoped/global repository factories; no opt-out; populate scoped at every depth                                                  |
+| Resource authorization       | Post-validation guard as defence-in-depth; ownership **in the query filter**                                                             |
+| Permission deactivation      | An explicit migration step; `syncPermissions` stays insert-only forever                                                                  |
+| Document delivery            | Both provider grants and proxy streaming, configurable; sensitive kinds default to proxy                                                 |
+| `DocumentAsset`              | Opaque locator plus metadata; **no stored delivery URL**                                                                                 |
+| Calendar                     | Library bake-off, then app-local; no calendar in a shared package                                                                        |
+| Money                        | `bigint` + ISO 4217 exponents in `toolkit-common`; formatting and parsing outside it                                                     |
+| Indexes                      | `@Index()` only; no `@Filterable` auto-indexing                                                                                          |
+| Encounter sections           | `Mixed` payload with a mandatory `schemaVersion` and a schema-level validator                                                            |
+| Clinical status on migration | Every migrated patient `ACTIVE`; nothing inferred from `crmLifecycle`                                                                    |
+| Imported allergy history     | Immutable staging collection, clinician-promoted, visible on the banner                                                                  |
+| CI                           | Minimal, Phase 0E, never publishes                                                                                                       |
+| Commercial checkpoint        | After Phase 9; billing is the cut line if pressure appears                                                                               |
 
 Status vocabulary, inherited from the workspace precedent:
 **Approved** · **Complete** · **In progress** · **Planning complete, awaiting approval** ·
@@ -445,7 +445,7 @@ pharmacy (dispensing, stock) · inventory & procurement · operating theatre ·
 insurance & claims · accounting integrations · patient portal · online booking ·
 telemedicine · SMS/WhatsApp campaign automation.
 
-None of these are built. Several are made *cheaper* by decisions taken now —
+None of these are built. Several are made _cheaper_ by decisions taken now —
 `organizationId` and `branchId` on every record, an append-only `AuditEvent`
 stream, a `Document` entity with private delivery, an `Encounter` that is not an
 `Appointment`, and an order-shaped `Service`/`Invoice` split. The full list of

@@ -11,5 +11,10 @@ export const PUT = createPutRoute({
   body: ReorderBookBlocksDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
   handler: async ({ params, body }) =>
-    reorderBookBlocks(params.id, { kind: "chapter", chapterId: params.chapterId }, body.blockIds, body.expectedRevision),
+    reorderBookBlocks(
+      params.id,
+      { kind: "chapter", chapterId: params.chapterId },
+      body.blockIds,
+      body.expectedRevision,
+    ),
 });

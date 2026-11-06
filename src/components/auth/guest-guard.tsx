@@ -2,31 +2,34 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
-import { CenteredSpinner, ClientOnly } from "@kira-joo/frontend-toolkit-tailwind";
-import { getAccessToken } from "../../common/auth/token-storage";
+import { CenteredSpinner } from "@kira-joo/frontend-toolkit-tailwind";
+import { useCurrentUser } from "../../common/auth/use-current-user";
 import { AppRoute } from "../../common/routes/app-route";
 
-/** Only ever rendered client-side, after mount (inside ClientOnly) — safe to read localStorage directly. */
+/**
+ * Wraps the login and signup pages — redirects away if already signed in.
+ *
+ * The inverse of `AuthGuard`, and it reads the same single source of truth. A
+ * 401 is the SUCCESS case here: it means no session, so the page should render.
+ */
 function AuthenticatedRedirectGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const hasToken = Boolean(getAccessToken());
+  const { data: user, isLoading, isError } = useCurrentUser();
 
   useEffect(() => {
-    if (hasToken) {
-      router.replace(AppRoute.home);
-    }
-  }, [hasToken, router]);
+    if (user) router.replace(AppRoute.home);
+  }, [user, router]);
 
-  if (hasToken) return null;
+  // Waiting on the answer. Rendering the login form first and yanking it away
+  // a moment later is worse than a brief spinner.
+  if (isLoading) return <CenteredSpinner />;
+  if (user) return null;
 
+  // isError — no session, which is exactly who this page is for.
+  void isError;
   return <>{children}</>;
 }
 
-/** Wraps public-only pages (login/signup) — redirects away if already authenticated. */
 export function GuestGuard({ children }: { children: ReactNode }) {
-  return (
-    <ClientOnly fallback={<CenteredSpinner />}>
-      <AuthenticatedRedirectGuard>{children}</AuthenticatedRedirectGuard>
-    </ClientOnly>
-  );
+  return <AuthenticatedRedirectGuard>{children}</AuthenticatedRedirectGuard>;
 }

@@ -40,6 +40,13 @@ error serialization all happen in the factory.
   `src/server/core/toolkit.config.ts`.
 - Read `backend-toolkit-next/src/routes/create-route.ts` and its test file once —
   it makes every route file in this repo trivially readable.
+- **Client-side `Endpoint` constants live in `src/common/api/*.endpoints.ts`.
+  Never put a file in a repo-root `api/` directory.** Vercel turns every file
+  under a top-level `/api/` into its own Serverless Function, independently of
+  Next.js. The 31 endpoint files that used to sit there pushed every `staging`
+  deployment past the Hobby plan's 12-function cap
+  (`exceeded_serverless_functions_per_deployment`). Route handlers live in
+  `src/app/api/`.
 
 ## Cache invalidation
 
@@ -82,7 +89,7 @@ Public responses use narrower shapes than the admin CRUD shapes — they omit
 ## This app is not localized; its content is
 
 There is no `[locale]` segment, no i18n library, and no locale middleware. The
-admin UI is single-locale. What *is* bilingual is the CMS content it authors —
+admin UI is single-locale. What _is_ bilingual is the CMS content it authors —
 so Arabic content rendering, RTL text inside editors and previews, and
 long-Arabic overflow are all still real concerns.
 
@@ -104,3 +111,30 @@ The Books system has its own invariants and its own skill —
 `src/server/books/**`, `src/server/book-settings/**`, `src/common/books/**`, or
 `src/common/book-blocks/**`. `BOOK_PLAN.md` is the architectural plan;
 `PLAN.md` is the approved backoffice/backend implementation plan.
+
+## Plans and reference documents
+
+- `BOOK_PLAN.md` — the Books/Arabic-publishing system plan.
+- `PLAN.md` — the approved backoffice/backend implementation plan.
+- `docs/plans/medical-platform/` — the approved Medical Platform plan (26
+  documents). `05-transactions-and-data-integrity.md` is the authoritative
+  transaction and data-integrity design, and it is **already implemented** in
+  `@kira-joo/backend-toolkit-mongoose`: ambient `withTransaction`,
+  `getActiveTransaction`, rollback-only marking, and the four-layer
+  partial-commit protection. Read it before touching transactional code.
+
+## This app is outside any client redesign
+
+`nutrition-staff` must not inherit the public site's visual identity and keeps
+its own conventions. Its UI/toolkit cleanup travels with the shared-package and
+refactor work instead.
+
+## Authentication (migrated 2026-08-28)
+
+This app now uses the workspace-standard **backend-set HttpOnly cookie**
+architecture — see `../docs/authentication-architecture.md`.
+
+`src/common/auth/token-storage.ts` and every `localStorage` token read are gone.
+The client cannot see the session at all; `useCurrentUser()` (`GET /api/auth/me`)
+is the only thing that can answer whether anyone is signed in, and a 401 is that
+answer. Do not reintroduce a client-side token store.

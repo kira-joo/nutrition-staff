@@ -1,4 +1,11 @@
-import { createMongoModel, Filterable, localizedStringField, MongoField, MongoSchema, Searchable } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  Filterable,
+  localizedStringField,
+  MongoField,
+  MongoSchema,
+  Searchable,
+} from "@kira-joo/backend-toolkit-mongoose";
 import type { LocalizedString } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";

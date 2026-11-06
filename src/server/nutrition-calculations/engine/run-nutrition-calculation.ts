@@ -57,7 +57,10 @@ export interface NutritionCalculationEngineOutput {
  * unchanged by the caller if the calculation is later persisted (an
  * assign action must never re-run this function).
  */
-export function runNutritionCalculation(input: NutritionCalculationEngineInput, calculatedAt: Date = new Date()): NutritionCalculationEngineOutput {
+export function runNutritionCalculation(
+  input: NutritionCalculationEngineInput,
+  calculatedAt: Date = new Date(),
+): NutritionCalculationEngineOutput {
   const assumptions: string[] = [];
   const results: Record<string, unknown> = {};
 
@@ -73,7 +76,7 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
 
   if (input.goal === NutritionGoal.MEDICAL_MANAGEMENT) {
     assumptions.push(
-      "Goal is Medical Management — standard protein/calorie ranges may not apply; a medical condition should drive the plan instead of these defaults."
+      "Goal is Medical Management — standard protein/calorie ranges may not apply; a medical condition should drive the plan instead of these defaults.",
     );
   }
 
@@ -81,21 +84,22 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
   if (age?.isApproximate) {
     assumptions.push("Age approximated from birth year only (exact date of birth not provided).");
   }
-  const ageOutOfSupportedRange = age !== null && (age.ageYears < MIN_SUPPORTED_AGE_YEARS || age.ageYears > MAX_SUPPORTED_AGE_YEARS);
+  const ageOutOfSupportedRange =
+    age !== null && (age.ageYears < MIN_SUPPORTED_AGE_YEARS || age.ageYears > MAX_SUPPORTED_AGE_YEARS);
 
   const sex = input.gender;
 
   if (!sex) {
     assumptions.push(
-      "BMR, maintenance calories, goal calories, and macros were not calculated: gender was not provided for this calculation."
+      "BMR, maintenance calories, goal calories, and macros were not calculated: gender was not provided for this calculation.",
     );
   } else if (!age) {
     assumptions.push(
-      "BMR, maintenance calories, goal calories, and macros were not calculated: no date of birth or birth year was available."
+      "BMR, maintenance calories, goal calories, and macros were not calculated: no date of birth or birth year was available.",
     );
   } else if (ageOutOfSupportedRange) {
     assumptions.push(
-      `BMR, maintenance calories, goal calories, and macros were not calculated: resolved age (${age.ageYears}) is outside the supported range (${MIN_SUPPORTED_AGE_YEARS}-${MAX_SUPPORTED_AGE_YEARS}) for these formulas.`
+      `BMR, maintenance calories, goal calories, and macros were not calculated: resolved age (${age.ageYears}) is outside the supported range (${MIN_SUPPORTED_AGE_YEARS}-${MAX_SUPPORTED_AGE_YEARS}) for these formulas.`,
     );
   } else {
     let bmrFormula = input.bmrFormula ?? BmrFormula.MIFFLIN_ST_JEOR;
@@ -114,7 +118,9 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
     });
 
     if (!input.activityLevel) {
-      assumptions.push("Maintenance calories, goal calories, and macros were not calculated: no activity level was provided.");
+      assumptions.push(
+        "Maintenance calories, goal calories, and macros were not calculated: no activity level was provided.",
+      );
     } else {
       const bmrValue = (results.bmr as { value: number }).value;
       results.maintenanceCalories = calculateMaintenanceCalories(bmrValue, input.activityLevel);
@@ -131,13 +137,15 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
 
       if (!goalCalories) {
         assumptions.push(
-          'Goal calories and macros were not calculated: the computed value falls below the standard safe floor for this sex. Enable "acknowledge below safe floor" to see it anyway.'
+          'Goal calories and macros were not calculated: the computed value falls below the standard safe floor for this sex. Enable "acknowledge below safe floor" to see it anyway.',
         );
       } else {
         results.goalCalories = goalCalories;
         results.calorieDelta = { value: goalCalories.delta, unit: "kcal/day" };
         if (goalCalories.belowSafeFloor) {
-          assumptions.push("Goal calories are below the standard safe floor for this sex — shown only because the doctor explicitly acknowledged this.");
+          assumptions.push(
+            "Goal calories are below the standard safe floor for this sex — shown only because the doctor explicitly acknowledged this.",
+          );
         }
 
         const proteinRange = results.proteinRangeGrams as { min: number; max: number };
@@ -147,7 +155,9 @@ export function runNutritionCalculation(input: NutritionCalculationEngineInput, 
           proteinGrams: proteinMidpoint,
           fatPercentOfCalories: input.fatPercentOfCalories,
         });
-        assumptions.push(`Macros use the midpoint of the protein range (${proteinMidpoint}g/day) as the protein target.`);
+        assumptions.push(
+          `Macros use the midpoint of the protein range (${proteinMidpoint}g/day) as the protein target.`,
+        );
       }
     }
   }

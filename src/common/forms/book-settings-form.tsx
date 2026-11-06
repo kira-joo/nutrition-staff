@@ -47,12 +47,16 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
     },
   });
 
-  const doctorProfileQuery = useRequesterQuery({ endpoint: getDoctorProfileEndpoint, queryOptions: { enabled: false } });
+  const doctorProfileQuery = useRequesterQuery({
+    endpoint: getDoctorProfileEndpoint,
+    queryOptions: { enabled: false },
+  });
 
   async function handleCopyFromDoctorProfile() {
     const confirmed = await confirm({
       title: "Copy from Doctor Profile?",
-      description: "This fills in the doctor name, title, and photo from the website Doctor Profile, as a one-time starting point. It will not stay in sync afterward, and nothing is saved until you save this form.",
+      description:
+        "This fills in the doctor name, title, and photo from the website Doctor Profile, as a one-time starting point. It will not stay in sync afterward, and nothing is saved until you save this form.",
     });
     if (!confirmed) return;
 
@@ -102,7 +106,12 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
                 value={item.platform}
                 onChange={(e) => update({ platform: e.target.value })}
               />
-              <input className="rounded border px-2 py-1" placeholder="URL" value={item.url} onChange={(e) => update({ url: e.target.value })} />
+              <input
+                className="rounded border px-2 py-1"
+                placeholder="URL"
+                value={item.url}
+                onChange={(e) => update({ url: e.target.value })}
+              />
             </div>
           )}
         />
@@ -119,8 +128,18 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
   ];
 
   const printFields: FormFieldConfig<BookSettingsFormValues>[] = [
-    { type: FieldType.SELECT, name: "print.pageSize", label: "Page size", options: Object.values(BookPageSize).map((value) => ({ label: value.toUpperCase(), value })) },
-    { type: FieldType.SELECT, name: "print.marginPreset", label: "Margins", options: Object.values(BookMarginPreset).map((value) => ({ label: value, value })) },
+    {
+      type: FieldType.SELECT,
+      name: "print.pageSize",
+      label: "Page size",
+      options: Object.values(BookPageSize).map((value) => ({ label: value.toUpperCase(), value })),
+    },
+    {
+      type: FieldType.SELECT,
+      name: "print.marginPreset",
+      label: "Margins",
+      options: Object.values(BookMarginPreset).map((value) => ({ label: value, value })),
+    },
     { type: FieldType.INPUT, name: "print.gutterMm", label: "Gutter (mm)", inputType: "number" },
     { type: FieldType.INPUT, name: "print.pageNumberStart", label: "First page number", inputType: "number" },
     { type: FieldType.SWITCH, name: "print.doublePageSpread", label: "Double-page spread preview" },
@@ -133,7 +152,12 @@ export function BookSettingsForm({ defaultValues, endpoint }: BookSettingsFormPr
    * upload code of its own. Leaving the image empty is the off switch.
    */
   const watermarkFields: FormFieldConfig<BookSettingsFormValues>[] = [
-    { type: FieldType.IMAGE_ASSET, name: "pageWatermark.image", label: "Page watermark (tiled, transparent PNG)", policy: bookLogoPolicy },
+    {
+      type: FieldType.IMAGE_ASSET,
+      name: "pageWatermark.image",
+      label: "Page watermark (tiled, transparent PNG)",
+      policy: bookLogoPolicy,
+    },
     { type: FieldType.INPUT, name: "pageWatermark.opacity", label: "Watermark opacity (0-1)", inputType: "number" },
     { type: FieldType.INPUT, name: "pageWatermark.scaleMm", label: "Watermark tile size (mm)", inputType: "number" },
   ];

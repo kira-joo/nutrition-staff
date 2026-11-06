@@ -9,5 +9,6 @@ export const dynamic = "force-dynamic";
 export const POST = createPostRoute({
   params: FindChapterBlocksParamsDto,
   auth: { permissions: [AppPermission.BOOK.UPDATE] },
-  handler: async ({ request, params }) => addBookBlock(request, params.id, { kind: "chapter", chapterId: params.chapterId }),
+  handler: async ({ request, params }) =>
+    addBookBlock(request, params.id, { kind: "chapter", chapterId: params.chapterId }),
 });

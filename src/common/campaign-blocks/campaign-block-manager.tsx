@@ -101,10 +101,22 @@ export function CampaignBlockManager({ campaignId, blocks, onChanged }: Campaign
                 >
                   <ArrowDown className="h-4 w-4" />
                 </CustomButton>
-                <CustomButton type="button" size="icon" variant="ghost" aria-label="Edit" onClick={() => setEditingBlock(block)}>
+                <CustomButton
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Edit"
+                  onClick={() => setEditingBlock(block)}
+                >
                   <Pencil className="h-4 w-4" />
                 </CustomButton>
-                <CustomButton type="button" size="icon" variant="ghost" aria-label="Remove" onClick={() => handleRemove(block)}>
+                <CustomButton
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Remove"
+                  onClick={() => handleRemove(block)}
+                >
                   <Trash2 className="h-4 w-4 text-red-600" />
                 </CustomButton>
               </div>
@@ -130,7 +142,12 @@ export function CampaignBlockManager({ campaignId, blocks, onChanged }: Campaign
       </DropdownMenu>
 
       {adding ? (
-        <Modal open onOpenChange={() => setAdding(null)} title={`Add ${campaignBlockRegistry[adding].label} block`} size="lg">
+        <Modal
+          open
+          onOpenChange={() => setAdding(null)}
+          title={`Add ${campaignBlockRegistry[adding].label} block`}
+          size="lg"
+        >
           {(() => {
             const { Editor } = campaignBlockRegistry[adding];
             return (

@@ -1,6 +1,11 @@
 import { ConflictError, NotFoundError, BadRequestError, validateDto } from "@kira-joo/backend-toolkit-core";
 import { parseMultipartFormData, withRevalidationMeta } from "@kira-joo/backend-toolkit-next";
-import { assetProvider, destroyReplacedAssets, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
+import {
+  assetProvider,
+  destroyReplacedAssets,
+  destroyUploadedAssets,
+  processAssetUploadFields,
+} from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createDeleteRoute, createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { bookSlugChangeTags } from "src/server/core/revalidation/revalidate-entity";
@@ -50,7 +55,7 @@ export const PUT = createPutRoute({
       try {
         saved = await bookRepository.update(
           { where: { _id: params.id, revision: expectedRevision } },
-          { ...updatePayload, revision: expectedRevision + 1 }
+          { ...updatePayload, revision: expectedRevision + 1 },
         );
       } catch (error) {
         if (error instanceof NotFoundError) {

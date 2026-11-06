@@ -3,7 +3,10 @@ import type { NextRequest } from "next/server";
 import { assertPublishReady } from "src/server/core/publishing";
 import { assetProvider, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
-import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/campaigns/blocks/campaign-block-asset-fields";
+import {
+  CAMPAIGN_ASSET_FOLDER,
+  getCampaignBlockAssetFields,
+} from "src/server/campaigns/blocks/campaign-block-asset-fields";
 import { assertValidBlockType, validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
 import { assertBlockReferencesValid } from "src/server/campaigns/blocks/assert-block-references-valid";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";

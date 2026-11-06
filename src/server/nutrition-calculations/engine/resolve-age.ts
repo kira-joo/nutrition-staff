@@ -5,7 +5,11 @@ export interface ResolvedAge {
 }
 
 /** Returns `null` when neither is available — the caller decides how to handle a missing age (skipping BMR-dependent outputs, never guessing one). */
-export function resolveAge(dateOfBirth: Date | undefined, birthYear: number | undefined, asOf: Date): ResolvedAge | null {
+export function resolveAge(
+  dateOfBirth: Date | undefined,
+  birthYear: number | undefined,
+  asOf: Date,
+): ResolvedAge | null {
   if (dateOfBirth) {
     let age = asOf.getFullYear() - dateOfBirth.getFullYear();
     const hasHadBirthdayThisYear =

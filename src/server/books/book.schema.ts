@@ -1,11 +1,30 @@
-import { createMongoModel, Filterable, imageAssetField, MongoField, MongoSchema, Searchable, Unique } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  Filterable,
+  imageAssetField,
+  MongoField,
+  MongoSchema,
+  Searchable,
+  Unique,
+} from "@kira-joo/backend-toolkit-mongoose";
 import type { ImageAsset } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { BookOverrideKey, BookStatus, BookVisibility } from "src/common/enums";
-import { asSchemaField, bookContactBlockSchema, bookSocialLinkSchema } from "src/server/book-settings/book-settings.schema";
+import {
+  asSchemaField,
+  bookContactBlockSchema,
+  bookSocialLinkSchema,
+} from "src/server/book-settings/book-settings.schema";
 import type { BookCoverMode, BookOverrides } from "src/common/interfaces/book.interface";
-import { emptyBackMatter, emptyFrontMatter, type BookBackMatter, type BookFrontMatter, type BookReference, type Chapter } from "src/common/interfaces/book-chapter.interface";
+import {
+  emptyBackMatter,
+  emptyFrontMatter,
+  type BookBackMatter,
+  type BookFrontMatter,
+  type BookReference,
+  type Chapter,
+} from "src/common/interfaces/book-chapter.interface";
 
 // Embedded, `_id:false` — mirrors BookSettings' overridable shape exactly,
 // reusing the same sub-schemas rather than redefining them.
@@ -43,7 +62,7 @@ const bookOverridesSchema = new mongoose.Schema(
     // `image` and `scaleMm`.
     pageWatermark: { type: mongoose.Schema.Types.Mixed, required: false },
   },
-  { _id: false }
+  { _id: false },
 );
 
 @MongoSchema({ timestamps: true, softDelete: true })

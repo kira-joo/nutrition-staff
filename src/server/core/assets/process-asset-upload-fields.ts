@@ -38,7 +38,12 @@ export interface ProcessAssetUploadFieldsResult {
  * `overrides.*` rather than at the payload's top level.
  */
 function getAtPath(obj: Record<string, unknown>, path: string): unknown {
-  return path.split(".").reduce<unknown>((acc, key) => (acc && typeof acc === "object" ? (acc as Record<string, unknown>)[key] : undefined), obj);
+  return path
+    .split(".")
+    .reduce<unknown>(
+      (acc, key) => (acc && typeof acc === "object" ? (acc as Record<string, unknown>)[key] : undefined),
+      obj,
+    );
 }
 
 function setAtPath(obj: Record<string, unknown>, path: string, value: unknown): void {

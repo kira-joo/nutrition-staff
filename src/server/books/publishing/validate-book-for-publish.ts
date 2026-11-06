@@ -27,7 +27,10 @@ const LOW_RESOLUTION_WIDTH_PX = 800;
  * unsafe/malformed URLs at write time, so there is nothing left to catch
  * at publish time.
  */
-export async function validateBookForPublish(book: BookSchema, identity: ResolvedBookIdentity): Promise<PublishValidationResult> {
+export async function validateBookForPublish(
+  book: BookSchema,
+  identity: ResolvedBookIdentity,
+): Promise<PublishValidationResult> {
   const errors: PublishValidationIssue[] = [];
   const warnings: PublishValidationIssue[] = [];
 
@@ -52,8 +55,12 @@ export async function validateBookForPublish(book: BookSchema, identity: Resolve
 
   const allBlocks = [
     ...book.chapters.flatMap((chapter) => (chapter.blocks ?? []).map((block) => ({ block, context: chapter.title }))),
-    ...frontMatterSections.flatMap(([slot, section]) => (section?.blocks ?? []).map((block) => ({ block, context: slot }))),
-    ...backMatterSections.flatMap(([slot, section]) => (section?.blocks ?? []).map((block) => ({ block, context: slot }))),
+    ...frontMatterSections.flatMap(([slot, section]) =>
+      (section?.blocks ?? []).map((block) => ({ block, context: slot })),
+    ),
+    ...backMatterSections.flatMap(([slot, section]) =>
+      (section?.blocks ?? []).map((block) => ({ block, context: slot })),
+    ),
   ];
 
   for (const { block, context } of allBlocks) {
@@ -61,25 +68,40 @@ export async function validateBookForPublish(book: BookSchema, identity: Resolve
       if (!block.image) {
         errors.push({ code: "MISSING_IMAGE", message: `An image block in "${context}" has no image.` });
       } else if ((block.image.width ?? 0) < LOW_RESOLUTION_WIDTH_PX) {
-        warnings.push({ code: "LOW_RESOLUTION_IMAGE", message: `An image in "${context}" is lower resolution than recommended for print (${block.image.width}px wide).` });
+        warnings.push({
+          code: "LOW_RESOLUTION_IMAGE",
+          message: `An image in "${context}" is lower resolution than recommended for print (${block.image.width}px wide).`,
+        });
       }
     }
     if (block.type === BookBlockType.RECIPE_REF) {
-      const recipe = await recipeRepository.findOne({ where: { _id: block.recipeId, status: ContentStatus.PUBLISHED }, skipThrowError: true });
+      const recipe = await recipeRepository.findOne({
+        where: { _id: block.recipeId, status: ContentStatus.PUBLISHED },
+        skipThrowError: true,
+      });
       if (!recipe) {
-        errors.push({ code: "BROKEN_RECIPE_REF", message: `A recipe reference in "${context}" no longer points to a published recipe.` });
+        errors.push({
+          code: "BROKEN_RECIPE_REF",
+          message: `A recipe reference in "${context}" no longer points to a published recipe.`,
+        });
       }
     }
     if (block.type === BookBlockType.CITATION) {
       const exists = book.references.some((reference) => reference.id === block.referenceId);
       if (!exists) {
-        errors.push({ code: "BROKEN_CITATION", message: `A citation in "${context}" no longer points to an existing reference.` });
+        errors.push({
+          code: "BROKEN_CITATION",
+          message: `A citation in "${context}" no longer points to an existing reference.`,
+        });
       }
     }
   }
 
   if (!identity.doctorName?.trim() && !identity.doctorBio?.trim()) {
-    warnings.push({ code: "MISSING_DOCTOR_IDENTITY", message: "Neither a doctor name nor a bio is resolved for this book (from Book Settings or an override)." });
+    warnings.push({
+      code: "MISSING_DOCTOR_IDENTITY",
+      message: "Neither a doctor name nor a bio is resolved for this book (from Book Settings or an override).",
+    });
   }
 
   return { errors, warnings };

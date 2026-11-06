@@ -25,7 +25,12 @@ function createItem(): FeatureGridItem {
 }
 
 /** The featureGrid block's own editor — a section heading plus a repeatable list of heading+description feature items. */
-export function FeatureGridBlockEditor({ defaultValues, endpoint, submitParams, onSuccess }: FeatureGridBlockEditorProps) {
+export function FeatureGridBlockEditor({
+  defaultValues,
+  endpoint,
+  submitParams,
+  onSuccess,
+}: FeatureGridBlockEditorProps) {
   const fields: FormFieldConfig<FeatureGridBlockFormValues>[] = [
     { type: FieldType.LOCALIZED_INPUT, name: "heading", label: "Section heading (optional)" },
     {
@@ -41,11 +46,7 @@ export function FeatureGridBlockEditor({ defaultValues, endpoint, submitParams, 
           emptyLabel="No features yet."
           renderItem={(item, index, update) => (
             <>
-              <LocalizedTextPair
-                label="Heading"
-                value={item.heading}
-                onChange={(heading) => update({ heading })}
-              />
+              <LocalizedTextPair label="Heading" value={item.heading} onChange={(heading) => update({ heading })} />
               <LocalizedTextPair
                 label="Description"
                 multiline
@@ -66,7 +67,9 @@ export function FeatureGridBlockEditor({ defaultValues, endpoint, submitParams, 
         heading: defaultValues?.heading ?? EMPTY_LOCALIZED,
         items: defaultValues?.items ?? [],
       }}
-      transformValues={(values) => ({ ...values, type: CampaignBlockType.FEATURE_GRID }) as unknown as Record<string, unknown>}
+      transformValues={(values) =>
+        ({ ...values, type: CampaignBlockType.FEATURE_GRID }) as unknown as Record<string, unknown>
+      }
       submitEndpoint={endpoint}
       submitParams={submitParams}
       onSuccess={() => {

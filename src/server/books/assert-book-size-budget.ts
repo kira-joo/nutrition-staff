@@ -15,6 +15,8 @@ export function assertBookSizeBudget(book: Record<string, unknown>): void {
   if (sizeBytes > BOOK_SIZE_SOFT_BUDGET_BYTES) {
     const sizeMb = (sizeBytes / 1024 / 1024).toFixed(1);
     const limitMb = (BOOK_SIZE_SOFT_BUDGET_BYTES / 1024 / 1024).toFixed(0);
-    throw new BadRequestError(`This book's content is too large (${sizeMb}MB, limit ${limitMb}MB). Split it into shorter chapters or remove unused content.`);
+    throw new BadRequestError(
+      `This book's content is too large (${sizeMb}MB, limit ${limitMb}MB). Split it into shorter chapters or remove unused content.`,
+    );
   }
 }

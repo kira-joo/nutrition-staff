@@ -20,7 +20,10 @@ export function CountdownBlockPreview({ block }: CountdownBlockPreviewProps) {
         <p className="text-sm text-slate-600">{expiredLabel}</p>
       ) : (
         <p className="text-sm text-slate-600">
-          Ends: {Number.isNaN(new Date(block.targetDate).getTime()) ? "(no date set)" : new Date(block.targetDate).toLocaleString()}
+          Ends:{" "}
+          {Number.isNaN(new Date(block.targetDate).getTime())
+            ? "(no date set)"
+            : new Date(block.targetDate).toLocaleString()}
         </p>
       )}
     </div>

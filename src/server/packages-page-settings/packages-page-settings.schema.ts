@@ -9,7 +9,7 @@ const durationLabelsSchema = new mongoose.Schema(
     quarter: localizedStringField(),
     half: localizedStringField(),
   },
-  { _id: false }
+  { _id: false },
 );
 
 export interface DurationLabels {
@@ -38,4 +38,7 @@ export class PackagesPageSettingsSchema {
   subscribeButtonLabel!: LocalizedString;
 }
 
-export const PackagesPageSettingsModel = createMongoModel(EntityName.PACKAGES_PAGE_SETTINGS, PackagesPageSettingsSchema);
+export const PackagesPageSettingsModel = createMongoModel(
+  EntityName.PACKAGES_PAGE_SETTINGS,
+  PackagesPageSettingsSchema,
+);

@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -8,7 +9,8 @@ import { PackageForm } from "src/common/forms/package-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function PackageUpdatePage({ params }: { params: { id: string } }) {
+export default function PackageUpdatePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const packageQuery = useRequesterQuery({
     endpoint: getPackageByIdEndpoint,
     options: { params: { id: params.id } },

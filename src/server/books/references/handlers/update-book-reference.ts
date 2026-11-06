@@ -9,12 +9,14 @@ export async function updateBookReference(bookId: string, referenceId: string, d
   if (index === -1) throw new NotFoundError(`No reference exists with id "${referenceId}".`, { referenceId });
 
   const { expectedRevision, ...patchFields } = dto;
-  const nextReferences = book.references.map((reference, i) => (i === index ? { ...reference, ...patchFields } : reference));
+  const nextReferences = book.references.map((reference, i) =>
+    i === index ? { ...reference, ...patchFields } : reference,
+  );
 
   try {
     return await bookRepository.update(
       { where: { _id: bookId, contentRevision: expectedRevision } },
-      { references: nextReferences, contentRevision: expectedRevision + 1 }
+      { references: nextReferences, contentRevision: expectedRevision + 1 },
     );
   } catch (error) {
     if (error instanceof NotFoundError) {

@@ -1,4 +1,12 @@
-import { createMongoModel, Filterable, localizedStringField, MongoField, MongoSchema, Searchable, Unique } from "@kira-joo/backend-toolkit-mongoose";
+import {
+  createMongoModel,
+  Filterable,
+  localizedStringField,
+  MongoField,
+  MongoSchema,
+  Searchable,
+  Unique,
+} from "@kira-joo/backend-toolkit-mongoose";
 import type { LocalizedString } from "@kira-joo/toolkit-common";
 import mongoose from "mongoose";
 import { EntityName } from "src/common/authorization/entity-name.enum";
@@ -10,7 +18,7 @@ const pricingTierSchema = new mongoose.Schema(
     originalPrice: { type: Number, required: true },
     price: { type: Number, required: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const pricingTiersSchema = new mongoose.Schema(
@@ -19,7 +27,7 @@ const pricingTiersSchema = new mongoose.Schema(
     quarter: pricingTierSchema,
     half: pricingTierSchema,
   },
-  { _id: false }
+  { _id: false },
 );
 
 export interface PricingTier {

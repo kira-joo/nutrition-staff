@@ -24,7 +24,11 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { FONT_SIZE_TOKENS, HIGHLIGHT_COLOR_TOKENS, TEXT_COLOR_TOKENS } from "../../src/common/books/rich-text/rich-text-tokens";
+import {
+  FONT_SIZE_TOKENS,
+  HIGHLIGHT_COLOR_TOKENS,
+  TEXT_COLOR_TOKENS,
+} from "../../src/common/books/rich-text/rich-text-tokens";
 
 const ROOT = join(__dirname, "../..");
 const shared = readFileSync(join(ROOT, "src/common/books/rich-text/render-rich-text.ts"), "utf8");
@@ -50,12 +54,12 @@ assert.deepEqual(
   missingOpen,
   [],
   `paginate-book.browser.ts's renderMarksOpenLocal is missing mark(s) the shared renderer handles: ${missingOpen.join(", ")}. ` +
-    `Split paragraphs would silently lose them in Staff Preview and the PDF.`
+    `Split paragraphs would silently lose them in Staff Preview and the PDF.`,
 );
 assert.deepEqual(
   missingClose,
   [],
-  `renderMarksCloseLocal is missing mark(s): ${missingClose.join(", ")} — split paragraphs would emit unbalanced markup.`
+  `renderMarksCloseLocal is missing mark(s): ${missingClose.join(", ")} — split paragraphs would emit unbalanced markup.`,
 );
 
 // The paginator inlines the token lists for the same toString() reason, so
@@ -70,4 +74,6 @@ for (const [label, tokens] of [
 }
 
 console.log(`OK  mark renderers in parity — ${[...sharedOpen].sort().join(", ")}`);
-console.log(`OK  tokens inlined — ${FONT_SIZE_TOKENS.length} sizes, ${TEXT_COLOR_TOKENS.length} colours, ${HIGHLIGHT_COLOR_TOKENS.length} highlights`);
+console.log(
+  `OK  tokens inlined — ${FONT_SIZE_TOKENS.length} sizes, ${TEXT_COLOR_TOKENS.length} colours, ${HIGHLIGHT_COLOR_TOKENS.length} highlights`,
+);

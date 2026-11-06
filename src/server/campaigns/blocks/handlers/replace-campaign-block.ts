@@ -9,7 +9,10 @@ import {
 } from "src/server/core/assets";
 import { assertPublishReady } from "src/server/core/publishing";
 import { campaignRepository } from "src/server/campaigns/campaigns.repository";
-import { CAMPAIGN_ASSET_FOLDER, getCampaignBlockAssetFields } from "src/server/campaigns/blocks/campaign-block-asset-fields";
+import {
+  CAMPAIGN_ASSET_FOLDER,
+  getCampaignBlockAssetFields,
+} from "src/server/campaigns/blocks/campaign-block-asset-fields";
 import type { CampaignBlock } from "src/server/campaigns/blocks/campaign-block.type";
 import { validateCampaignBlock } from "src/server/campaigns/blocks/validate-campaign-block";
 import { assertBlockReferencesValid } from "src/server/campaigns/blocks/assert-block-references-valid";

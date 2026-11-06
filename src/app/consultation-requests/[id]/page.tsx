@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import {
@@ -23,7 +24,8 @@ const INTENT_LABEL: Record<ConsultationRequestIntent, string> = {
   [ConsultationRequestIntent.NEWSLETTER]: "Newsletter",
 };
 
-export default function ConsultationRequestDetailsPage({ params }: { params: { id: string } }) {
+export default function ConsultationRequestDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const requestQuery = useRequesterQuery({
     endpoint: getConsultationRequestByIdEndpoint,
     options: { params: { id: params.id } },

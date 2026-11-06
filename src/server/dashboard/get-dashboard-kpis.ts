@@ -9,7 +9,11 @@ import {
   OVERDUE_FOLLOW_UPS_WARNING_THRESHOLD,
 } from "src/server/dashboard/dashboard.constants";
 import { resolveDashboardPermissions } from "src/server/dashboard/dashboard-permissions.util";
-import { resolveScopedClientProfileIds, withAssignedStaffWhere, withScopedClientWhere } from "src/server/dashboard/dashboard-scope.util";
+import {
+  resolveScopedClientProfileIds,
+  withAssignedStaffWhere,
+  withScopedClientWhere,
+} from "src/server/dashboard/dashboard-scope.util";
 import {
   bucketTimestamps,
   resolveBucketGranularity,
@@ -42,9 +46,13 @@ async function periodMetric(
   countInPreviousRange: () => Promise<number>,
   timestampsInRange: () => Promise<Date[]>,
   range: DashboardDateRange,
-  granularity: ReturnType<typeof resolveBucketGranularity>
+  granularity: ReturnType<typeof resolveBucketGranularity>,
 ): Promise<KpiMetric> {
-  const [value, previousPeriodValue, timestamps] = await Promise.all([countInRange(), countInPreviousRange(), timestampsInRange()]);
+  const [value, previousPeriodValue, timestamps] = await Promise.all([
+    countInRange(),
+    countInPreviousRange(),
+    timestampsInRange(),
+  ]);
   return {
     value,
     previousPeriodValue,
@@ -71,48 +79,69 @@ export async function getDashboardKpis(query: DashboardQueryDto, user: AuthUser)
   const startOfToday = startOfDayInZone(now);
   const startOfTomorrow = addDaysInZone(now, 1);
 
-  const [totalClients, activeClients, todaysFollowUpsCount, overdueFollowUpsCount, newLeads, newClients] = await Promise.all([
-    clientProfileRepository.count({ where: withAssignedStaffWhere({}, assignedToUserId) }),
-    clientProfileRepository.count({ where: withAssignedStaffWhere({ lifecycle: ClientLifecycle.ACTIVE }, assignedToUserId) }),
-    clientProfileRepository.count({
-      where: withAssignedStaffWhere({ nextFollowUpAt: { $gte: startOfToday, $lt: startOfTomorrow } }, assignedToUserId),
-    }),
-    clientProfileRepository.count({
-      where: withAssignedStaffWhere({ nextFollowUpAt: { $lt: now } }, assignedToUserId),
-    }),
-    periodMetric(
-      () => clientProfileRepository.count({ where: withAssignedStaffWhere(rangeWhere("createdAt", range), assignedToUserId) }),
-      () => clientProfileRepository.count({ where: withAssignedStaffWhere(rangeWhere("createdAt", previousRange), assignedToUserId) }),
-      async () => {
-        const rows = await clientProfileRepository.findAll({
-          where: withAssignedStaffWhere(rangeWhere("createdAt", range), assignedToUserId),
-          select: { createdAt: true },
-        });
-        return rows.map((row) => new Date((row as unknown as { createdAt: string | Date }).createdAt));
-      },
-      range,
-      granularity
-    ),
-    periodMetric(
-      () =>
-        clientProfileRepository.count({
-          where: withAssignedStaffWhere({ ...rangeWhere("createdAt", range), lifecycle: { $in: ACTIVE_OR_FURTHER } }, assignedToUserId),
-        }),
-      () =>
-        clientProfileRepository.count({
-          where: withAssignedStaffWhere({ ...rangeWhere("createdAt", previousRange), lifecycle: { $in: ACTIVE_OR_FURTHER } }, assignedToUserId),
-        }),
-      async () => {
-        const rows = await clientProfileRepository.findAll({
-          where: withAssignedStaffWhere({ ...rangeWhere("createdAt", range), lifecycle: { $in: ACTIVE_OR_FURTHER } }, assignedToUserId),
-          select: { createdAt: true },
-        });
-        return rows.map((row) => new Date((row as unknown as { createdAt: string | Date }).createdAt));
-      },
-      range,
-      granularity
-    ),
-  ]);
+  const [totalClients, activeClients, todaysFollowUpsCount, overdueFollowUpsCount, newLeads, newClients] =
+    await Promise.all([
+      clientProfileRepository.count({ where: withAssignedStaffWhere({}, assignedToUserId) }),
+      clientProfileRepository.count({
+        where: withAssignedStaffWhere({ lifecycle: ClientLifecycle.ACTIVE }, assignedToUserId),
+      }),
+      clientProfileRepository.count({
+        where: withAssignedStaffWhere(
+          { nextFollowUpAt: { $gte: startOfToday, $lt: startOfTomorrow } },
+          assignedToUserId,
+        ),
+      }),
+      clientProfileRepository.count({
+        where: withAssignedStaffWhere({ nextFollowUpAt: { $lt: now } }, assignedToUserId),
+      }),
+      periodMetric(
+        () =>
+          clientProfileRepository.count({
+            where: withAssignedStaffWhere(rangeWhere("createdAt", range), assignedToUserId),
+          }),
+        () =>
+          clientProfileRepository.count({
+            where: withAssignedStaffWhere(rangeWhere("createdAt", previousRange), assignedToUserId),
+          }),
+        async () => {
+          const rows = await clientProfileRepository.findAll({
+            where: withAssignedStaffWhere(rangeWhere("createdAt", range), assignedToUserId),
+            select: { createdAt: true },
+          });
+          return rows.map((row) => new Date((row as unknown as { createdAt: string | Date }).createdAt));
+        },
+        range,
+        granularity,
+      ),
+      periodMetric(
+        () =>
+          clientProfileRepository.count({
+            where: withAssignedStaffWhere(
+              { ...rangeWhere("createdAt", range), lifecycle: { $in: ACTIVE_OR_FURTHER } },
+              assignedToUserId,
+            ),
+          }),
+        () =>
+          clientProfileRepository.count({
+            where: withAssignedStaffWhere(
+              { ...rangeWhere("createdAt", previousRange), lifecycle: { $in: ACTIVE_OR_FURTHER } },
+              assignedToUserId,
+            ),
+          }),
+        async () => {
+          const rows = await clientProfileRepository.findAll({
+            where: withAssignedStaffWhere(
+              { ...rangeWhere("createdAt", range), lifecycle: { $in: ACTIVE_OR_FURTHER } },
+              assignedToUserId,
+            ),
+            select: { createdAt: true },
+          });
+          return rows.map((row) => new Date((row as unknown as { createdAt: string | Date }).createdAt));
+        },
+        range,
+        granularity,
+      ),
+    ]);
 
   const kpis: DashboardKpis = {
     totalClients: snapshotMetric(totalClients),
@@ -130,8 +159,14 @@ export async function getDashboardKpis(query: DashboardQueryDto, user: AuthUser)
 
   if (permissions.canViewMeasurements) {
     kpis.measurementsRecorded = await periodMetric(
-      () => clientMeasurementRepository.count({ where: withScopedClientWhere(rangeWhere("measuredAt", range), scopedClientProfileIds) }),
-      () => clientMeasurementRepository.count({ where: withScopedClientWhere(rangeWhere("measuredAt", previousRange), scopedClientProfileIds) }),
+      () =>
+        clientMeasurementRepository.count({
+          where: withScopedClientWhere(rangeWhere("measuredAt", range), scopedClientProfileIds),
+        }),
+      () =>
+        clientMeasurementRepository.count({
+          where: withScopedClientWhere(rangeWhere("measuredAt", previousRange), scopedClientProfileIds),
+        }),
       async () => {
         const rows = await clientMeasurementRepository.findAll({
           where: withScopedClientWhere(rangeWhere("measuredAt", range), scopedClientProfileIds),
@@ -140,14 +175,20 @@ export async function getDashboardKpis(query: DashboardQueryDto, user: AuthUser)
         return rows.map((row) => new Date((row as unknown as { measuredAt: string | Date }).measuredAt));
       },
       range,
-      granularity
+      granularity,
     );
   }
 
   if (permissions.canViewCalculations) {
     kpis.nutritionCalculationsSaved = await periodMetric(
-      () => nutritionCalculationRepository.count({ where: withScopedClientWhere(rangeWhere("calculatedAt", range), scopedClientProfileIds) }),
-      () => nutritionCalculationRepository.count({ where: withScopedClientWhere(rangeWhere("calculatedAt", previousRange), scopedClientProfileIds) }),
+      () =>
+        nutritionCalculationRepository.count({
+          where: withScopedClientWhere(rangeWhere("calculatedAt", range), scopedClientProfileIds),
+        }),
+      () =>
+        nutritionCalculationRepository.count({
+          where: withScopedClientWhere(rangeWhere("calculatedAt", previousRange), scopedClientProfileIds),
+        }),
       async () => {
         const rows = await nutritionCalculationRepository.findAll({
           where: withScopedClientWhere(rangeWhere("calculatedAt", range), scopedClientProfileIds),
@@ -156,7 +197,7 @@ export async function getDashboardKpis(query: DashboardQueryDto, user: AuthUser)
         return rows.map((row) => new Date((row as unknown as { calculatedAt: string | Date }).calculatedAt));
       },
       range,
-      granularity
+      granularity,
     );
   }
 

@@ -38,7 +38,8 @@ export default function ClientsPage() {
     onSuccess: () => tableRef.current?.refetch(),
   });
 
-  const isFollowUpOverdue = (client: Client) => Boolean(client.nextFollowUpAt && new Date(client.nextFollowUpAt) < new Date());
+  const isFollowUpOverdue = (client: Client) =>
+    Boolean(client.nextFollowUpAt && new Date(client.nextFollowUpAt) < new Date());
 
   const columns: TableColumn<Client>[] = [
     {
@@ -85,7 +86,10 @@ export default function ClientsPage() {
       key: "profileCompleteness",
       header: "Profile",
       render: (client) => {
-        const completeness = calculateProfileCompleteness({ ...client, hasMeasurement: Boolean(client.hasMeasurement) });
+        const completeness = calculateProfileCompleteness({
+          ...client,
+          hasMeasurement: Boolean(client.hasMeasurement),
+        });
         const missingSummary = completeness.missing.map((item) => item.label).join(", ");
         return (
           <Badge

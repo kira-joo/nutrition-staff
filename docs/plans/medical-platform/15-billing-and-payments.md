@@ -45,7 +45,7 @@ Currency mismatch throws rather than coercing. Because `bigint` is not
 JSON-native, an explicit `toMoneyJson`/`fromMoneyJson` pair crosses the API
 boundary; DTOs carry the serialized form.
 
-**Formatting and parsing are deliberately *not* in `toolkit-common`.**
+**Formatting and parsing are deliberately _not_ in `toolkit-common`.**
 `formatMoney` mixes `Intl` presentation with domain arithmetic and lives next to
 the UI as `MoneyText` in `frontend-toolkit-tailwind`; free-text money parsing
 lives in the app's form layer, where the locale is actually known. A generic

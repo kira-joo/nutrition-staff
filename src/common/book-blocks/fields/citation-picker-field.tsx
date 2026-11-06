@@ -5,7 +5,11 @@ import type { FieldValues, Path } from "react-hook-form";
 import type { BookReference } from "src/common/interfaces/book-chapter.interface";
 
 /** Options come from `book.references` — there's no server round-trip needed (unlike the recipe picker), since the parent Content tab already holds the full book. */
-export function citationPickerField<T extends FieldValues>(name: Path<T>, label: string, references: BookReference[]): FormFieldConfig<T> {
+export function citationPickerField<T extends FieldValues>(
+  name: Path<T>,
+  label: string,
+  references: BookReference[],
+): FormFieldConfig<T> {
   return {
     type: FieldType.CUSTOM,
     name,

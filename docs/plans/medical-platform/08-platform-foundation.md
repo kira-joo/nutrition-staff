@@ -15,13 +15,14 @@ documents and files with private delivery · in-app notifications ·
 global search and the command palette · the module/navigation registry ·
 the audit/activity surface.
 
-Roles, permissions and the audit *schema* are [07](07-authorization-roles-permissions.md);
+Roles, permissions and the audit _schema_ are [07](07-authorization-roles-permissions.md);
 organization structure is [06](06-organization-and-branches.md). This document
 covers what is left.
 
 ## Documents and files
 
 ### Current state
+
 `AssetProvider` supports `"image"` and `"video"` only. Cloudinary's `"raw"`
 resource type — PDFs, DOCX, anything else — is **unreachable**: there is no
 `uploadDocument`/`uploadRaw`, no `DocumentAsset` type in `toolkit-common`, no
@@ -41,6 +42,7 @@ checks `BookEdition.referencedAssetPublicIds` and **fails open** on a query erro
 (documented as deliberate).
 
 ### Target state
+
 - A `Document` entity ([04](04-domain-model.md) §8) — patient- and
   encounter-scoped, typed by `kind`.
 - `DocumentAsset` in `toolkit-common` — an **opaque provider locator plus
@@ -87,10 +89,10 @@ every grant audited with the requesting actor.
 
 The asset abstraction supports **both**, and neither is forced globally:
 
-| Mode | How | Trade-off |
-|---|---|---|
-| **Provider grant** | `createDownloadGrant(locator, {expiresInSeconds})`; the browser fetches from the provider | Cheap and fast. The grant is forwardable for its TTL. |
-| **Proxy stream** | The application authorizes, fetches, and streams the bytes; no third-party URL ever reaches the browser | No forwardable URL and a per-request audit point. Costs bandwidth and execution time through the app server, which on a serverless deployment has real limits. |
+| Mode               | How                                                                                                     | Trade-off                                                                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Provider grant** | `createDownloadGrant(locator, {expiresInSeconds})`; the browser fetches from the provider               | Cheap and fast. The grant is forwardable for its TTL.                                                                                                          |
+| **Proxy stream**   | The application authorizes, fetches, and streams the bytes; no third-party URL ever reaches the browser | No forwardable URL and a per-request audit point. Costs bandwidth and execution time through the app server, which on a serverless deployment has real limits. |
 
 **The most sensitive document `kind`s default to proxy streaming where
 operationally viable** — identity documents and consent forms first. Everything
@@ -122,8 +124,8 @@ generically:
 
 Those are procurement and deployment decisions per customer, not architecture
 decisions. This document therefore commits to two things only: signed private
-delivery as the v1 implementation *if the provider review supports it for that
-deployment*, and **keeping the `AssetProvider` abstraction clean so the provider
+delivery as the v1 implementation _if the provider review supports it for that
+deployment_, and **keeping the `AssetProvider` abstraction clean so the provider
 can be replaced where a customer's requirements demand it.** That interface
 already exists in `backend-toolkit-core` and already documents that every upload
 passes through the application server rather than direct-to-provider — which is
@@ -131,15 +133,17 @@ what makes substitution realistic.
 
 Out of scope in v1: DICOM viewing, customer-managed encryption keys, retention
 policy enforcement, legal hold, and provider-side access-log ingestion.
-**Malware scanning is explicitly *in* scope** — moved in after review.
+**Malware scanning is explicitly _in_ scope** — moved in after review.
 
 ## Notifications
 
 ### Current state
+
 None. `grep notification` across all seven packages returns one doc comment.
 The only user feedback is the ephemeral `toast`.
 
 ### Target state
+
 `Notification` + `NotificationPreference` ([04](04-domain-model.md) §8),
 in-app only, with a bell and an unread count in the shell.
 
@@ -177,6 +181,7 @@ an outbox would be infrastructure with no consumer. See
 ## Global search and the command palette
 
 ### Current state
+
 No global search of any kind. No `cmdk` usage, no ⌘K, no shortcut registry.
 Search is per-table only, via `FeatureTable`'s own `SearchInput`. Worse, patient
 search today is a **two-hop unindexed regex**: `ClientProfile` has zero
@@ -185,6 +190,7 @@ case-insensitive `$regex` against `users.name/phone/email` and then `$in`s the
 matched ids. That will not scale and it is the single most-used query in a clinic.
 
 ### Target state
+
 - `Patient` gains `@Searchable` on `mrn`, and the two-hop regex is replaced by a
   proper index. A clinic searches by MRN, phone, and name — in that order of
   precision — so the search endpoint resolves an exact MRN or exact phone match
@@ -203,17 +209,19 @@ matched ids. That will not scale and it is the single most-used query in a clini
 ## The module and navigation registry
 
 ### Current state
+
 Adding a module means four hand-synced edits: `src/common/routes/app-route.ts`
 (84 flat route constants), an `api/<domain>.endpoints.ts`, a section block in
 `src/common/navigation/side-nav.config.ts` (203 lines, 8 sections, 20 items,
 each with a `permission`), and the page files. There is no registry; `AppRoute`
 and the nav config are two independent lists kept in sync by hand.
 
-The nav *is* genuinely role-aware and declarative, which is the good half — the
+The nav _is_ genuinely role-aware and declarative, which is the good half — the
 same permission strings gate nav items, `RouteButton`, row actions and route
 tabs, filtered by `filterSideNavItems`.
 
 ### Target state
+
 One module manifest per platform module and per vertical, co-locating routes,
 nav entries, required permissions, and dashboard widgets:
 
@@ -289,15 +297,15 @@ is the one a clinic will actually be asked about.
 
 **Reviewed 2026-08-22. Verdict: FLAWED. Amended.**
 
-| # | Finding | Sev | Analysis | Resolution |
-|---|---|---|---|---|
-| 1 | An ordinary signed Cloudinary delivery URL is **not** inherently short-lived; expiry needs the private-download / token mechanism. `getSignedUrl(id, {expiresInSeconds})` conflated the two. | CRITICAL | Correct, and the API name encoded the confusion. | **Accepted.** Renamed `createDownloadGrant`; expiry asserted by an elapsed-TTL test rather than trusted. |
-| 2 | `raw` is not a synonym for "document" — Cloudinary treats PDFs as `image`, and delivery and destruction both need the exact resource type, delivery type, format and version. | MAJOR | Correct. | **Accepted.** The provider determines and persists the real resource type per upload. |
-| 3 | `DocumentAsset` persisting a `url` is wrong when private URLs must be generated. It also omitted delivery type, version, checksum, MIME type and original filename. | CRITICAL | Correct. | **Accepted.** Reworked to an opaque locator plus metadata, with no stored URL. |
-| 4 | The current `AssetProvider` cannot deliver private assets at all — it only uploads image/video and destroys by `(publicId, resourceType)`. | MAJOR | Correct. **Verified** at `backend-toolkit-core/src/asset/asset-provider.interface.ts:17`. | **Accepted.** The interface is generalised in the same release, not just the Cloudinary implementation. |
-| 5 | Cloudinary vocabulary is already leaking (`publicId`, `resourceType`, canonical `url`), making substitution expensive. | MAJOR | Correct. | **Accepted.** `assetKey`, `providerData`, `mediaKind`, `accessPolicy`, `createDownloadGrant`. |
-| 6 | App-server authorization does not prevent post-issuance sharing of a grant. | MAJOR | Correct — a grant is a bearer capability. | **Accepted.** Very short TTLs, `no-store`, audited grants, and proxy streaming for the most sensitive kinds. |
-| 7 | Deferring malware scanning is wrong for arbitrary uploaded documents. | MAJOR | Correct, and this was a genuine oversight: a clinic receives files from patients by definition, and signed delivery does nothing about content safety. | **Accepted.** Quarantine + MIME sniffing + scan moved **into** v1 scope. |
+| #   | Finding                                                                                                                                                                                      | Sev      | Analysis                                                                                                                                               | Resolution                                                                                                   |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| 1   | An ordinary signed Cloudinary delivery URL is **not** inherently short-lived; expiry needs the private-download / token mechanism. `getSignedUrl(id, {expiresInSeconds})` conflated the two. | CRITICAL | Correct, and the API name encoded the confusion.                                                                                                       | **Accepted.** Renamed `createDownloadGrant`; expiry asserted by an elapsed-TTL test rather than trusted.     |
+| 2   | `raw` is not a synonym for "document" — Cloudinary treats PDFs as `image`, and delivery and destruction both need the exact resource type, delivery type, format and version.                | MAJOR    | Correct.                                                                                                                                               | **Accepted.** The provider determines and persists the real resource type per upload.                        |
+| 3   | `DocumentAsset` persisting a `url` is wrong when private URLs must be generated. It also omitted delivery type, version, checksum, MIME type and original filename.                          | CRITICAL | Correct.                                                                                                                                               | **Accepted.** Reworked to an opaque locator plus metadata, with no stored URL.                               |
+| 4   | The current `AssetProvider` cannot deliver private assets at all — it only uploads image/video and destroys by `(publicId, resourceType)`.                                                   | MAJOR    | Correct. **Verified** at `backend-toolkit-core/src/asset/asset-provider.interface.ts:17`.                                                              | **Accepted.** The interface is generalised in the same release, not just the Cloudinary implementation.      |
+| 5   | Cloudinary vocabulary is already leaking (`publicId`, `resourceType`, canonical `url`), making substitution expensive.                                                                       | MAJOR    | Correct.                                                                                                                                               | **Accepted.** `assetKey`, `providerData`, `mediaKind`, `accessPolicy`, `createDownloadGrant`.                |
+| 6   | App-server authorization does not prevent post-issuance sharing of a grant.                                                                                                                  | MAJOR    | Correct — a grant is a bearer capability.                                                                                                              | **Accepted.** Very short TTLs, `no-store`, audited grants, and proxy streaming for the most sensitive kinds. |
+| 7   | Deferring malware scanning is wrong for arbitrary uploaded documents.                                                                                                                        | MAJOR    | Correct, and this was a genuine oversight: a clinic receives files from patients by definition, and signed delivery does nothing about content safety. | **Accepted.** Quarantine + MIME sniffing + scan moved **into** v1 scope.                                     |
 
 **Resolved (D10 in [25](25-risks-and-open-decisions.md)):** both modes stay
 supported and configurable; the most sensitive kinds default to proxy streaming

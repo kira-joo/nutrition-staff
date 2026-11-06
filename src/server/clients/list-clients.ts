@@ -17,7 +17,13 @@ export async function listClients(query: ListClientsQueryDto) {
 
   if (query.search) {
     const matchingUsers = await userRepository.findAll({
-      where: { $or: [{ name: { $regex: query.search, $options: "i" } }, { phone: { $regex: query.search, $options: "i" } }, { email: { $regex: query.search, $options: "i" } }] },
+      where: {
+        $or: [
+          { name: { $regex: query.search, $options: "i" } },
+          { phone: { $regex: query.search, $options: "i" } },
+          { email: { $regex: query.search, $options: "i" } },
+        ],
+      },
     });
     where.userId = { $in: matchingUsers.map((user) => user._id) };
   }
@@ -41,7 +47,9 @@ export async function listClients(query: ListClientsQueryDto) {
     select: { clientProfileId: true },
   });
   const clientIdsWithMeasurement = new Set(
-    (measurements as unknown as { clientProfileId: unknown }[]).map((measurement) => String(measurement.clientProfileId))
+    (measurements as unknown as { clientProfileId: unknown }[]).map((measurement) =>
+      String(measurement.clientProfileId),
+    ),
   );
 
   return {

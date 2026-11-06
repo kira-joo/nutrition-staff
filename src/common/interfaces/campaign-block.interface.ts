@@ -71,7 +71,8 @@ export interface CountdownBlock {
 }
 
 /** Union of every block type — a new block type adds a member here (and to the block registry). */
-export type CampaignBlock = HeroBlock | RichTextBlock | FeatureGridBlock | MediaBlock | CtaBlock | FaqRefBlock | CountdownBlock;
+export type CampaignBlock =
+  HeroBlock | RichTextBlock | FeatureGridBlock | MediaBlock | CtaBlock | FaqRefBlock | CountdownBlock;
 
 /** The Hero block editor's own form-value shape — `image` can be a pending `File`, same as any other IMAGE_ASSET field. */
 export interface HeroBlockFormValues {

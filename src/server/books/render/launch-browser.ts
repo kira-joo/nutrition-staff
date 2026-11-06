@@ -27,7 +27,10 @@ export interface LaunchedBrowser {
  */
 export async function launchBookRenderBrowser(): Promise<LaunchedBrowser> {
   if (process.env.VERCEL) {
-    const [{ default: chromium }, { default: puppeteerCore }] = await Promise.all([import("@sparticuz/chromium"), import("puppeteer-core")]);
+    const [{ default: chromium }, { default: puppeteerCore }] = await Promise.all([
+      import("@sparticuz/chromium"),
+      import("puppeteer-core"),
+    ]);
     const executablePath = await chromium.executablePath();
     const browser = await puppeteerCore.launch({
       executablePath,

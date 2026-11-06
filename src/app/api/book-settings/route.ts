@@ -1,10 +1,18 @@
 import { validateDto } from "@kira-joo/backend-toolkit-core";
 import { parseMultipartFormData } from "@kira-joo/backend-toolkit-next";
-import { assetProvider, destroyReplacedAssets, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
+import {
+  assetProvider,
+  destroyReplacedAssets,
+  destroyUploadedAssets,
+  processAssetUploadFields,
+} from "src/server/core/assets";
 import { AppPermission } from "src/server/core/authorization/authorization-registry";
 import { createGetRoute, createPutRoute } from "src/server/core/route-factories";
 import { getOrCreateSingleton } from "src/server/core/singleton";
-import { BOOK_SETTINGS_ASSET_FIELDS, BOOK_SETTINGS_ASSET_FOLDER } from "src/server/book-settings/book-settings-asset-fields";
+import {
+  BOOK_SETTINGS_ASSET_FIELDS,
+  BOOK_SETTINGS_ASSET_FOLDER,
+} from "src/server/book-settings/book-settings-asset-fields";
 import { UpdateBookSettingsDto } from "src/server/book-settings/dto/update-book-settings.dto";
 import { bookSettingsRepository } from "src/server/book-settings/book-settings.repository";
 

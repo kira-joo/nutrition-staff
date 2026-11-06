@@ -8,6 +8,7 @@ import {
   Logger,
   QueryParamsRouterProvider,
   ToolkitProviders,
+  clearAuthenticatedQueries,
   createToolkitQueryClient,
   type AppLinkComponentProps,
 } from "@kira-joo/frontend-toolkit-core";
@@ -18,7 +19,6 @@ import Link from "next/link";
 import { APP_TIMEZONE } from "../common/config/app-timezone.constant";
 import { DIALOG_LABELS } from "../common/config/dialog-labels.constant";
 import { AppRoute } from "../common/routes/app-route";
-import { getAccessToken, removeAccessToken } from "../common/auth/token-storage";
 import { usePermissions } from "../common/auth/use-permissions";
 import { useNextQueryParamsRouter } from "../common/routes/use-next-query-params-router";
 
@@ -48,14 +48,29 @@ DateTimeConfig.timeZone = APP_TIMEZONE;
 
 APIConfig.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 
-APIConfig.dynamicHeaders = (): Record<string, string> => {
-  const token = getAccessToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+/*
+ * No dynamicHeaders. The session is an HttpOnly cookie the browser attaches to
+ * every same-origin request by itself — `fetch` defaults to
+ * `credentials: "same-origin"`, and this app's API is same-origin.
+ *
+ * There is deliberately nothing here to read a token from. That is the point of
+ * the architecture: a credential JavaScript can attach is a credential
+ * JavaScript can leak.
+ */
 
 APIConfig.onUnauthorized = () => {
-  removeAccessToken();
-  queryClient.clear();
+  /*
+   * Nothing local to remove — the cookie is HttpOnly and only the backend can
+   * clear it. A 401 means it is already invalid, expired, or gone.
+   *
+   * `clearAuthenticatedQueries`, never `queryClient.clear()`. The handler runs
+   * while the response that triggered it is still being processed, so a plain
+   * clear removes that query mid-flight and anything gating on `isLoading`
+   * waits forever — see the toolkit function's own doc comment for the trace
+   * and for the two fixes that do not work.
+   */
+  clearAuthenticatedQueries(queryClient);
+
   // Avoid a redirect loop when the failing request originates from the
   // login page itself (e.g. a wrong-password attempt is also a 401).
   if (typeof window !== "undefined" && window.location.pathname !== AppRoute.login) {

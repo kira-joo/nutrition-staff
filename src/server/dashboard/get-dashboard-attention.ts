@@ -13,7 +13,11 @@ import {
   STALE_MEASUREMENT_DAYS,
 } from "src/server/dashboard/dashboard.constants";
 import { resolveDashboardPermissions } from "src/server/dashboard/dashboard-permissions.util";
-import { resolveScopedClientProfileIds, withAssignedStaffWhere, withScopedClientWhere } from "src/server/dashboard/dashboard-scope.util";
+import {
+  resolveScopedClientProfileIds,
+  withAssignedStaffWhere,
+  withScopedClientWhere,
+} from "src/server/dashboard/dashboard-scope.util";
 import { DashboardQueryDto } from "src/server/dashboard/dto/dashboard-query.dto";
 import { nutritionAssessmentRepository } from "src/server/assessments/nutrition-assessments.repository";
 import { nutritionCalculationRepository } from "src/server/nutrition-calculations/nutrition-calculations.repository";
@@ -52,7 +56,10 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
   const [activeClients, nonTerminalClients] = await Promise.all([
     getActiveClients(assignedToUserId),
     clientProfileRepository.findAll({
-      where: withAssignedStaffWhere({ lifecycle: { $nin: [ClientLifecycle.COMPLETED, ClientLifecycle.LOST] } }, assignedToUserId),
+      where: withAssignedStaffWhere(
+        { lifecycle: { $nin: [ClientLifecycle.COMPLETED, ClientLifecycle.LOST] } },
+        assignedToUserId,
+      ),
       relations: ["userId"],
     }) as unknown as Promise<Client[]>,
   ]);
@@ -63,7 +70,13 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
       const baseline = client.lastContactedAt ? new Date(client.lastContactedAt) : new Date(client.createdAt);
       return baseline < contactThreshold;
     })
-    .map((client) => toAttentionItem(client, "not_contacted_recently", client.lastContactedAt ? `Last contacted ${client.lastContactedAt}` : "Never contacted"));
+    .map((client) =>
+      toAttentionItem(
+        client,
+        "not_contacted_recently",
+        client.lastContactedAt ? `Last contacted ${client.lastContactedAt}` : "Never contacted",
+      ),
+    );
 
   // Same "one batched query for the whole set, not per row" shape as the
   // measurement/assessment checks below — needed so `hasMeasurement` (now a
@@ -76,13 +89,24 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
     select: { clientProfileId: true },
   });
   const hasMeasurementByClient = new Set(
-    (measurementsForCompleteness as unknown as { clientProfileId: unknown }[]).map((row) => String(row.clientProfileId))
+    (measurementsForCompleteness as unknown as { clientProfileId: unknown }[]).map((row) =>
+      String(row.clientProfileId),
+    ),
   );
 
   attention.incompleteProfile = nonTerminalClients.reduce<DashboardAttentionItem[]>((items, client) => {
-    const completeness = calculateProfileCompleteness({ ...client, hasMeasurement: hasMeasurementByClient.has(String(client._id)) });
+    const completeness = calculateProfileCompleteness({
+      ...client,
+      hasMeasurement: hasMeasurementByClient.has(String(client._id)),
+    });
     if (completeness.completed / completeness.total < INCOMPLETE_PROFILE_MAX_RATIO) {
-      items.push(toAttentionItem(client, "incomplete_profile", `${completeness.completed}/${completeness.total} profile fields filled`));
+      items.push(
+        toAttentionItem(
+          client,
+          "incomplete_profile",
+          `${completeness.completed}/${completeness.total} profile fields filled`,
+        ),
+      );
     }
     return items;
   }, []);
@@ -111,7 +135,11 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
       })
       .map((client) => {
         const latest = latestMeasurementByClient.get(String(client._id));
-        return toAttentionItem(client, "no_recent_measurement", latest ? `Last measured ${latest.toISOString()}` : "No measurement recorded yet");
+        return toAttentionItem(
+          client,
+          "no_recent_measurement",
+          latest ? `Last measured ${latest.toISOString()}` : "No measurement recorded yet",
+        );
       });
   }
 
@@ -121,7 +149,9 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
       where: { clientProfileId: { $in: activeClientIds } },
       select: { clientProfileId: true },
     });
-    const hasAssessment = new Set((assessments as unknown as { clientProfileId: string }[]).map((row) => String(row.clientProfileId)));
+    const hasAssessment = new Set(
+      (assessments as unknown as { clientProfileId: string }[]).map((row) => String(row.clientProfileId)),
+    );
 
     const assessmentThreshold = daysAgo(NO_ASSESSMENT_GRACE_DAYS);
     attention.noAssessment = activeClients
@@ -143,17 +173,22 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
       select: { measurementId: true },
     });
     const hasCalculation = new Set(
-      (calculationsWithMeasurement as unknown as { measurementId?: string }[]).map((row) => String(row.measurementId))
+      (calculationsWithMeasurement as unknown as { measurementId?: string }[]).map((row) => String(row.measurementId)),
     );
 
-    const flaggedMeasurements = (staleMeasurements as unknown as { _id: string; clientProfileId: string; measuredAt: string }[]).filter(
-      (measurement) => !hasCalculation.has(String(measurement._id))
-    );
+    const flaggedMeasurements = (
+      staleMeasurements as unknown as { _id: string; clientProfileId: string; measuredAt: string }[]
+    ).filter((measurement) => !hasCalculation.has(String(measurement._id)));
 
-    const flaggedClientIds = [...new Set(flaggedMeasurements.map((measurement) => String(measurement.clientProfileId)))];
+    const flaggedClientIds = [
+      ...new Set(flaggedMeasurements.map((measurement) => String(measurement.clientProfileId))),
+    ];
     const flaggedClients =
       flaggedClientIds.length > 0
-        ? ((await clientProfileRepository.findAll({ where: { _id: { $in: flaggedClientIds } }, relations: ["userId"] })) as unknown as Client[])
+        ? ((await clientProfileRepository.findAll({
+            where: { _id: { $in: flaggedClientIds } },
+            relations: ["userId"],
+          })) as unknown as Client[])
         : [];
     const clientById = new Map(flaggedClients.map((client) => [String(client._id), client]));
 
@@ -161,7 +196,11 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
       .map((measurement) => {
         const client = clientById.get(String(measurement.clientProfileId));
         if (!client) return null;
-        return toAttentionItem(client, "measurement_without_calculation", `Measured ${measurement.measuredAt}, no calculation since`);
+        return toAttentionItem(
+          client,
+          "measurement_without_calculation",
+          `Measured ${measurement.measuredAt}, no calculation since`,
+        );
       })
       .filter((item): item is DashboardAttentionItem => item !== null);
   }
@@ -169,6 +208,10 @@ export async function getDashboardAttention(query: DashboardQueryDto, user: Auth
   return attention;
 }
 
-function toAttentionItem(client: Client, reason: DashboardAttentionItem["reason"], detail: string): DashboardAttentionItem {
+function toAttentionItem(
+  client: Client,
+  reason: DashboardAttentionItem["reason"],
+  detail: string,
+): DashboardAttentionItem {
   return { reason, clientProfileId: String(client._id), clientName: client.userId.name, detail };
 }

@@ -25,7 +25,11 @@ import { validateBookForPublish } from "./validate-book-for-publish";
 // deliberate one). ARCHIVED stays excluded on purpose: un-archiving is
 // its own explicit, separate action (ARCHIVED -> DRAFT), not something a
 // publish attempt should silently do on a book's behalf.
-const PUBLISHABLE_STATUSES: readonly BookStatus[] = [BookStatus.DRAFT, BookStatus.READY_FOR_REVIEW, BookStatus.PUBLISHED];
+const PUBLISHABLE_STATUSES: readonly BookStatus[] = [
+  BookStatus.DRAFT,
+  BookStatus.READY_FOR_REVIEW,
+  BookStatus.PUBLISHED,
+];
 
 /**
  * Publish, in order (matches the approved architecture):
@@ -100,7 +104,7 @@ export async function publishBookEdition(bookId: string, publishedByUserId: stri
         lastPublishedAt: publishedAt,
         editionCount: editionNumber,
         revision: dto.expectedRevision + 1,
-      }
+      },
     );
     return { book: updatedBook, edition };
   } catch (error) {

@@ -5,7 +5,11 @@ import { assertBookSizeBudget } from "src/server/books/assert-book-size-budget";
 import { assertBookBlockLimits } from "src/server/books/blocks/assert-book-block-limits";
 import { assertBookBlockReferencesValid } from "src/server/books/blocks/assert-book-block-references-valid";
 import { BOOK_BLOCK_ASSET_FOLDER, getBookBlockAssetFields } from "src/server/books/blocks/book-block-asset-fields";
-import { BlockContainerRef, getContainerBlocks, withContainerBlocks } from "src/server/books/blocks/resolve-block-container";
+import {
+  BlockContainerRef,
+  getContainerBlocks,
+  withContainerBlocks,
+} from "src/server/books/blocks/resolve-block-container";
 import { assertValidBlockType, validateBookBlock } from "src/server/books/blocks/validate-book-block";
 import { ExpectedRevisionDto } from "src/server/books/dto/expected-revision.dto";
 import { bookRepository } from "src/server/books/books.repository";
@@ -27,7 +31,13 @@ export async function addBookBlock(request: NextRequest, bookId: string, contain
   const containerBlocks = getContainerBlocks(book, containerRef);
 
   const assetFields = getBookBlockAssetFields(assertValidBlockType(payload.type));
-  const { uploaded } = await processAssetUploadFields({ files, payload, fields: assetFields, provider: assetProvider, folder: BOOK_BLOCK_ASSET_FOLDER });
+  const { uploaded } = await processAssetUploadFields({
+    files,
+    payload,
+    fields: assetFields,
+    provider: assetProvider,
+    folder: BOOK_BLOCK_ASSET_FOLDER,
+  });
 
   try {
     const dto = (await validateBookBlock(payload)) as Omit<BookBlock, "id" | "order">;
@@ -41,7 +51,10 @@ export async function addBookBlock(request: NextRequest, bookId: string, contain
     assertBookSizeBudget({ ...book, ...patch } as unknown as Record<string, unknown>);
 
     try {
-      return await bookRepository.update({ where: { _id: bookId, contentRevision: expectedRevision } }, { ...patch, contentRevision: expectedRevision + 1 });
+      return await bookRepository.update(
+        { where: { _id: bookId, contentRevision: expectedRevision } },
+        { ...patch, contentRevision: expectedRevision + 1 },
+      );
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ConflictError("This book's content was changed elsewhere. Refresh the page and try again.");

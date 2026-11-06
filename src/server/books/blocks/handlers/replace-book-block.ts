@@ -4,14 +4,28 @@ import type { NextRequest } from "next/server";
 import { assertBookSizeBudget } from "src/server/books/assert-book-size-budget";
 import { assertBookBlockReferencesValid } from "src/server/books/blocks/assert-book-block-references-valid";
 import { BOOK_BLOCK_ASSET_FOLDER, getBookBlockAssetFields } from "src/server/books/blocks/book-block-asset-fields";
-import { BlockContainerRef, getContainerBlocks, withContainerBlocks } from "src/server/books/blocks/resolve-block-container";
+import {
+  BlockContainerRef,
+  getContainerBlocks,
+  withContainerBlocks,
+} from "src/server/books/blocks/resolve-block-container";
 import { validateBookBlock } from "src/server/books/blocks/validate-book-block";
 import { ExpectedRevisionDto } from "src/server/books/dto/expected-revision.dto";
 import { bookRepository } from "src/server/books/books.repository";
-import { assetProvider, destroyReplacedAssets, destroyUploadedAssets, processAssetUploadFields } from "src/server/core/assets";
+import {
+  assetProvider,
+  destroyReplacedAssets,
+  destroyUploadedAssets,
+  processAssetUploadFields,
+} from "src/server/core/assets";
 import type { BookBlock } from "src/common/interfaces/book-block.interface";
 
-export async function replaceBookBlock(request: NextRequest, bookId: string, containerRef: BlockContainerRef, blockId: string) {
+export async function replaceBookBlock(
+  request: NextRequest,
+  bookId: string,
+  containerRef: BlockContainerRef,
+  blockId: string,
+) {
   const { fields, files } = await parseMultipartFormData(request);
   const payload = JSON.parse(fields.payload ?? "{}");
   // See add-book-block.ts for why this is narrowed to one field before validating.
@@ -27,7 +41,13 @@ export async function replaceBookBlock(request: NextRequest, bookId: string, con
   payload.type = previousBlock.type;
 
   const assetFields = getBookBlockAssetFields(previousBlock.type);
-  const { uploaded } = await processAssetUploadFields({ files, payload, fields: assetFields, provider: assetProvider, folder: BOOK_BLOCK_ASSET_FOLDER });
+  const { uploaded } = await processAssetUploadFields({
+    files,
+    payload,
+    fields: assetFields,
+    provider: assetProvider,
+    folder: BOOK_BLOCK_ASSET_FOLDER,
+  });
 
   let saved;
   try {
@@ -41,7 +61,10 @@ export async function replaceBookBlock(request: NextRequest, bookId: string, con
     assertBookSizeBudget({ ...book, ...patch } as unknown as Record<string, unknown>);
 
     try {
-      saved = await bookRepository.update({ where: { _id: bookId, contentRevision: expectedRevision } }, { ...patch, contentRevision: expectedRevision + 1 });
+      saved = await bookRepository.update(
+        { where: { _id: bookId, contentRevision: expectedRevision } },
+        { ...patch, contentRevision: expectedRevision + 1 },
+      );
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ConflictError("This book's content was changed elsewhere. Refresh the page and try again.");

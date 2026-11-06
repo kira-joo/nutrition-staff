@@ -6,7 +6,8 @@
 
 import type { RichTextMark } from "src/common/books/rich-text/rich-text-doc.interface";
 
-export type FragmentKind = "content" | "chapterOpener" | "singlePage" | "tocReservation" | "pageBreakMarker" | "pageFooterNote";
+export type FragmentKind =
+  "content" | "chapterOpener" | "singlePage" | "tocReservation" | "pageBreakMarker" | "pageFooterNote";
 
 /** One contiguous run of identically-marked text — the same granularity a ProseMirror "text" node already has. */
 export interface StreamFragmentRun {

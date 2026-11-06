@@ -33,7 +33,5 @@ export async function getDashboardSourceChart(query: DashboardQueryDto): Promise
     counts.set(label, (counts.get(label) ?? 0) + 1);
   }
 
-  return [...counts.entries()]
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value);
+  return [...counts.entries()].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
 }

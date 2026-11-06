@@ -22,7 +22,11 @@ import assert from "node:assert/strict";
 import puppeteer, { type Browser } from "puppeteer";
 import { renderRichTextToHtml, richTextToParagraphRuns } from "../../src/common/books/rich-text/render-rich-text";
 import { paginateAndRenderBook } from "../../src/server/books/render/paginate-book.browser";
-import type { PaginationInput, PaginationResult, StreamFragment } from "../../src/server/books/render/page-model.interface";
+import type {
+  PaginationInput,
+  PaginationResult,
+  StreamFragment,
+} from "../../src/server/books/render/page-model.interface";
 import type { RichTextDoc } from "../../src/common/books/rich-text/rich-text-doc.interface";
 
 const LEAD_IN = Array.from({ length: 40 }, (_, index) => `lead${index}`).join(" ");
@@ -111,8 +115,9 @@ async function paginateAtHeight(browser: Browser, contentBoxHeightPx: number): P
   try {
     await page.setContent(buildHtml(), { waitUntil: "load" });
     return await page.evaluate(
-      (paginationInput) => (window as unknown as { __paginate__: typeof paginateAndRenderBook }).__paginate__(paginationInput),
-      buildInput(contentBoxHeightPx)
+      (paginationInput) =>
+        (window as unknown as { __paginate__: typeof paginateAndRenderBook }).__paginate__(paginationInput),
+      buildInput(contentBoxHeightPx),
     );
   } finally {
     await page.close();
@@ -124,12 +129,18 @@ function assertLosslessReconstruction(result: PaginationResult, contentBoxHeight
   const allHtml = result.pages.map((renderedPage) => renderedPage.html).join("");
   const reconstituted = normalize(allHtml.replace(/<[^>]+>/g, ""));
   const source = normalize(`${LEAD_IN} ${MARKED_PHRASE} ${TRAILING}`);
-  assert.strictEqual(reconstituted, source, `[height=${contentBoxHeightPx}] reconstructed text across all pages must exactly match the source (no loss/duplication)`);
+  assert.strictEqual(
+    reconstituted,
+    source,
+    `[height=${contentBoxHeightPx}] reconstructed text across all pages must exactly match the source (no loss/duplication)`,
+  );
 }
 
 /** Returns the bold runs found, in page order, each tagged with which page index it's on — or null if the marked phrase wasn't actually split across two different pages at this height. */
 function findMidPhraseSplit(result: PaginationResult): { boldRuns: string[] } | null {
-  const boldRunsByPage = result.pages.map((renderedPage) => [...renderedPage.html.matchAll(/<strong>([^<]*)<\/strong>/g)].map((match) => match[1]));
+  const boldRunsByPage = result.pages.map((renderedPage) =>
+    [...renderedPage.html.matchAll(/<strong>([^<]*)<\/strong>/g)].map((match) => match[1]),
+  );
   const pagesWithBold = boldRunsByPage.filter((runs) => runs.length > 0);
   if (pagesWithBold.length < 2) return null;
 
@@ -144,7 +155,7 @@ function findMidPhraseSplit(result: PaginationResult): { boldRuns: string[] } | 
     result.pages
       .map((renderedPage) => renderedPage.html.replace(/<strong>[^<]*<\/strong>/g, ""))
       .join(" ")
-      .replace(/<[^>]+>/g, "")
+      .replace(/<[^>]+>/g, ""),
   );
   if (nonBoldText.includes("marked")) return null;
   if (concatenated.includes("lead") || concatenated.includes("tail")) return null;
@@ -169,14 +180,17 @@ async function main(): Promise<void> {
 
     assert.ok(
       found,
-      `never observed the marked phrase split across two pages while sweeping content-box heights [${HEIGHTS_TO_TRY.join(", ")}]px — this check cannot confirm marks survive a real page-boundary split`
+      `never observed the marked phrase split across two pages while sweeping content-box heights [${HEIGHTS_TO_TRY.join(", ")}]px — this check cannot confirm marks survive a real page-boundary split`,
     );
 
-    assert.ok(found.boldRuns.length >= 2, "expected at least two separate <strong> runs (one per page) for a genuine mid-phrase split");
+    assert.ok(
+      found.boldRuns.length >= 2,
+      "expected at least two separate <strong> runs (one per page) for a genuine mid-phrase split",
+    );
 
     // eslint-disable-next-line no-console
     console.log(
-      `PASS check-paragraph-mark-split — at height=${found.contentBoxHeightPx}px (${found.pageCount} pages), the marked phrase split into ${found.boldRuns.length} <strong> runs across pages and reassembled exactly: ${found.boldRuns.map((run) => `"${run}"`).join(" + ")}`
+      `PASS check-paragraph-mark-split — at height=${found.contentBoxHeightPx}px (${found.pageCount} pages), the marked phrase split into ${found.boldRuns.length} <strong> runs across pages and reassembled exactly: ${found.boldRuns.map((run) => `"${run}"`).join(" + ")}`,
     );
   } finally {
     await browser.close();

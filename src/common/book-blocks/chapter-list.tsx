@@ -36,9 +36,9 @@ export function ChapterList({ bookId, book, enqueue }: ChapterListProps) {
   const duplicateMutation = useRequesterMutation({ endpoint: duplicateChapterEndpoint });
 
   function handleReorder(orderedIds: string[]): void {
-    enqueue((expectedRevision) => reorderMutation.mutateAsync({ params: { bookId }, body: { chapterIds: orderedIds, expectedRevision } })).catch(
-      (error: { message?: string }) => toast.error(error.message ?? "Failed to reorder chapters")
-    );
+    enqueue((expectedRevision) =>
+      reorderMutation.mutateAsync({ params: { bookId }, body: { chapterIds: orderedIds, expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to reorder chapters"));
   }
 
   async function handleAddChapter(): Promise<void> {
@@ -64,15 +64,15 @@ export function ChapterList({ bookId, book, enqueue }: ChapterListProps) {
       destructive: true,
     });
     if (!confirmed) return;
-    enqueue((expectedRevision) => removeMutation.mutateAsync({ params: { bookId, chapterId }, body: { expectedRevision } })).catch(
-      (error: { message?: string }) => toast.error(error.message ?? "Failed to remove chapter")
-    );
+    enqueue((expectedRevision) =>
+      removeMutation.mutateAsync({ params: { bookId, chapterId }, body: { expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to remove chapter"));
   }
 
   function handleDuplicate(chapterId: string): void {
-    enqueue((expectedRevision) => duplicateMutation.mutateAsync({ params: { bookId, chapterId }, body: { expectedRevision } })).catch(
-      (error: { message?: string }) => toast.error(error.message ?? "Failed to duplicate chapter")
-    );
+    enqueue((expectedRevision) =>
+      duplicateMutation.mutateAsync({ params: { bookId, chapterId }, body: { expectedRevision } }),
+    ).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to duplicate chapter"));
   }
 
   return (
@@ -100,7 +100,13 @@ export function ChapterList({ bookId, book, enqueue }: ChapterListProps) {
       {addingChapter ? (
         <Modal open onOpenChange={() => setAddingChapter(false)} title="Add chapter" size="sm">
           <div className="flex flex-col gap-3">
-            <CustomInput name="title" label="Chapter title" value={newTitle} onChange={(event) => setNewTitle(event.target.value)} dir="rtl" />
+            <CustomInput
+              name="title"
+              label="Chapter title"
+              value={newTitle}
+              onChange={(event) => setNewTitle(event.target.value)}
+              dir="rtl"
+            />
             <CustomButton type="button" onClick={handleAddChapter}>
               Add chapter
             </CustomButton>
@@ -146,7 +152,10 @@ function ChapterRow({
     enqueue((expectedRevision) => {
       const formData = new FormData();
       formData.set("payload", JSON.stringify({ title: value, expectedRevision }));
-      return updateMutation.mutateAsync({ params: { bookId, chapterId }, body: formData as unknown as Record<string, unknown> });
+      return updateMutation.mutateAsync({
+        params: { bookId, chapterId },
+        body: formData as unknown as Record<string, unknown>,
+      });
     }).catch((error: { message?: string }) => toast.error(error.message ?? "Failed to save chapter title"));
   });
 
@@ -155,7 +164,14 @@ function ChapterRow({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <CustomInput name={`chapter-title-${chapterId}`} value={localTitle} onChange={(event) => setLocalTitle(event.target.value)} onBlur={flush} dir="rtl" wrapperClassName="flex-1" />
+        <CustomInput
+          name={`chapter-title-${chapterId}`}
+          value={localTitle}
+          onChange={(event) => setLocalTitle(event.target.value)}
+          onBlur={flush}
+          dir="rtl"
+          wrapperClassName="flex-1"
+        />
         <span className="whitespace-nowrap text-xs text-slate-500">{blockCount} blocks</span>
         <CustomButton type="button" size="icon" variant="ghost" aria-label="Duplicate chapter" onClick={onDuplicate}>
           <Copy className="h-4 w-4" />
@@ -163,7 +179,13 @@ function ChapterRow({
         <CustomButton type="button" size="icon" variant="ghost" aria-label="Remove chapter" onClick={onRemove}>
           <Trash2 className="h-4 w-4 text-red-600" />
         </CustomButton>
-        <CustomButton type="button" size="icon" variant="ghost" aria-label={expanded ? "Collapse" : "Expand"} onClick={onToggle}>
+        <CustomButton
+          type="button"
+          size="icon"
+          variant="ghost"
+          aria-label={expanded ? "Collapse" : "Expand"}
+          onClick={onToggle}
+        >
           {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </CustomButton>
       </div>
@@ -171,7 +193,13 @@ function ChapterRow({
         <div className="flex flex-col gap-3">
           <ChapterSettingsForm bookId={bookId} chapter={chapter} enqueue={enqueue} />
           <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-            <BookBlockList bookId={bookId} book={book} container={{ kind: "chapter", chapterId }} blocks={chapter.blocks} enqueue={enqueue} />
+            <BookBlockList
+              bookId={bookId}
+              book={book}
+              container={{ kind: "chapter", chapterId }}
+              blocks={chapter.blocks}
+              enqueue={enqueue}
+            />
           </div>
         </div>
       ) : null}

@@ -27,20 +27,22 @@ export function useBookContentQueue(initialBook: Book) {
   const queueRef = useRef<Promise<unknown>>(Promise.resolve());
   const [pendingCount, setPendingCount] = useState(0);
 
-  const enqueue = useCallback(<T,>(run: (expectedRevision: number) => Promise<T & Book>): Promise<T & Book> => {
+  const enqueue = useCallback(<T>(run: (expectedRevision: number) => Promise<T & Book>): Promise<T & Book> => {
     setPendingCount((count) => count + 1);
-    const result = queueRef.current.then(() => run(revisionRef.current)).then(
-      (updated) => {
-        revisionRef.current = updated.contentRevision;
-        setBook(updated);
-        setPendingCount((count) => count - 1);
-        return updated;
-      },
-      (error) => {
-        setPendingCount((count) => count - 1);
-        throw error;
-      }
-    );
+    const result = queueRef.current
+      .then(() => run(revisionRef.current))
+      .then(
+        (updated) => {
+          revisionRef.current = updated.contentRevision;
+          setBook(updated);
+          setPendingCount((count) => count - 1);
+          return updated;
+        },
+        (error) => {
+          setPendingCount((count) => count - 1);
+          throw error;
+        },
+      );
     // Swallow the rejection on the SHARED chain (each caller still sees the real rejection via `result`) — otherwise one failed mutation would permanently wedge every later queued call.
     queueRef.current = result.catch(() => undefined);
     return result;

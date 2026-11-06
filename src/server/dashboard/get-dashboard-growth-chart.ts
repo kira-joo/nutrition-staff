@@ -1,7 +1,11 @@
 import type { DashboardGrowthChart } from "src/common/interfaces/dashboard.interface";
 import { clientProfileRepository } from "src/server/clients/client-profiles.repository";
 import { withAssignedStaffWhere } from "src/server/dashboard/dashboard-scope.util";
-import { bucketTimestampsCumulative, resolveBucketGranularity, resolveDashboardRange } from "src/server/dashboard/dashboard-time-buckets.util";
+import {
+  bucketTimestampsCumulative,
+  resolveBucketGranularity,
+  resolveDashboardRange,
+} from "src/server/dashboard/dashboard-time-buckets.util";
 import { DashboardQueryDto } from "src/server/dashboard/dto/dashboard-query.dto";
 
 /**
@@ -17,7 +21,9 @@ export async function getDashboardGrowthChart(query: DashboardQueryDto): Promise
   const granularity = resolveBucketGranularity(range);
 
   const [baselineCount, rowsInRange] = await Promise.all([
-    clientProfileRepository.count({ where: withAssignedStaffWhere({ createdAt: { $lt: range.from } }, assignedToUserId) }),
+    clientProfileRepository.count({
+      where: withAssignedStaffWhere({ createdAt: { $lt: range.from } }, assignedToUserId),
+    }),
     clientProfileRepository.findAll({
       where: withAssignedStaffWhere({ createdAt: { $gte: range.from, $lte: range.to } }, assignedToUserId),
       select: { createdAt: true },

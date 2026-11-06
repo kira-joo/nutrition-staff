@@ -120,21 +120,96 @@ const packagesAr = readClientJson("src/i18n/locales/ar/packages.json") as Record
 // of actual bilingual text below is read live from recipes.json above, never
 // retyped, so there is no transcription risk for the content itself.
 const RECIPE_META: { key: string; image: string; category: string; foodGroup: string[] }[] = [
-  { key: "healthy_koshary", image: "healthy_koshary.jpg", category: "30 Minutes or Less", foodGroup: ["Grains", "Legumes", "Vegetables"] },
-  { key: "molokhia_with_grilled_chicken", image: "molokhia_with_grilled_chicken.jpg", category: "30 Minutes or Less", foodGroup: ["Legumes", "Vegetables"] },
-  { key: "stuffed_zucchini_light", image: "stuffed_zucchini_light.jpg", category: "30 Minutes or Less", foodGroup: ["Vegetables", "Grains"] },
-  { key: "bamia_with_olive_oil", image: "bamia_with_olive_oil.jpg", category: "30 Minutes or Less", foodGroup: ["Vegetables", "Protein"] },
-  { key: "grilled_fish_with_tahini", image: "grilled_fish_with_tahini.jpg", category: "30 Minutes or Less", foodGroup: ["Protein", "Vegetables"] },
-  { key: "light_lentil_soup", image: "light_lentil_soup.jpg", category: "30 Minutes or Less", foodGroup: ["Legumes", "Vegetables"] },
-  { key: "light_potato_tagine", image: "light_potato_tagine.jpg", category: "30 Minutes or Less, Kid-Friendly", foodGroup: ["Vegetables", "Protein"] },
-  { key: "diet_grape_leaves", image: "diet_grape_leaves.jpg", category: "30 Minutes or Less", foodGroup: ["Vegetables", "Grains"] },
-  { key: "diet_tuna_salad", image: "diet_tuna_salad.jpg", category: "30 Minutes or Less", foodGroup: ["Protein", "Vegetables"] },
-  { key: "diet_vegetable_omelette", image: "diet_vegetable_omelette.jpg", category: "30 Minutes or Less", foodGroup: ["Protein", "Vegetables"] },
-  { key: "diet_baked_potatoes", image: "diet_baked_potatoes.jpg", category: "30 Minutes or Less", foodGroup: ["Vegetables", "Carbohydrates"] },
-  { key: "diet_banana_oat_smoothie", image: "diet_banana_oat_smoothie.jpg", category: "30 Minutes or Less", foodGroup: ["Fruits", "Dairy", "Grains"] },
-  { key: "diet_cottage_cheese_avocado_sandwich", image: "diet_cottage_cheese_avocado_sandwich.jpg", category: "30 Minutes or Less", foodGroup: ["Dairy", "Vegetables", "Grains"] },
-  { key: "diet_yogurt_cucumber_salad", image: "diet_yogurt_cucumber_salad.jpg", category: "30 Minutes or Less", foodGroup: ["Dairy", "Vegetables"] },
-  { key: "diet_grilled_chicken_lemon", image: "diet_grilled_chicken_lemon.jpg", category: "30 Minutes or Less", foodGroup: ["Protein", "Vegetables", "Grains"] },
+  {
+    key: "healthy_koshary",
+    image: "healthy_koshary.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Grains", "Legumes", "Vegetables"],
+  },
+  {
+    key: "molokhia_with_grilled_chicken",
+    image: "molokhia_with_grilled_chicken.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Legumes", "Vegetables"],
+  },
+  {
+    key: "stuffed_zucchini_light",
+    image: "stuffed_zucchini_light.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Vegetables", "Grains"],
+  },
+  {
+    key: "bamia_with_olive_oil",
+    image: "bamia_with_olive_oil.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Vegetables", "Protein"],
+  },
+  {
+    key: "grilled_fish_with_tahini",
+    image: "grilled_fish_with_tahini.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Protein", "Vegetables"],
+  },
+  {
+    key: "light_lentil_soup",
+    image: "light_lentil_soup.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Legumes", "Vegetables"],
+  },
+  {
+    key: "light_potato_tagine",
+    image: "light_potato_tagine.jpg",
+    category: "30 Minutes or Less, Kid-Friendly",
+    foodGroup: ["Vegetables", "Protein"],
+  },
+  {
+    key: "diet_grape_leaves",
+    image: "diet_grape_leaves.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Vegetables", "Grains"],
+  },
+  {
+    key: "diet_tuna_salad",
+    image: "diet_tuna_salad.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Protein", "Vegetables"],
+  },
+  {
+    key: "diet_vegetable_omelette",
+    image: "diet_vegetable_omelette.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Protein", "Vegetables"],
+  },
+  {
+    key: "diet_baked_potatoes",
+    image: "diet_baked_potatoes.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Vegetables", "Carbohydrates"],
+  },
+  {
+    key: "diet_banana_oat_smoothie",
+    image: "diet_banana_oat_smoothie.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Fruits", "Dairy", "Grains"],
+  },
+  {
+    key: "diet_cottage_cheese_avocado_sandwich",
+    image: "diet_cottage_cheese_avocado_sandwich.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Dairy", "Vegetables", "Grains"],
+  },
+  {
+    key: "diet_yogurt_cucumber_salad",
+    image: "diet_yogurt_cucumber_salad.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Dairy", "Vegetables"],
+  },
+  {
+    key: "diet_grilled_chicken_lemon",
+    image: "diet_grilled_chicken_lemon.jpg",
+    category: "30 Minutes or Less",
+    foodGroup: ["Protein", "Vegetables", "Grains"],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -146,14 +221,18 @@ async function ensureByTitleEn(
   title: Localized,
   extra: Record<string, unknown>,
   existingCache: Map<string, { _id: string; title: Localized }>,
-  counters: { created: number; matched: number }
+  counters: { created: number; matched: number },
 ): Promise<string> {
   const found = existingCache.get(title.en);
   if (found) {
     counters.matched++;
     return found._id;
   }
-  const created = await apiJson<{ _id: string; title: Localized }>(endpoint, "POST", { title, status: ContentStatus.PUBLISHED, ...extra });
+  const created = await apiJson<{ _id: string; title: Localized }>(endpoint, "POST", {
+    title,
+    status: ContentStatus.PUBLISHED,
+    ...extra,
+  });
   existingCache.set(title.en, created);
   counters.created++;
   return created._id;
@@ -199,7 +278,10 @@ function toLocalizedLines(en: string[], ar: string[]): Localized[] {
   return en.map((line, i) => ({ en: line, ar: ar[i] }));
 }
 
-async function migrateRecipes(categoryIdByKey: Map<string, string>, foodGroupIdByKey: Map<string, string>): Promise<void> {
+async function migrateRecipes(
+  categoryIdByKey: Map<string, string>,
+  foodGroupIdByKey: Map<string, string>,
+): Promise<void> {
   const recipesEnMap = recipesEn.recipes as Record<string, any>;
   const recipesArMap = recipesAr.recipes as Record<string, any>;
   report.recipes.source = RECIPE_META.length;
@@ -275,7 +357,7 @@ function parseFaqSource(en: Record<string, string>, ar: Record<string, string>) 
     ...new Set(
       Object.keys(en)
         .map((k) => k.match(/^section(\d+)\.title$/)?.[1])
-        .filter((n): n is string => Boolean(n))
+        .filter((n): n is string => Boolean(n)),
     ),
   ].sort((a, b) => Number(a) - Number(b));
 
@@ -285,7 +367,7 @@ function parseFaqSource(en: Record<string, string>, ar: Record<string, string>) 
       ...new Set(
         Object.keys(en)
           .map((k) => k.match(new RegExp(`^section${num}\\.q(\\d+)\\.question$`))?.[1])
-          .filter((n): n is string => Boolean(n))
+          .filter((n): n is string => Boolean(n)),
       ),
     ].sort((a, b) => Number(a) - Number(b));
 
@@ -308,7 +390,8 @@ async function migrateFaq(): Promise<void> {
   const sectionCache = new Map(existingSections.map((s) => [s.title.en, s]));
 
   for (const section of sections) {
-    if (!section.title.en || !section.title.ar) throw new Error(`FAQ section missing a translation: ${JSON.stringify(section.title)}`);
+    if (!section.title.en || !section.title.ar)
+      throw new Error(`FAQ section missing a translation: ${JSON.stringify(section.title)}`);
 
     let sectionId: string;
     const cached = sectionCache.get(section.title.en);
@@ -328,13 +411,15 @@ async function migrateFaq(): Promise<void> {
     }
 
     const existingItems = await listAll<{ _id: string; question: Localized; section: string | { _id: string } }>(
-      `/api/faq-items?section=${sectionId}`
+      `/api/faq-items?section=${sectionId}`,
     );
     const itemCache = new Map(existingItems.map((i) => [i.question.en, i]));
 
     for (const item of section.items) {
       if (!item.question.en || !item.question.ar || !item.answer.en || !item.answer.ar) {
-        throw new Error(`FAQ item missing a translation under section "${section.title.en}": ${JSON.stringify(item.question)}`);
+        throw new Error(
+          `FAQ item missing a translation under section "${section.title.en}": ${JSON.stringify(item.question)}`,
+        );
       }
       if (itemCache.has(item.question.en)) {
         report.faqItems.matched++;
@@ -409,7 +494,7 @@ async function migratePackages(): Promise<void> {
       ...new Set(
         Object.keys(en)
           .map((k) => k.match(/^detail(\d+)$/)?.[1])
-          .filter((n): n is string => Boolean(n))
+          .filter((n): n is string => Boolean(n)),
       ),
     ].sort((a, b) => Number(a) - Number(b));
     const details: Localized[] = detailNumbers.map((n) => ({ en: en[`detail${n}`], ar: ar[`detail${n}`] }));
@@ -422,7 +507,7 @@ async function migratePackages(): Promise<void> {
           originalPrice: parsePricingTier(en.originalPrice, ar.originalPrice, d),
           price: parsePricingTier(en.price, ar.price, d),
         },
-      ])
+      ]),
     );
 
     await apiJson("/api/packages", "POST", {
@@ -453,8 +538,7 @@ async function migratePackages(): Promise<void> {
 // Facebook testimonial quote), so this is imported as Draft with `en: ""`
 // per the migration rule: never invent a translation to force a publish.
 const DEMO_REVIEW = {
-  contentAr:
-    "حرفيا احنا عملنا إنجاز من 43 كيلو وجرثومة معدة ل 53 زياده صحية بدون دهون ولا شكل جسم مش صحي بفضل الله ♥️",
+  contentAr: "حرفيا احنا عملنا إنجاز من 43 كيلو وجرثومة معدة ل 53 زياده صحية بدون دهون ولا شكل جسم مش صحي بفضل الله ♥️",
   sourceUrl: "https://www.facebook.com/share/p/5wQbix2K6zmaPXp8/",
   image: "image1.jpg",
 };
@@ -497,7 +581,9 @@ async function migrateDemoReview(): Promise<void> {
     throw new Error(`Failed to create demo review: ${res.status} ${JSON.stringify(body)}`);
   }
   report.reviews.created++;
-  report.draftRecords.push(`Review ${body._id} (sourceUrl: ${DEMO_REVIEW.sourceUrl}) — no English translation exists in source`);
+  report.draftRecords.push(
+    `Review ${body._id} (sourceUrl: ${DEMO_REVIEW.sourceUrl}) — no English translation exists in source`,
+  );
   console.log(`  created demo review (Draft, no EN translation in source): ${body._id}`);
 }
 

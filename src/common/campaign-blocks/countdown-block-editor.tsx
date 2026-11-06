@@ -37,7 +37,9 @@ export function CountdownBlockEditor({ defaultValues, endpoint, submitParams, on
         targetDate: defaultValues?.targetDate ?? "",
         expiredLabel: defaultValues?.expiredLabel ?? EMPTY_LOCALIZED,
       }}
-      transformValues={(values) => ({ ...values, type: CampaignBlockType.COUNTDOWN }) as unknown as Record<string, unknown>}
+      transformValues={(values) =>
+        ({ ...values, type: CampaignBlockType.COUNTDOWN }) as unknown as Record<string, unknown>
+      }
       submitEndpoint={endpoint}
       submitParams={submitParams}
       onSuccess={() => {

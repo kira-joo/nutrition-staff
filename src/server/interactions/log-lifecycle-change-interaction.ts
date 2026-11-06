@@ -6,7 +6,7 @@ export async function logLifecycleChangeInteraction(
   clientProfileId: string,
   from: ClientLifecycle,
   to: ClientLifecycle,
-  actingUserId: string
+  actingUserId: string,
 ) {
   await clientInteractionRepository.save({
     clientProfileId,

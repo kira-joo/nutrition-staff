@@ -29,7 +29,7 @@ export function calculateBmr(params: CalculateBmrParams) {
       const value = Math.round(
         sex === Gender.MALE
           ? 13.397 * weightKg + 4.799 * heightCm - 5.677 * ageYears + 88.362
-          : 9.247 * weightKg + 3.098 * heightCm - 4.33 * ageYears + 447.593
+          : 9.247 * weightKg + 3.098 * heightCm - 4.33 * ageYears + 447.593,
       );
       return { value, unit: "kcal/day", formula: "harris-benedict-revised", formulaVersion: "1984" };
     }

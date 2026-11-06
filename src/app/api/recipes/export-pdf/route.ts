@@ -60,7 +60,9 @@ export async function POST(request: NextRequest) {
 
     // Preserve the order the client selected them in, not the DB's order.
     const recipesById = new Map(recipes.map((recipe) => [recipe._id.toString(), recipe]));
-    const orderedRecipes = dto.ids.map((id) => recipesById.get(id)).filter((recipe): recipe is PopulatedRecipe => Boolean(recipe));
+    const orderedRecipes = dto.ids
+      .map((id) => recipesById.get(id))
+      .filter((recipe): recipe is PopulatedRecipe => Boolean(recipe));
 
     const html = await buildRecipesPdfHtml(orderedRecipes);
     const pdf = await renderHtmlToPdf(html);

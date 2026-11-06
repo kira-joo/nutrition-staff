@@ -28,13 +28,13 @@ premature abstraction that gestures at this problem without solving it.
 
 Neither pure approach works.
 
-| Approach | Why it fails alone |
-|---|---|
-| **Code-only** (a module per specialty, compiled in) | Cannot express "this clinic wants an extra field on its intake form" without a release. Every customer request becomes a code change. |
+| Approach                                                   | Why it fails alone                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Code-only** (a module per specialty, compiled in)        | Cannot express "this clinic wants an extra field on its intake form" without a release. Every customer request becomes a code change.                                                                                                                |
 | **Data-only** (everything is a configurable form template) | Cannot express the nutrition calculation engine, its versioned formulas, its safety floors, or its typed provenance chain. Reduces real clinical logic to a form builder, and the audit found that engine is the most valuable IP in the repository. |
 
-**The split, stated as a rule:** *typed behaviour is code; the long tail of
-fields is data.*
+**The split, stated as a rule:** _typed behaviour is code; the long tail of
+fields is data._
 
 - A vertical contributes **code** for: structured observation definitions,
   calculators and clinical algorithms, typed encounter sections with their own
@@ -96,7 +96,7 @@ export function resolveObservationDefinition(key: string): ObservationDefinition
 
 ```ts
 export interface EncounterSectionDefinition<TPayload = unknown> {
-  readonly key: string;                       // "nutrition.assessment"
+  readonly key: string; // "nutrition.assessment"
   readonly label: string;
   readonly verticalKey: string;
   /** class-validator DTO. The platform runs it; it does not know the fields. */
@@ -104,7 +104,7 @@ export interface EncounterSectionDefinition<TPayload = unknown> {
   /** Renderer id resolved by the frontend's section-component registry. */
   readonly rendererId: string;
   readonly appliesTo?: { encounterTypes?: EncounterType[]; appointmentTypeCodes?: string[] };
-  readonly signRequirements?: (payload: TPayload) => string[];  // blocking reasons
+  readonly signRequirements?: (payload: TPayload) => string[]; // blocking reasons
 }
 ```
 
@@ -115,7 +115,7 @@ export interface EncounterSectionDefinition<TPayload = unknown> {
 
 **`schemaVersion` is not optional and was missing from the first draft.** A
 payload written against DTO v1 will eventually be read by a renderer and a
-`signRequirements` function from v3. Stable section *keys* do not solve schema
+`signRequirements` function from v3. Stable section _keys_ do not solve schema
 evolution — only a persisted version does. Each `EncounterSectionDefinition`
 therefore declares `version`, retains validators and renderers for every version
 still present in data, and a version bump ships with an explicit migration or an
@@ -131,7 +131,7 @@ The platform's `PUT /api/encounters/:id/sections/:key` route:
    `validateDto` from `backend-toolkit-core`, unchanged.
 4. Writes the payload into the array.
 
-So there is exactly one section *route* for every specialty forever. No
+So there is exactly one section _route_ for every specialty forever. No
 `platform/` file mentions nutrition, and adding a vertical adds no routes.
 
 **But "exactly one write path" was false as originally stated,** and the review
@@ -235,14 +235,14 @@ formulas, safety floors, or typed provenance without one.
 
 Detailed in [13](13-nutrition-vertical.md). In summary:
 
-| Nutrition asset today | Becomes |
-|---|---|
-| `NutritionAssessment` (33 fields) | encounter section `nutrition.assessment`, DTO unchanged, collection retained for history and for the `previousAssessmentId` chain |
-| `ClientMeasurement`'s 11 anthropometric fields | 10 registered `ObservationDefinition`s (weight/height/BMI go to the platform) |
-| `NutritionCalculation` + `engine/` (10 files) | a vertical-owned collection plus 4 registered calculators. **The engine files move byte-identical** and finally get tests |
-| 8 nutrition enums in `src/common/enums/` | move into the vertical; nothing in `platform/` imports them |
-| 3 nutrition dashboard attention lists | contributed `dashboardWidgets` |
-| Recipes | the vertical's `patient-education` module |
+| Nutrition asset today                          | Becomes                                                                                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `NutritionAssessment` (33 fields)              | encounter section `nutrition.assessment`, DTO unchanged, collection retained for history and for the `previousAssessmentId` chain |
+| `ClientMeasurement`'s 11 anthropometric fields | 10 registered `ObservationDefinition`s (weight/height/BMI go to the platform)                                                     |
+| `NutritionCalculation` + `engine/` (10 files)  | a vertical-owned collection plus 4 registered calculators. **The engine files move byte-identical** and finally get tests         |
+| 8 nutrition enums in `src/common/enums/`       | move into the vertical; nothing in `platform/` imports them                                                                       |
+| 3 nutrition dashboard attention lists          | contributed `dashboardWidgets`                                                                                                    |
+| Recipes                                        | the vertical's `patient-education` module                                                                                         |
 
 ## Explicitly out of scope
 
@@ -268,8 +268,7 @@ Detailed in [13](13-nutrition-vertical.md). In summary:
 - **A vertical hook throwing during `onEncounterSigned`** → the signing
   transaction aborts. A vertical can therefore block a clinical action, which is
   intended (its `signRequirements` exist for exactly that) and must be
-  documented, tested, and surfaced to the user as a specific reason rather than a
-  500.
+  documented, tested, and surfaced to the user as a specific reason rather than a 500.
 
 ## Testing strategy
 
@@ -282,7 +281,7 @@ Detailed in [13](13-nutrition-vertical.md). In summary:
 - A generic encounter update containing `sections` is **rejected** (400), not
   silently accepted or stripped.
 - A raw write of an unregistered section key fails at the schema validator.
-- `signRequirements` is evaluated against the *persisted* section version, so a
+- `signRequirements` is evaluated against the _persisted_ section version, so a
   deployment does not retroactively change whether a signed encounter was valid.
 - The section route: unknown key → 404; disabled vertical → 403; invalid payload
   → 400 with per-field errors; valid payload → persisted and re-readable.
@@ -319,16 +318,16 @@ Phase 8 ([13](13-nutrition-vertical.md)) is the first consumer.
 
 **Reviewed 2026-08-22. Verdict on the original design: FATALLY FLAWED. Amended.**
 
-| # | Finding | Sev | Analysis | Resolution |
-|---|---|---|---|---|
-| 1 | `sections.payload` as unconstrained `Mixed` is the same defect as `NutritionCalculation.inputs/results`, moved behind a convention — route validation helps, the database invariant remains unenforced. | CRITICAL | Substantially correct. Route-level validation is real protection against the API surface and no protection at all against migrations, seeds, imports and bulk writes. | **Accepted.** Three enforcement layers added, the load-bearing one being a **schema-level validator** — the only layer nothing bypasses. |
-| 2 | "Exactly one write path" is false: `save`, generic updates, raw Mongoose, migrations, seeds, imports, tests, and the newly-planned `bulkWrite`/`updateMany` all bypass it. | CRITICAL | Correct, and the plan was adding bypasses in the same programme. | **Accepted.** `sections` excluded from the generic update DTO (rejected by `forbidNonWhitelisted`), a boundary rule confining writes to one service, plus the schema validator. |
-| 3 | class-validator is not a complete unknown-object boundary unless nested validation, whitelist, `forbidNonWhitelisted` and `forbidUnknownValues` are all configured. | MAJOR | Correct. `validateDto` already sets whitelist and `forbidNonWhitelisted`; nested and unknown-value behaviour was assumed rather than specified. | **Accepted.** Specified centrally and asserted by test. |
-| 4 | **Section schema versions are absent** — a v1 payload read by a v3 renderer. | CRITICAL | Correct, and a clear miss. Stable keys do not solve evolution. | **Accepted.** `schemaVersion` is now mandatory on every persisted section, with versioned validators and renderers and explicit upcasts. |
-| 5 | `signRequirements(payload)` is current code, not the rules in force when the encounter was signed. | MAJOR | Correct — a deployment could retroactively change whether a signed record was valid. | **Accepted.** Signing evaluates against the persisted section version, and the definition version is snapshotted on the encounter. |
-| 6 | The read-only-after-disable promise cannot be kept if the vertical's code is removed, since the renderer lives in it. | MAJOR | Correct. The draft conflated "disabled" with "removed". | **Accepted.** Two distinct cases; removal now requires persisting a canonical rendering snapshot first. |
-| 7 | A code registry plus a DB template creates two authorities that can drift; for one built-in vertical, typed collections and routes would be simpler. | MAJOR | Half accepted. The drift risk is real and is now addressed. But specialty extensibility is the product requirement that makes this sellable to a non-nutrition clinic, so collapsing to typed-collections-per-specialty defeats the purpose. | **Accepted in part.** Drift addressed by versioning and by making a template referencing an unknown definition a startup error. And the largest nutrition payload — `NutritionAssessment` — **stays a typed collection**, not a section payload, so the highest-value clinical data is not behind `Mixed` at all. Sections carry the long tail. |
+| #   | Finding                                                                                                                                                                                                 | Sev      | Analysis                                                                                                                                                                                                                                     | Resolution                                                                                                                                                                                                                                                                                                                                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `sections.payload` as unconstrained `Mixed` is the same defect as `NutritionCalculation.inputs/results`, moved behind a convention — route validation helps, the database invariant remains unenforced. | CRITICAL | Substantially correct. Route-level validation is real protection against the API surface and no protection at all against migrations, seeds, imports and bulk writes.                                                                        | **Accepted.** Three enforcement layers added, the load-bearing one being a **schema-level validator** — the only layer nothing bypasses.                                                                                                                                                                                                        |
+| 2   | "Exactly one write path" is false: `save`, generic updates, raw Mongoose, migrations, seeds, imports, tests, and the newly-planned `bulkWrite`/`updateMany` all bypass it.                              | CRITICAL | Correct, and the plan was adding bypasses in the same programme.                                                                                                                                                                             | **Accepted.** `sections` excluded from the generic update DTO (rejected by `forbidNonWhitelisted`), a boundary rule confining writes to one service, plus the schema validator.                                                                                                                                                                 |
+| 3   | class-validator is not a complete unknown-object boundary unless nested validation, whitelist, `forbidNonWhitelisted` and `forbidUnknownValues` are all configured.                                     | MAJOR    | Correct. `validateDto` already sets whitelist and `forbidNonWhitelisted`; nested and unknown-value behaviour was assumed rather than specified.                                                                                              | **Accepted.** Specified centrally and asserted by test.                                                                                                                                                                                                                                                                                         |
+| 4   | **Section schema versions are absent** — a v1 payload read by a v3 renderer.                                                                                                                            | CRITICAL | Correct, and a clear miss. Stable keys do not solve evolution.                                                                                                                                                                               | **Accepted.** `schemaVersion` is now mandatory on every persisted section, with versioned validators and renderers and explicit upcasts.                                                                                                                                                                                                        |
+| 5   | `signRequirements(payload)` is current code, not the rules in force when the encounter was signed.                                                                                                      | MAJOR    | Correct — a deployment could retroactively change whether a signed record was valid.                                                                                                                                                         | **Accepted.** Signing evaluates against the persisted section version, and the definition version is snapshotted on the encounter.                                                                                                                                                                                                              |
+| 6   | The read-only-after-disable promise cannot be kept if the vertical's code is removed, since the renderer lives in it.                                                                                   | MAJOR    | Correct. The draft conflated "disabled" with "removed".                                                                                                                                                                                      | **Accepted.** Two distinct cases; removal now requires persisting a canonical rendering snapshot first.                                                                                                                                                                                                                                         |
+| 7   | A code registry plus a DB template creates two authorities that can drift; for one built-in vertical, typed collections and routes would be simpler.                                                    | MAJOR    | Half accepted. The drift risk is real and is now addressed. But specialty extensibility is the product requirement that makes this sellable to a non-nutrition clinic, so collapsing to typed-collections-per-specialty defeats the purpose. | **Accepted in part.** Drift addressed by versioning and by making a template referencing an unknown definition a startup error. And the largest nutrition payload — `NutritionAssessment` — **stays a typed collection**, not a section payload, so the highest-value clinical data is not behind `Mixed` at all. Sections carry the long tail. |
 
 **Still open:** whether `EncounterTemplate`'s custom-field values should also
 carry a version, or whether template-driven fields are inherently
-schema-versionless because the template *is* the schema.
+schema-versionless because the template _is_ the schema.

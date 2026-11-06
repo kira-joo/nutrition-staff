@@ -7,7 +7,11 @@ import {
   startOfMonthInZone,
   startOfWeekInZone,
 } from "@kira-joo/toolkit-common";
-import { DAILY_BUCKET_MAX_DAYS, DEFAULT_RANGE_DAYS, WEEKLY_BUCKET_MAX_DAYS } from "src/server/dashboard/dashboard.constants";
+import {
+  DAILY_BUCKET_MAX_DAYS,
+  DEFAULT_RANGE_DAYS,
+  WEEKLY_BUCKET_MAX_DAYS,
+} from "src/server/dashboard/dashboard.constants";
 
 export type BucketGranularity = "day" | "week" | "month";
 
@@ -87,7 +91,11 @@ export interface ChartDataPoint {
  * that day," not a missing data point a line chart should visually skip
  * over (which would misleadingly connect two distant points).
  */
-export function bucketTimestamps(timestamps: Date[], range: DashboardDateRange, granularity: BucketGranularity): ChartDataPoint[] {
+export function bucketTimestamps(
+  timestamps: Date[],
+  range: DashboardDateRange,
+  granularity: BucketGranularity,
+): ChartDataPoint[] {
   const counts = new Map<string, number>();
   for (const timestamp of timestamps) {
     const key = bucketKey(truncateToBucketStart(timestamp, granularity));
@@ -100,7 +108,12 @@ export function bucketTimestamps(timestamps: Date[], range: DashboardDateRange, 
 }
 
 /** Same as `bucketTimestamps`, but each bucket holds the running total up to and including it — for a cumulative growth line. */
-export function bucketTimestampsCumulative(timestamps: Date[], range: DashboardDateRange, granularity: BucketGranularity, baselineCount: number): ChartDataPoint[] {
+export function bucketTimestampsCumulative(
+  timestamps: Date[],
+  range: DashboardDateRange,
+  granularity: BucketGranularity,
+  baselineCount: number,
+): ChartDataPoint[] {
   const series = bucketTimestamps(timestamps, range, granularity);
   let running = baselineCount;
   return series.map((point) => {

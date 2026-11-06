@@ -16,13 +16,21 @@ export const getBookEditionsEndpoint: Endpoint<{ params: { id: string }; returnT
   methodType: MethodType.GET,
 };
 
-export const getBookEditionByIdEndpoint: Endpoint<{ params: { id: string; editionId: string }; returnType: BookEdition }> = {
+export const getBookEditionByIdEndpoint: Endpoint<{
+  params: { id: string; editionId: string };
+  returnType: BookEdition;
+}> = {
   url: "/books/:id/editions/:editionId",
   methodType: MethodType.GET,
 };
 
 export const publishBookEditionEndpoint: Endpoint<{
   params: { id: string };
-  body: { expectedRevision: number; expectedContentRevision: number; acknowledgedWarningCodes?: string[]; notes?: string };
+  body: {
+    expectedRevision: number;
+    expectedContentRevision: number;
+    acknowledgedWarningCodes?: string[];
+    notes?: string;
+  };
   returnType: { book: unknown; edition: BookEdition };
 }> = { url: "/books/:id/editions", methodType: MethodType.POST };

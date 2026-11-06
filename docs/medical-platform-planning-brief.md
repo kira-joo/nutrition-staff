@@ -12,14 +12,14 @@ Before planning anything, fully inspect the workspace instructions and relevant 
 
 At minimum, read and understand:
 
-* root `CLAUDE.md`
-* root `.claude/settings.json`
-* relevant workspace skills
-* `nutrition-staff/CLAUDE.md`
-* `nutrition-client/CLAUDE.md` where relevant
-* the current `nutrition-staff` architecture and source tree
-* existing documentation/plans/handoff files
-* all shared frontend/backend toolkit repositories used by the project
+- root `CLAUDE.md`
+- root `.claude/settings.json`
+- relevant workspace skills
+- `nutrition-staff/CLAUDE.md`
+- `nutrition-client/CLAUDE.md` where relevant
+- the current `nutrition-staff` architecture and source tree
+- existing documentation/plans/handoff files
+- all shared frontend/backend toolkit repositories used by the project
 
 Do not assume the current structure is correct just because it exists.
 
@@ -47,27 +47,27 @@ The shared packages are foundational infrastructure, not frozen third-party depe
 
 Audit all relevant shared packages before introducing app-local abstractions:
 
-* frontend toolkit packages
-* backend toolkit packages
-* toolkit-common
-* any other workspace package currently used by the apps
+- frontend toolkit packages
+- backend toolkit packages
+- toolkit-common
+- any other workspace package currently used by the apps
 
 If a generic capability needed by this product does not exist, prefer improving/extending the appropriate shared package and publishing/adopting the new version rather than adding a duplicate local mechanism.
 
 Examples of areas that may belong in packages if generic enough:
 
-* richer permissions / authorization primitives
-* scoped access control
-* audit/event helpers
-* reusable timeline primitives
-* advanced table/filter/search primitives
-* dialogs/drawers
-* command/search interfaces
-* resource scheduling primitives
-* generic cards, layouts, sections, skeletons
-* route-safe links
-* accessibility helpers
-* shared API/repository mechanisms
+- richer permissions / authorization primitives
+- scoped access control
+- audit/event helpers
+- reusable timeline primitives
+- advanced table/filter/search primitives
+- dialogs/drawers
+- command/search interfaces
+- resource scheduling primitives
+- generic cards, layouts, sections, skeletons
+- route-safe links
+- accessibility helpers
+- shared API/repository mechanisms
 
 Do not over-generalize.
 
@@ -95,49 +95,49 @@ The first major product scope should primarily cover:
 
 ### Platform foundation
 
-* clinic/organization settings
-* branches/facilities where appropriate
-* users/staff
-* doctors
-* roles and permissions
-* audit/activity
-* files/documents
-* notifications/settings
-* search and navigation
+- clinic/organization settings
+- branches/facilities where appropriate
+- users/staff
+- doctors
+- roles and permissions
+- audit/activity
+- files/documents
+- notifications/settings
+- search and navigation
 
 ### Patients
 
-* patient identity/profile
-* medical/patient number
-* contact information
-* emergency contacts where useful
-* tags/source/status
-* assigned doctor/staff
-* medical alerts/basic clinical summary
-* files
-* notes
-* appointments
-* visits/encounters
-* billing
-* follow-up
-* unified timeline
+- patient identity/profile
+- medical/patient number
+- contact information
+- emergency contacts where useful
+- tags/source/status
+- assigned doctor/staff
+- medical alerts/basic clinical summary
+- files
+- notes
+- appointments
+- visits/encounters
+- billing
+- follow-up
+- unified timeline
 
 ### Appointments / scheduling
 
-* calendar
-* doctor availability
-* appointment types
-* duration
-* branch/room/resource where justified
-* booking
-* rescheduling
-* cancellation
-* walk-in
-* no-show
-* check-in
-* waiting status
-* daily/weekly views
-* multi-doctor usability
+- calendar
+- doctor availability
+- appointment types
+- duration
+- branch/room/resource where justified
+- booking
+- rescheduling
+- cancellation
+- walk-in
+- no-show
+- check-in
+- waiting status
+- daily/weekly views
+- multi-doctor usability
 
 ### Medical encounters / records
 
@@ -145,14 +145,14 @@ Do not treat an appointment as the medical encounter itself.
 
 Plan a proper but initially manageable Encounter model supporting:
 
-* visit reason / complaint
-* vitals
-* clinical notes
-* diagnosis
-* prescription/basic medication instructions
-* attachments
-* follow-up instructions/date
-* configurable specialty forms/templates where appropriate
+- visit reason / complaint
+- vitals
+- clinical notes
+- diagnosis
+- prescription/basic medication instructions
+- attachments
+- follow-up instructions/date
+- configurable specialty forms/templates where appropriate
 
 The architecture should allow Nutrition, Dentistry, Dermatology, Physiotherapy, Pediatrics, etc. to extend the clinical workflow without hardcoding every specialty into the platform core.
 
@@ -160,29 +160,29 @@ The architecture should allow Nutrition, Dentistry, Dermatology, Physiotherapy, 
 
 This should remain a strong differentiator:
 
-* next follow-up
-* overdue follow-ups
-* contact attempts
-* notes
-* tasks
-* source/referral
-* lifecycle/status
-* missed-appointment recovery
-* communication history
-* retention/reactivation concepts where appropriate
+- next follow-up
+- overdue follow-ups
+- contact attempts
+- notes
+- tasks
+- source/referral
+- lifecycle/status
+- missed-appointment recovery
+- communication history
+- retention/reactivation concepts where appropriate
 
 ### Billing / payments
 
 Keep the first version practical rather than accounting-heavy:
 
-* service catalog
-* prices
-* invoices/receipts
-* payments
-* discounts
-* outstanding balances
-* payment methods
-* packages/subscriptions/sessions if justified
+- service catalog
+- prices
+- invoices/receipts
+- payments
+- discounts
+- outstanding balances
+- payment methods
+- packages/subscriptions/sessions if justified
 
 Do not build full financial accounting or insurance claims in the first implementation.
 
@@ -190,15 +190,15 @@ Do not build full financial accounting or insurance claims in the first implemen
 
 Role-relevant and actionable:
 
-* today’s appointments
-* waiting/check-in
-* follow-ups due
-* unpaid balances
-* new patients
-* recent activity
-* revenue summaries
-* doctor workload
-* useful operational KPIs
+- today’s appointments
+- waiting/check-in
+- follow-ups due
+- unpaid balances
+- new patients
+- recent activity
+- revenue summaries
+- doctor workload
+- useful operational KPIs
 
 Avoid meaningless decorative dashboards.
 
@@ -210,18 +210,18 @@ Audit the current Nutrition-specific functionality carefully.
 
 Examples may include:
 
-* nutrition assessments
-* measurements
-* body calculations
-* nutrition plans
-* food/meal-specific workflows
-* nutrition follow-up logic
+- nutrition assessments
+- measurements
+- body calculations
+- nutrition plans
+- food/meal-specific workflows
+- nutrition follow-up logic
 
 Determine what is:
 
-* generic healthcare functionality,
-* reusable platform functionality,
-* Nutrition-specific functionality.
+- generic healthcare functionality,
+- reusable platform functionality,
+- Nutrition-specific functionality.
 
 Propose how the architecture should separate these concerns cleanly.
 
@@ -256,17 +256,17 @@ This example is directional, not a required filesystem structure. Audit the actu
 
 The architecture should leave reasonable room for later additions such as:
 
-* hospital admissions
-* wards / beds
-* nursing
-* emergency department
-* laboratory
-* radiology
-* pharmacy
-* inventory/procurement
-* operating theatre
-* insurance
-* advanced billing/accounting integrations
+- hospital admissions
+- wards / beds
+- nursing
+- emergency department
+- laboratory
+- radiology
+- pharmacy
+- inventory/procurement
+- operating theatre
+- insurance
+- advanced billing/accounting integrations
 
 These belong in a future roadmap, not the first implementation scope.
 
@@ -284,31 +284,31 @@ The user wants a premium, modern, highly usable product with strong visual desig
 
 The previously established design direction across the workspace should be respected:
 
-* premium art direction
-* excellent UX before visual gimmicks
-* contextual interactions
-* responsive/mobile/tablet-aware behavior
-* thoughtful motion
-* polished transitions
-* high-quality visual hierarchy
-* accessibility
-* reduced-motion support
-* reusable design systems
+- premium art direction
+- excellent UX before visual gimmicks
+- contextual interactions
+- responsive/mobile/tablet-aware behavior
+- thoughtful motion
+- polished transitions
+- high-quality visual hierarchy
+- accessibility
+- reduced-motion support
+- reusable design systems
 
 Motion should serve clarity and state, especially in medical operational interfaces.
 
 Examples worth exploring:
 
-* patient timeline
-* doctor/reception worklists
-* appointment calendar/resource views
-* waiting/check-in board
-* contextual drawers rather than unnecessary page navigation
-* command/search interface
-* role-based home screens
-* smooth state changes
-* excellent empty/loading/error states
-* persistent Patient Context while navigating the patient record
+- patient timeline
+- doctor/reception worklists
+- appointment calendar/resource views
+- waiting/check-in board
+- contextual drawers rather than unnecessary page navigation
+- command/search interface
+- role-based home screens
+- smooth state changes
+- excellent empty/loading/error states
+- persistent Patient Context while navigating the patient record
 
 Do not turn operational medical screens into cinematic marketing pages.
 
@@ -331,11 +331,11 @@ Audit and plan for different workspaces where useful rather than one dashboard f
 
 Potential actors include:
 
-* clinic owner/admin
-* doctor
-* receptionist
-* assistant
-* other staff roles
+- clinic owner/admin
+- doctor
+- receptionist
+- assistant
+- other staff roles
 
 Determine what each role needs to see and do.
 
@@ -353,48 +353,48 @@ Specifically answer:
 
 ### Existing functionality
 
-* what modules/features already exist?
-* which are production-quality?
-* which are partial?
-* which are dead/legacy?
-* what is strongly coupled to Nutrition?
-* what is already generic?
+- what modules/features already exist?
+- which are production-quality?
+- which are partial?
+- which are dead/legacy?
+- what is strongly coupled to Nutrition?
+- what is already generic?
 
 ### Data/domain
 
-* what are the current core entities?
-* is the current `User`/client model suitable for becoming a Patient model?
-* should it be renamed/refactored/replaced?
-* what migrations would be required?
-* what current assumptions will become problematic?
+- what are the current core entities?
+- is the current `User`/client model suitable for becoming a Patient model?
+- should it be renamed/refactored/replaced?
+- what migrations would be required?
+- what current assumptions will become problematic?
 
 ### Frontend
 
-* what page/layout/component patterns already exist?
-* what should be reused?
-* what needs redesign?
-* what generic UI can be promoted into packages?
+- what page/layout/component patterns already exist?
+- what should be reused?
+- what needs redesign?
+- what generic UI can be promoted into packages?
 
 ### Backend
 
-* current route/repository/DTO conventions
-* toolkit usage
-* validation
-* authorization
-* relationships
-* caching/revalidation
-* files/uploads
-* existing domain coupling
+- current route/repository/DTO conventions
+- toolkit usage
+- validation
+- authorization
+- relationships
+- caching/revalidation
+- files/uploads
+- existing domain coupling
 
 ### Architecture
 
 Determine whether the current repository should:
 
-* be incrementally evolved,
-* undergo a focused internal restructuring,
-* introduce explicit feature/domain modules,
-* separate Nutrition vertically,
-* or eventually be extracted into a new healthcare product repo.
+- be incrementally evolved,
+- undergo a focused internal restructuring,
+- introduce explicit feature/domain modules,
+- separate Nutrition vertically,
+- or eventually be extracted into a new healthcare product repo.
 
 Do not make a large repo split only for cleanliness if there is no concrete benefit.
 
@@ -416,25 +416,25 @@ Create a master roadmap plus focused MD files.
 
 The exact file list must be based on your audit, but it should cover concepts similar to:
 
-* product scope and goals
-* audit/current-state findings
-* target architecture
-* domain model
-* migration/refactor strategy
-* platform foundation
-* patients
-* appointments/scheduling
-* encounters/medical records
-* CRM/follow-up
-* billing/payments
-* staff/roles/permissions
-* dashboard/reporting
-* UX/design system/motion
-* toolkit/package changes
-* tests/QA
-* migrations/seeding
-* future expansion
-* implementation roadmap
+- product scope and goals
+- audit/current-state findings
+- target architecture
+- domain model
+- migration/refactor strategy
+- platform foundation
+- patients
+- appointments/scheduling
+- encounters/medical records
+- CRM/follow-up
+- billing/payments
+- staff/roles/permissions
+- dashboard/reporting
+- UX/design system/motion
+- toolkit/package changes
+- tests/QA
+- migrations/seeding
+- future expansion
+- implementation roadmap
 
 Do not mechanically create files just to match this list. Use the structure that best fits the repository and dependencies.
 
@@ -444,38 +444,38 @@ Do not mechanically create files just to match this list. Use the structure that
 
 Each relevant plan should include, where applicable:
 
-* purpose
-* current state
-* target state
-* scope
-* explicitly out of scope
-* domain concepts/entities
-* relationships
-* states/status transitions
-* user roles
-* permissions
-* workflows
-* screens/routes
-* APIs
-* validation/business rules
-* search/filter/sort requirements
-* files/media behavior
-* notifications/events
-* audit requirements
-* toolkit/package dependencies
-* local vs shared decisions
-* migrations
-* backward compatibility
-* edge cases
-* error states
-* accessibility
-* responsive UX
-* motion/interaction requirements
-* testing strategy
-* acceptance criteria
-* prerequisites
-* downstream dependencies
-* implementation steps
+- purpose
+- current state
+- target state
+- scope
+- explicitly out of scope
+- domain concepts/entities
+- relationships
+- states/status transitions
+- user roles
+- permissions
+- workflows
+- screens/routes
+- APIs
+- validation/business rules
+- search/filter/sort requirements
+- files/media behavior
+- notifications/events
+- audit requirements
+- toolkit/package dependencies
+- local vs shared decisions
+- migrations
+- backward compatibility
+- edge cases
+- error states
+- accessibility
+- responsive UX
+- motion/interaction requirements
+- testing strategy
+- acceptance criteria
+- prerequisites
+- downstream dependencies
+- implementation steps
 
 The plans must be detailed enough that a fresh agent can implement a phase without inventing missing product decisions.
 
@@ -487,18 +487,18 @@ Create a single master/index MD linking all planning files.
 
 It must show:
 
-* overall vision
-* final first-release scope
-* architecture summary
-* implementation phases
-* dependency graph/order
-* what may run in parallel
-* toolkit releases required before app work
-* migrations/refactors required before feature work
-* checkpoints
-* acceptance gates
-* status tracking
-* future modules deliberately deferred
+- overall vision
+- final first-release scope
+- architecture summary
+- implementation phases
+- dependency graph/order
+- what may run in parallel
+- toolkit releases required before app work
+- migrations/refactors required before feature work
+- checkpoints
+- acceptance gates
+- status tracking
+- future modules deliberately deferred
 
 Prefer small, verifiable implementation phases over one massive rewrite.
 
@@ -510,10 +510,10 @@ Use parallel agents for genuinely independent audit/planning workstreams where b
 
 Examples:
 
-* backend/domain audit
-* frontend/UX audit
-* toolkit audit
-* current Nutrition coupling audit
+- backend/domain audit
+- frontend/UX audit
+- toolkit audit
+- current Nutrition coupling audit
 
 Do not parallelize tightly coupled architecture decisions and then merge incompatible plans blindly.
 
@@ -523,15 +523,15 @@ Do not parallelize tightly coupled architecture decisions and then merge incompa
 
 Do not:
 
-* start feature implementation yet
-* rewrite the application blindly
-* remove working Nutrition behavior without migration reasoning
-* duplicate toolkit functionality locally
-* over-engineer hospital functionality into the first release
-* assume existing naming/data modeling is correct
-* reduce UX planning to wireframe-level generic admin screens
-* treat animation as a final cosmetic pass
-* make architecture decisions without inspecting actual code
+- start feature implementation yet
+- rewrite the application blindly
+- remove working Nutrition behavior without migration reasoning
+- duplicate toolkit functionality locally
+- over-engineer hospital functionality into the first release
+- assume existing naming/data modeling is correct
+- reduce UX planning to wireframe-level generic admin screens
+- treat animation as a final cosmetic pass
+- make architecture decisions without inspecting actual code
 
 You are allowed to recommend substantial changes where justified because this product is still early enough to change direction.
 

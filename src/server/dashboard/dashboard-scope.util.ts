@@ -15,11 +15,17 @@ export async function resolveScopedClientProfileIds(assignedToUserId?: string): 
 }
 
 /** Merges the staff filter into a `ClientProfile` query's `where`. */
-export function withAssignedStaffWhere(where: Record<string, unknown>, assignedToUserId?: string): Record<string, unknown> {
+export function withAssignedStaffWhere(
+  where: Record<string, unknown>,
+  assignedToUserId?: string,
+): Record<string, unknown> {
   return assignedToUserId ? { ...where, assignedToUserId } : where;
 }
 
 /** Merges a resolved staff-scope (see `resolveScopedClientProfileIds`) into a historical collection's `where`. */
-export function withScopedClientWhere(where: Record<string, unknown>, scopedClientProfileIds?: string[]): Record<string, unknown> {
+export function withScopedClientWhere(
+  where: Record<string, unknown>,
+  scopedClientProfileIds?: string[],
+): Record<string, unknown> {
   return scopedClientProfileIds ? { ...where, clientProfileId: { $in: scopedClientProfileIds } } : where;
 }

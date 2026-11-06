@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 
 import { useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
 import { PageShell, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
@@ -8,7 +9,8 @@ import { FaqItemForm } from "src/common/forms/faq-item-form";
 import { EntityName } from "src/common/authorization/entity-name.enum";
 import { AppRoute } from "src/common/routes/app-route";
 
-export default function FaqItemUpdatePage({ params }: { params: { id: string } }) {
+export default function FaqItemUpdatePage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const itemQuery = useRequesterQuery({
     endpoint: getFaqItemByIdEndpoint,
     options: { params: { id: params.id } },

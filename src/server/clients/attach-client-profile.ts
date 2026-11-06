@@ -26,7 +26,11 @@ export async function attachClientProfile(userId: string, body: AttachClientProf
 
   const profilePatch = { ...body, lifecycle: body.lifecycle ?? ClientLifecycle.LEAD, tags: body.tags ?? [] };
 
-  const softDeleted = await clientProfileRepository.findOne({ where: { userId }, onlyDeleted: true, skipThrowError: true });
+  const softDeleted = await clientProfileRepository.findOne({
+    where: { userId },
+    onlyDeleted: true,
+    skipThrowError: true,
+  });
   if (softDeleted) {
     await clientProfileRepository.restore({ where: { userId } });
     return clientProfileRepository.update({ where: { userId } }, profilePatch);

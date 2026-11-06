@@ -28,33 +28,61 @@ export interface CoverModeToggleProps {
  * ever existed inside a CUSTOM field's own render tree would never be
  * whitelisted into the submit payload or recognized as multipart-worthy.
  */
-export function CoverModeField({ sectionLabel, modeValue, onModeChange, hasImage, generatedDescription, uploadedDescription }: CoverModeToggleProps) {
+export function CoverModeField({
+  sectionLabel,
+  modeValue,
+  onModeChange,
+  hasImage,
+  generatedDescription,
+  uploadedDescription,
+}: CoverModeToggleProps) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border p-4">
       <span className="text-sm font-semibold">{sectionLabel}</span>
 
       <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label={sectionLabel}>
-        <ModeCard selected={modeValue === "generated"} title="Generated" description={generatedDescription} onClick={() => onModeChange("generated")} />
-        <ModeCard selected={modeValue === "uploaded"} title="Uploaded" description={uploadedDescription} onClick={() => onModeChange("uploaded")} />
+        <ModeCard
+          selected={modeValue === "generated"}
+          title="Generated"
+          description={generatedDescription}
+          onClick={() => onModeChange("generated")}
+        />
+        <ModeCard
+          selected={modeValue === "uploaded"}
+          title="Uploaded"
+          description={uploadedDescription}
+          onClick={() => onModeChange("uploaded")}
+        />
       </div>
 
       {modeValue === "uploaded" && !hasImage ? (
         <p className="rounded-md bg-amber-50 p-2 text-xs text-amber-800">
-          No image uploaded yet — this cover will render blank (no generated content underneath it) until you upload one below.
+          No image uploaded yet — this cover will render blank (no generated content underneath it) until you upload one
+          below.
         </p>
       ) : null}
 
       {modeValue === "generated" ? (
         <p className="text-xs text-slate-500">
-          Any previously uploaded image stays stored and is not deleted — switching back to &quot;Uploaded&quot; restores it without a
-          re-upload.
+          Any previously uploaded image stays stored and is not deleted — switching back to &quot;Uploaded&quot;
+          restores it without a re-upload.
         </p>
       ) : null}
     </div>
   );
 }
 
-function ModeCard({ selected, title, description, onClick }: { selected: boolean; title: string; description: string; onClick: () => void }) {
+function ModeCard({
+  selected,
+  title,
+  description,
+  onClick,
+}: {
+  selected: boolean;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"

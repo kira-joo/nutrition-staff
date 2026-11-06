@@ -145,7 +145,9 @@ body { direction: rtl; }
 .book-page-footer-note p:last-child { margin-bottom: 0; }
 
 /* ---- Page chrome: folio at the outer edge, running head at the inner edge ---- */
-${watermark ? `
+${
+  watermark
+    ? `
 /* Tiled watermark for ordinary paper pages only. The exclusion list is the
    template's existing one (see the inner-frame rule): uploaded/generated
    covers and chapter openers carry their own full-bleed artwork and must
@@ -185,7 +187,9 @@ ${watermark ? `
   position: relative;
   z-index: 1;
 }
-` : ""}
+`
+    : ""
+}
 .book-running-head {
   position: absolute;
   z-index: 2;
@@ -249,7 +253,9 @@ ${watermark ? `
 }
 .book-folio-number::before { left: 0; }
 .book-folio-number::after { right: 0; }
-${leafUrl ? `
+${
+  leafUrl
+    ? `
 /* Botanical mark at each outer end of the footer. ONE asset, mirrored on
    the far side via scaleX(-1) so the pair reads as a symmetric composition
    rather than the same image printed twice facing the same way.
@@ -273,7 +279,9 @@ ${leafUrl ? `
 }
 .book-folio-leaf:first-child { order: -1; }
 .book-folio-leaf:last-child { order: 1; transform: scaleX(-1); }
-` : ""}
+`
+    : ""
+}
 
 /* An ordinary printed page's inner frame — a thin decorative rule set
    IN the margin, between the trim edge and the text block, not around

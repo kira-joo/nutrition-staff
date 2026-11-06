@@ -1,5 +1,14 @@
 import { Type } from "class-transformer";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEnum, IsString, MaxLength, ValidateNested } from "class-validator";
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsString,
+  MaxLength,
+  ValidateNested,
+} from "class-validator";
 import "reflect-metadata";
 import { BookBlockType } from "src/common/enums";
 import { BaseBookBlockDto } from "./base-book-block.dto";

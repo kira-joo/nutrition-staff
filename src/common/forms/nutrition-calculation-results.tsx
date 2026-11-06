@@ -25,7 +25,9 @@ export function NutritionCalculationResultsView({ results, assumptions }: Nutrit
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {results.bmi ? <StatCard label="BMI" value={`${results.bmi.value}`} sub={results.bmi.category} /> : null}
-        {results.bmr ? <StatCard label="BMR" value={`${results.bmr.value} kcal/day`} sub={results.bmr.formula as string} /> : null}
+        {results.bmr ? (
+          <StatCard label="BMR" value={`${results.bmr.value} kcal/day`} sub={results.bmr.formula as string} />
+        ) : null}
         {results.maintenanceCalories ? (
           <StatCard
             label="Maintenance calories"
@@ -37,7 +39,11 @@ export function NutritionCalculationResultsView({ results, assumptions }: Nutrit
           <StatCard
             label="Goal calories"
             value={`${results.goalCalories.value} kcal/day`}
-            sub={results.goalCalories.belowSafeFloor ? "Below standard safe floor" : `${results.goalCalories.delta > 0 ? "+" : ""}${results.goalCalories.delta} kcal vs. maintenance`}
+            sub={
+              results.goalCalories.belowSafeFloor
+                ? "Below standard safe floor"
+                : `${results.goalCalories.delta > 0 ? "+" : ""}${results.goalCalories.delta} kcal vs. maintenance`
+            }
           />
         ) : null}
         {results.proteinRangeGrams ? (
@@ -55,7 +61,10 @@ export function NutritionCalculationResultsView({ results, assumptions }: Nutrit
           />
         ) : null}
         {results.targetWeightRangeKg ? (
-          <StatCard label="Healthy weight range" value={`${results.targetWeightRangeKg.min}-${results.targetWeightRangeKg.max} kg`} />
+          <StatCard
+            label="Healthy weight range"
+            value={`${results.targetWeightRangeKg.min}-${results.targetWeightRangeKg.max} kg`}
+          />
         ) : null}
         {results.waterIntakeLiters ? (
           <StatCard label="Water intake" value={`${results.waterIntakeLiters.value} L/day`} />

@@ -14,7 +14,7 @@ export async function reorderChapters(bookId: string, chapterIds: string[], expe
   try {
     return await bookRepository.update(
       { where: { _id: bookId, contentRevision: expectedRevision } },
-      { chapters: nextChapters, contentRevision: expectedRevision + 1 }
+      { chapters: nextChapters, contentRevision: expectedRevision + 1 },
     );
   } catch (error) {
     if (error instanceof NotFoundError) {

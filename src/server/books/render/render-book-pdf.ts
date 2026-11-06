@@ -61,7 +61,9 @@ export async function renderBookPdf(edition: {
     // (font-readiness + measurement) before it ever sets this attribute
     // — the same signal the staff preview iframe could poll for, and
     // the only reliable way to know the DOM is ready to print.
-    await page.waitForFunction('document.body.getAttribute("data-pagination-complete") === "true"', { timeout: GENERATION_TIMEOUT_MS });
+    await page.waitForFunction('document.body.getAttribute("data-pagination-complete") === "true"', {
+      timeout: GENERATION_TIMEOUT_MS,
+    });
 
     // The rendered pages (including every <img>) are injected into
     // #book-root via `innerHTML` INSIDE that async run() — well after
@@ -73,9 +75,13 @@ export async function renderBookPdf(edition: {
     // every image rendered as a blank area in the exported PDF. `.pdf()`
     // rasterizes whatever has visually painted at that instant, so every
     // <img> must finish loading (or fail — `.complete` covers both) first.
-    await page.waitForFunction(() => Array.from(document.images).every((img) => img.complete), { timeout: GENERATION_TIMEOUT_MS });
+    await page.waitForFunction(() => Array.from(document.images).every((img) => img.complete), {
+      timeout: GENERATION_TIMEOUT_MS,
+    });
 
-    const pageModel = await page.evaluate(() => (window as unknown as { __BOOK_PAGE_MODEL__: BookPageModel }).__BOOK_PAGE_MODEL__);
+    const pageModel = await page.evaluate(
+      () => (window as unknown as { __BOOK_PAGE_MODEL__: BookPageModel }).__BOOK_PAGE_MODEL__,
+    );
 
     const pdfBytes = await page.pdf({
       width: `${geometry.widthMm}mm`,

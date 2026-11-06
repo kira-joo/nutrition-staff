@@ -21,20 +21,24 @@ const AUTOSAVE_DEBOUNCE_MS = 1500;
  * ordering guarantee.
  */
 export function useDebouncedAutosave<T>(value: T, onSave: (value: T) => void) {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const latestRef = useRef(value);
   const savedRef = useRef(value);
-  latestRef.current = value;
 
   const flush = useCallback(() => {
     clearTimeout(timeoutRef.current);
     if (JSON.stringify(latestRef.current) === JSON.stringify(savedRef.current)) return;
     savedRef.current = latestRef.current;
     onSave(latestRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSave]);
 
   useEffect(() => {
+    // latestRef is only ever read from `flush`, which always runs after this
+    // effect has committed (via the timer below or a caller-triggered
+    // flush()) — never synchronously during render — so updating it here
+    // rather than inline during render satisfies react-hooks/refs without
+    // changing behaviour.
+    latestRef.current = value;
     if (JSON.stringify(value) === JSON.stringify(savedRef.current)) return;
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(flush, AUTOSAVE_DEBOUNCE_MS);

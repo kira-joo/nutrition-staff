@@ -19,7 +19,12 @@ const LIFECYCLE_COLORS: Record<ClientLifecycle, string> = Object.fromEntries(
   Object.values(ClientLifecycle).map((lifecycle) => [lifecycle, BADGE_VARIANT_HEX[LIFECYCLE_BADGE_VARIANT[lifecycle]]]),
 ) as Record<ClientLifecycle, string>;
 
-const FUNNEL_STAGES = [ClientLifecycle.LEAD, ClientLifecycle.PROSPECT, ClientLifecycle.ACTIVE, ClientLifecycle.COMPLETED];
+const FUNNEL_STAGES = [
+  ClientLifecycle.LEAD,
+  ClientLifecycle.PROSPECT,
+  ClientLifecycle.ACTIVE,
+  ClientLifecycle.COMPLETED,
+];
 
 /**
  * Always a current-state snapshot — never affected by the dashboard's

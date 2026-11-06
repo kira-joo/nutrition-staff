@@ -121,7 +121,11 @@ async function login(): Promise<void> {
   console.log(`Authenticated as ${MIGRATION_EMAIL}`);
 }
 
-async function putMultipart(pathName: string, payload: Record<string, unknown>, files: Record<string, { buffer: Buffer<ArrayBuffer>; filename: string; mime: string }>): Promise<unknown> {
+async function putMultipart(
+  pathName: string,
+  payload: Record<string, unknown>,
+  files: Record<string, { buffer: Buffer<ArrayBuffer>; filename: string; mime: string }>,
+): Promise<unknown> {
   if (DRY_RUN) return undefined;
 
   const form = new FormData();
@@ -140,7 +144,11 @@ async function putMultipart(pathName: string, payload: Record<string, unknown>, 
   return body;
 }
 
-async function postMultipart(pathName: string, payload: Record<string, unknown>, files: Record<string, { buffer: Buffer<ArrayBuffer>; filename: string; mime: string }>): Promise<unknown> {
+async function postMultipart(
+  pathName: string,
+  payload: Record<string, unknown>,
+  files: Record<string, { buffer: Buffer<ArrayBuffer>; filename: string; mime: string }>,
+): Promise<unknown> {
   if (DRY_RUN) return undefined;
 
   const form = new FormData();
@@ -184,7 +192,7 @@ function planScalarField<T>(
   current: T,
   source: T,
   isEmpty: (value: T) => boolean,
-  equal: (a: T, b: T) => boolean
+  equal: (a: T, b: T) => boolean,
 ): { include: boolean; value?: T } {
   if (isEmpty(current)) {
     moduleReport.filled.push(field);
@@ -270,7 +278,14 @@ async function migrateSiteSettings(): Promise<void> {
 
   const payload: Record<string, unknown> = {};
 
-  const phonePlan = planScalarField(moduleReport, "phone", current.phone, SITE_SETTINGS_SOURCE.phone, isEmptyString, (a, b) => a === b);
+  const phonePlan = planScalarField(
+    moduleReport,
+    "phone",
+    current.phone,
+    SITE_SETTINGS_SOURCE.phone,
+    isEmptyString,
+    (a, b) => a === b,
+  );
   if (phonePlan.include) payload.phone = phonePlan.value;
 
   const whatsappPlan = planScalarField(
@@ -279,11 +294,18 @@ async function migrateSiteSettings(): Promise<void> {
     current.whatsappNumber,
     SITE_SETTINGS_SOURCE.whatsappNumber,
     isEmptyString,
-    (a, b) => a === b
+    (a, b) => a === b,
   );
   if (whatsappPlan.include) payload.whatsappNumber = whatsappPlan.value;
 
-  const emailPlan = planScalarField(moduleReport, "email", current.email, SITE_SETTINGS_SOURCE.email, isEmptyString, (a, b) => a === b);
+  const emailPlan = planScalarField(
+    moduleReport,
+    "email",
+    current.email,
+    SITE_SETTINGS_SOURCE.email,
+    isEmptyString,
+    (a, b) => a === b,
+  );
   if (emailPlan.include) payload.email = emailPlan.value;
 
   const titlePlan = planScalarField(
@@ -292,7 +314,7 @@ async function migrateSiteSettings(): Promise<void> {
     current.defaultSeo?.title,
     SITE_SETTINGS_SOURCE.defaultSeoTitle,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   const descriptionPlan = planScalarField(
     moduleReport,
@@ -300,7 +322,7 @@ async function migrateSiteSettings(): Promise<void> {
     current.defaultSeo?.description,
     SITE_SETTINGS_SOURCE.defaultSeoDescription,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (titlePlan.include || descriptionPlan.include) {
     payload.defaultSeo = {
@@ -311,7 +333,9 @@ async function migrateSiteSettings(): Promise<void> {
 
   // socialLinks: additive by platform name, never overwrites an existing link.
   const existingPlatforms = new Set((current.socialLinks ?? []).map((link) => link.platform.toLowerCase()));
-  const linksToAdd = SITE_SETTINGS_SOURCE.socialLinks.filter((link) => !existingPlatforms.has(link.platform.toLowerCase()));
+  const linksToAdd = SITE_SETTINGS_SOURCE.socialLinks.filter(
+    (link) => !existingPlatforms.has(link.platform.toLowerCase()),
+  );
   for (const link of SITE_SETTINGS_SOURCE.socialLinks) {
     if (existingPlatforms.has(link.platform.toLowerCase())) moduleReport.matched.push(`socialLinks.${link.platform}`);
     else moduleReport.filled.push(`socialLinks.${link.platform}`);
@@ -344,7 +368,8 @@ async function migrateSiteSettings(): Promise<void> {
   } else {
     moduleReport.assetsSkipped.push({
       field: "favicon",
-      reason: "Source is a .ico file; faviconImagePolicy only allows jpg/png/webp — convert to PNG and upload via the admin UI",
+      reason:
+        "Source is a .ico file; faviconImagePolicy only allows jpg/png/webp — convert to PNG and upload via the admin UI",
     });
   }
 
@@ -356,10 +381,17 @@ async function migrateSiteSettings(): Promise<void> {
       files.ogImage = { buffer, filename: "og-image.jpg", mime: "image/jpeg" };
       moduleReport.assetsUploaded.push("ogImage");
     } else {
-      moduleReport.invalid.push({ key: "ogImage", reason: "Source is an external, token-signed Facebook CDN URL that failed to fetch (likely expired) — upload a real image via the admin UI" });
+      moduleReport.invalid.push({
+        key: "ogImage",
+        reason:
+          "Source is an external, token-signed Facebook CDN URL that failed to fetch (likely expired) — upload a real image via the admin UI",
+      });
     }
   } else {
-    moduleReport.assetsSkipped.push({ field: "ogImage", reason: "[dry-run] would attempt to fetch the external Facebook CDN URL — not attempted in dry-run" });
+    moduleReport.assetsSkipped.push({
+      field: "ogImage",
+      reason: "[dry-run] would attempt to fetch the external Facebook CDN URL — not attempted in dry-run",
+    });
   }
 
   console.log(`  fields to fill: ${moduleReport.filled.join(", ") || "(none)"}`);
@@ -373,7 +405,9 @@ async function migrateSiteSettings(): Promise<void> {
   }
 
   if (DRY_RUN) {
-    console.log(`  [dry-run] would PUT /api/site-settings with fields: ${Object.keys(payload).join(", ")}, assets: ${Object.keys(files).join(", ") || "(none)"}`);
+    console.log(
+      `  [dry-run] would PUT /api/site-settings with fields: ${Object.keys(payload).join(", ")}, assets: ${Object.keys(files).join(", ") || "(none)"}`,
+    );
     return;
   }
 
@@ -408,19 +442,34 @@ const DOCTOR_PROFILE_SOURCE = {
       ar: "بقدم متابعات واستشارات غذائية علاجية عبر الإنترنت، مخصصة لكل اللي بيعاني من مشاكل الوزن سواء السمنة أو النحافة، ولكل اللي عايز يحسن صحته العامة. وكمان بنقدم تغذية للحوامل والمرضعات والأطفال والرياضيين.",
     },
   ] as Localized[],
-  programHeading: { en: "In the follow-up program with me, you'll get:", ar: "في برنامج المتابعة معايا هتحصل علي:" } as Localized,
+  programHeading: {
+    en: "In the follow-up program with me, you'll get:",
+    ar: "في برنامج المتابعة معايا هتحصل علي:",
+  } as Localized,
   programHighlights: [
-    { en: "✅ A personalized nutrition plan designed specifically for you.", ar: "✅ خطة تغذوية شخصية مصممة خصيصاً لك." },
+    {
+      en: "✅ A personalized nutrition plan designed specifically for you.",
+      ar: "✅ خطة تغذوية شخصية مصممة خصيصاً لك.",
+    },
     { en: "✅ Daily follow-up to ensure your commitment and success.", ar: "✅ متابعة يومية لضمان التزامك ونجاحك." },
     { en: "✅ Practical tips that fit your lifestyle.", ar: "✅ نصائح عملية تناسب نمط حياتك." },
     { en: "✅ Continuous support to achieve your health goals.", ar: "✅ دعم مستمر لتحقيق أهدافك الصحية." },
   ] as Localized[],
   whyChooseHeading: { en: "Why choose me?", ar: "ليه تختارني؟" } as Localized,
   whyChooseReasons: [
-    { en: "Over 6 years of experience in pharmacy and medication fields.", ar: "خبرة في مجال الصيدلة والأدوية لأكثر من ٦ سنوات." },
-    { en: "Over 5 years of experience and professionalism in providing nutritional consultations.", ar: "خبرة واحترافية في تقديم الاستشارات الغذائية لأكثر من خمس سنوات." },
+    {
+      en: "Over 6 years of experience in pharmacy and medication fields.",
+      ar: "خبرة في مجال الصيدلة والأدوية لأكثر من ٦ سنوات.",
+    },
+    {
+      en: "Over 5 years of experience and professionalism in providing nutritional consultations.",
+      ar: "خبرة واحترافية في تقديم الاستشارات الغذائية لأكثر من خمس سنوات.",
+    },
     { en: "Precise and personalized follow-up for each case.", ar: "متابعة دقيقة وشخصية لكل حالة." },
-    { en: "Continuous support and motivation to achieve your health goals.", ar: "دعم مستمر وتحفيز لتحقيق أهدافك الصحية." },
+    {
+      en: "Continuous support and motivation to achieve your health goals.",
+      ar: "دعم مستمر وتحفيز لتحقيق أهدافك الصحية.",
+    },
     { en: "Competitive prices and special offers.", ar: "أسعار تنافسية وعروض خاصة." },
   ] as Localized[],
   featuredInLabel: { en: "Featured In", ar: "متميز في" } as Localized,
@@ -438,7 +487,7 @@ function planOrderedLocalizedList(
   moduleReport: ModuleReport,
   fieldPrefix: string,
   current: OrderedLocalized[] | undefined,
-  source: Localized[]
+  source: Localized[],
 ): OrderedLocalized[] | undefined {
   const existingTexts = new Set((current ?? []).map((item) => item.text.en));
   const missing = source.filter((text) => !existingTexts.has(text.en));
@@ -469,13 +518,34 @@ async function migrateDoctorProfile(): Promise<void> {
 
   const payload: Record<string, unknown> = {};
 
-  const namePlan = planScalarField(moduleReport, "name", current.name, DOCTOR_PROFILE_SOURCE.name, isEmptyLocalized, localizedEqual);
+  const namePlan = planScalarField(
+    moduleReport,
+    "name",
+    current.name,
+    DOCTOR_PROFILE_SOURCE.name,
+    isEmptyLocalized,
+    localizedEqual,
+  );
   if (namePlan.include) payload.name = namePlan.value;
 
-  const taglinePlan = planScalarField(moduleReport, "tagline", current.tagline, DOCTOR_PROFILE_SOURCE.tagline, isEmptyLocalized, localizedEqual);
+  const taglinePlan = planScalarField(
+    moduleReport,
+    "tagline",
+    current.tagline,
+    DOCTOR_PROFILE_SOURCE.tagline,
+    isEmptyLocalized,
+    localizedEqual,
+  );
   if (taglinePlan.include) payload.tagline = taglinePlan.value;
 
-  const avatarAltPlan = planScalarField(moduleReport, "avatarAlt", current.avatarAlt, DOCTOR_PROFILE_SOURCE.avatarAlt, isEmptyLocalized, localizedEqual);
+  const avatarAltPlan = planScalarField(
+    moduleReport,
+    "avatarAlt",
+    current.avatarAlt,
+    DOCTOR_PROFILE_SOURCE.avatarAlt,
+    isEmptyLocalized,
+    localizedEqual,
+  );
   if (avatarAltPlan.include) payload.avatarAlt = avatarAltPlan.value;
 
   const programHeadingPlan = planScalarField(
@@ -484,7 +554,7 @@ async function migrateDoctorProfile(): Promise<void> {
     current.programHeading,
     DOCTOR_PROFILE_SOURCE.programHeading,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (programHeadingPlan.include) payload.programHeading = programHeadingPlan.value;
 
@@ -494,7 +564,7 @@ async function migrateDoctorProfile(): Promise<void> {
     current.whyChooseHeading,
     DOCTOR_PROFILE_SOURCE.whyChooseHeading,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (whyChooseHeadingPlan.include) payload.whyChooseHeading = whyChooseHeadingPlan.value;
 
@@ -504,7 +574,7 @@ async function migrateDoctorProfile(): Promise<void> {
     current.featuredInLabel,
     DOCTOR_PROFILE_SOURCE.featuredInLabel,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (featuredInLabelPlan.include) payload.featuredInLabel = featuredInLabelPlan.value;
 
@@ -523,10 +593,20 @@ async function migrateDoctorProfile(): Promise<void> {
     ];
   }
 
-  const programHighlights = planOrderedLocalizedList(moduleReport, "programHighlights", current.programHighlights, DOCTOR_PROFILE_SOURCE.programHighlights);
+  const programHighlights = planOrderedLocalizedList(
+    moduleReport,
+    "programHighlights",
+    current.programHighlights,
+    DOCTOR_PROFILE_SOURCE.programHighlights,
+  );
   if (programHighlights) payload.programHighlights = programHighlights;
 
-  const whyChooseReasons = planOrderedLocalizedList(moduleReport, "whyChooseReasons", current.whyChooseReasons, DOCTOR_PROFILE_SOURCE.whyChooseReasons);
+  const whyChooseReasons = planOrderedLocalizedList(
+    moduleReport,
+    "whyChooseReasons",
+    current.whyChooseReasons,
+    DOCTOR_PROFILE_SOURCE.whyChooseReasons,
+  );
   if (whyChooseReasons) payload.whyChooseReasons = whyChooseReasons;
 
   const files: Record<string, { buffer: Buffer<ArrayBuffer>; filename: string; mime: string }> = {};
@@ -548,7 +628,9 @@ async function migrateDoctorProfile(): Promise<void> {
 
   if (Object.keys(payload).length > 0 || Object.keys(files).length > 0) {
     if (DRY_RUN) {
-      console.log(`  [dry-run] would PUT /api/doctor-profile with fields: ${Object.keys(payload).join(", ")}, assets: ${Object.keys(files).join(", ") || "(none)"}`);
+      console.log(
+        `  [dry-run] would PUT /api/doctor-profile with fields: ${Object.keys(payload).join(", ")}, assets: ${Object.keys(files).join(", ") || "(none)"}`,
+      );
     } else {
       await putMultipart("/api/doctor-profile", payload, files);
       console.log("  updated doctor profile");
@@ -616,7 +698,14 @@ async function migratePackagesPageSettings(): Promise<void> {
 
   const payload: Record<string, unknown> = {};
 
-  const titlePlan = planScalarField(moduleReport, "title", current.title, PACKAGES_PAGE_SETTINGS_SOURCE.title, isEmptyLocalized, localizedEqual);
+  const titlePlan = planScalarField(
+    moduleReport,
+    "title",
+    current.title,
+    PACKAGES_PAGE_SETTINGS_SOURCE.title,
+    isEmptyLocalized,
+    localizedEqual,
+  );
   if (titlePlan.include) payload.title = titlePlan.value;
 
   const titleAccentPlan = planScalarField(
@@ -625,11 +714,18 @@ async function migratePackagesPageSettings(): Promise<void> {
     current.titleAccent,
     PACKAGES_PAGE_SETTINGS_SOURCE.titleAccent,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (titleAccentPlan.include) payload.titleAccent = titleAccentPlan.value;
 
-  const subtitlePlan = planScalarField(moduleReport, "subtitle", current.subtitle, PACKAGES_PAGE_SETTINGS_SOURCE.subtitle, isEmptyLocalized, localizedEqual);
+  const subtitlePlan = planScalarField(
+    moduleReport,
+    "subtitle",
+    current.subtitle,
+    PACKAGES_PAGE_SETTINGS_SOURCE.subtitle,
+    isEmptyLocalized,
+    localizedEqual,
+  );
   if (subtitlePlan.include) payload.subtitle = subtitlePlan.value;
 
   const subscribeButtonLabelPlan = planScalarField(
@@ -638,7 +734,7 @@ async function migratePackagesPageSettings(): Promise<void> {
     current.subscribeButtonLabel,
     PACKAGES_PAGE_SETTINGS_SOURCE.subscribeButtonLabel,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (subscribeButtonLabelPlan.include) payload.subscribeButtonLabel = subscribeButtonLabelPlan.value;
 
@@ -648,7 +744,7 @@ async function migratePackagesPageSettings(): Promise<void> {
     current.durationLabels?.month,
     PACKAGES_PAGE_SETTINGS_SOURCE.durationLabels.month,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   const quarterPlan = planScalarField(
     moduleReport,
@@ -656,7 +752,7 @@ async function migratePackagesPageSettings(): Promise<void> {
     current.durationLabels?.quarter,
     PACKAGES_PAGE_SETTINGS_SOURCE.durationLabels.quarter,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   const halfPlan = planScalarField(
     moduleReport,
@@ -664,7 +760,7 @@ async function migratePackagesPageSettings(): Promise<void> {
     current.durationLabels?.half,
     PACKAGES_PAGE_SETTINGS_SOURCE.durationLabels.half,
     isEmptyLocalized,
-    localizedEqual
+    localizedEqual,
   );
   if (monthPlan.include || quarterPlan.include || halfPlan.include) {
     payload.durationLabels = {
@@ -699,7 +795,9 @@ async function migratePackagesPageSettings(): Promise<void> {
 async function main() {
   console.log(`Migration source: ${NUTRITION_CLIENT_PATH}`);
   console.log(`Migration target: ${BASE_URL}`);
-  console.log(`Mode: ${DRY_RUN ? "DRY RUN — no writes will be performed" : "LIVE — will create real records and upload real assets"}`);
+  console.log(
+    `Mode: ${DRY_RUN ? "DRY RUN — no writes will be performed" : "LIVE — will create real records and upload real assets"}`,
+  );
 
   await login();
 

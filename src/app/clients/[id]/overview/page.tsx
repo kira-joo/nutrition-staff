@@ -1,17 +1,17 @@
 "use client";
 
 import { SortOrder, useRequesterQuery } from "@kira-joo/frontend-toolkit-core";
-import { CustomButton, DateText, DeltaIndicator, InfoRow, Modal, PageSection, QueryState } from "@kira-joo/frontend-toolkit-tailwind";
 import {
-  Activity,
-  CalendarClock,
-  Contact,
-  FlaskConical,
-  NotebookPen,
-  Repeat,
-  Ruler,
-} from "lucide-react";
-import { useState } from "react";
+  CustomButton,
+  DateText,
+  DeltaIndicator,
+  InfoRow,
+  Modal,
+  PageSection,
+  QueryState,
+} from "@kira-joo/frontend-toolkit-tailwind";
+import { Activity, CalendarClock, Contact, FlaskConical, NotebookPen, Repeat, Ruler } from "lucide-react";
+import { useState, use } from "react";
 import { usePermissions } from "src/common/auth/use-permissions";
 import { AppPermission } from "src/common/authorization/app-permission";
 import { ClientLifecycleForm } from "src/common/forms/client-lifecycle-form";
@@ -29,7 +29,8 @@ type DialogKind = "lifecycle" | "followUp" | null;
 /** A disabled quick action always says why — a permission gap should never look like a silent bug. */
 const NO_PERMISSION_TITLE = "You don't have permission to do this";
 
-export default function ClientOverviewPage({ params }: { params: { id: string } }) {
+export default function ClientOverviewPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const navigate = useNavigate();
   const { can } = usePermissions();
   const [openDialog, setOpenDialog] = useState<DialogKind>(null);
@@ -198,7 +199,10 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
                 {latestMeasurement ? (
                   <div className="flex flex-col gap-3">
                     <InfoRow label="Measured on" value={<DateText value={latestMeasurement.measuredAt} />} />
-                    <InfoRow label="Weight" value={latestMeasurement.weightKg ? `${latestMeasurement.weightKg} kg` : "—"} />
+                    <InfoRow
+                      label="Weight"
+                      value={latestMeasurement.weightKg ? `${latestMeasurement.weightKg} kg` : "—"}
+                    />
                     <InfoRow label="BMI" value={latestMeasurement.bmi ?? "—"} />
                     {latestMeasurement.weightKg !== undefined ? (
                       <DeltaIndicator
@@ -230,7 +234,12 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
                     <button
                       type="button"
                       className="text-left text-sm text-slate-600 underline hover:text-slate-900"
-                      onClick={() => navigate(AppRoute.clientAssessmentDetails, { id: params.id, assessmentId: latestAssessment._id })}
+                      onClick={() =>
+                        navigate(AppRoute.clientAssessmentDetails, {
+                          id: params.id,
+                          assessmentId: latestAssessment._id,
+                        })
+                      }
                     >
                       View details →
                     </button>
@@ -258,7 +267,12 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
                     <button
                       type="button"
                       className="text-left text-sm text-slate-600 underline hover:text-slate-900"
-                      onClick={() => navigate(AppRoute.clientCalculationDetails, { id: params.id, calculationId: latestCalculation._id })}
+                      onClick={() =>
+                        navigate(AppRoute.clientCalculationDetails, {
+                          id: params.id,
+                          calculationId: latestCalculation._id,
+                        })
+                      }
                     >
                       View details →
                     </button>
@@ -269,7 +283,11 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               </PageSection>
             </div>
 
-            <Modal open={openDialog === "lifecycle"} onOpenChange={(open) => setOpenDialog(open ? "lifecycle" : null)} title="Change lifecycle">
+            <Modal
+              open={openDialog === "lifecycle"}
+              onOpenChange={(open) => setOpenDialog(open ? "lifecycle" : null)}
+              title="Change lifecycle"
+            >
               <ClientLifecycleForm
                 clientId={client._id}
                 currentLifecycle={client.lifecycle}
@@ -280,7 +298,11 @@ export default function ClientOverviewPage({ params }: { params: { id: string } 
               />
             </Modal>
 
-            <Modal open={openDialog === "followUp"} onOpenChange={(open) => setOpenDialog(open ? "followUp" : null)} title="Schedule follow-up">
+            <Modal
+              open={openDialog === "followUp"}
+              onOpenChange={(open) => setOpenDialog(open ? "followUp" : null)}
+              title="Schedule follow-up"
+            >
               <ScheduleFollowUpForm
                 clientId={client._id}
                 currentNextFollowUpAt={client.nextFollowUpAt}

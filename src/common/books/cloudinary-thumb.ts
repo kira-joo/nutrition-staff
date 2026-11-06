@@ -9,7 +9,10 @@ import { AssetProviderType, type ImageAsset } from "@kira-joo/frontend-toolkit-c
  * `secureUrl` for any non-Cloudinary provider or a malformed URL, so a
  * thumbnail never breaks outright over a missed transform.
  */
-export function thumbUrl(asset: Pick<ImageAsset, "provider" | "secureUrl"> | null | undefined, width: number): string | undefined {
+export function thumbUrl(
+  asset: Pick<ImageAsset, "provider" | "secureUrl"> | null | undefined,
+  width: number,
+): string | undefined {
   if (!asset) return undefined;
   if (asset.provider !== AssetProviderType.CLOUDINARY) return asset.secureUrl;
 

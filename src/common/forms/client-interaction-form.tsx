@@ -9,7 +9,9 @@ import type {
 import { ClientInteraction, CreateClientInteractionDto } from "../interfaces/client-interaction.interface";
 
 /** `LIFECYCLE_CHANGE` is deliberately excluded — it's only ever auto-logged, never manually chosen. */
-const MANUAL_INTERACTION_TYPES = Object.values(InteractionType).filter((type) => type !== InteractionType.LIFECYCLE_CHANGE);
+const MANUAL_INTERACTION_TYPES = Object.values(InteractionType).filter(
+  (type) => type !== InteractionType.LIFECYCLE_CHANGE,
+);
 
 export interface ClientInteractionFormProps {
   clientProfileId: string;
@@ -24,7 +26,12 @@ export interface ClientInteractionFormProps {
  * them entirely. `type` is only shown when creating — like
  * `UpdateClientInteractionDto`, editing never reassigns it.
  */
-export function ClientInteractionForm({ clientProfileId, defaultValues, endpoint, onSuccess }: ClientInteractionFormProps) {
+export function ClientInteractionForm({
+  clientProfileId,
+  defaultValues,
+  endpoint,
+  onSuccess,
+}: ClientInteractionFormProps) {
   const fields: FormFieldConfig<CreateClientInteractionDto>[] = [
     ...(defaultValues
       ? []

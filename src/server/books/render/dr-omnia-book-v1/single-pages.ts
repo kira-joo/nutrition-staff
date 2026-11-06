@@ -20,10 +20,24 @@ import type { StreamFragment } from "../page-model.interface";
  * `coverImage` itself is never cleared by a mode switch either direction,
  * so toggling back to "uploaded" later needs no re-upload.
  */
-export function renderCoverPage(book: Pick<Book, "title" | "subtitle" | "coverMode" | "coverImage">, identity: ResolvedBookIdentity): StreamFragment {
+export function renderCoverPage(
+  book: Pick<Book, "title" | "subtitle" | "coverMode" | "coverImage">,
+  identity: ResolvedBookIdentity,
+): StreamFragment {
   if (book.coverMode === "uploaded" && book.coverImage) {
     const html = `<div class="book-cover book-cover--uploaded" style="--book-cover-image-url: url('${escapeHtml(book.coverImage.secureUrl)}')"></div>`;
-    return { id: "cover", kind: "singlePage", pageKind: "cover", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: false, numbered: false };
+    return {
+      id: "cover",
+      kind: "singlePage",
+      pageKind: "cover",
+      chapterId: null,
+      html,
+      atomic: true,
+      splittable: false,
+      keepWithNext: false,
+      forceNewPage: false,
+      numbered: false,
+    };
   }
   const html = `
     <div class="book-cover">
@@ -32,7 +46,18 @@ export function renderCoverPage(book: Pick<Book, "title" | "subtitle" | "coverMo
       ${identity.bookLogo ? `<img class="book-cover-logo" src="${escapeHtml(identity.bookLogo.secureUrl)}" alt="" />` : ""}
       ${identity.doctorName ? `<div class="book-cover-doctor">${escapeHtml(identity.doctorName)}</div>` : ""}
     </div>`;
-  return { id: "cover", kind: "singlePage", pageKind: "cover", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: false, numbered: false };
+  return {
+    id: "cover",
+    kind: "singlePage",
+    pageKind: "cover",
+    chapterId: null,
+    html,
+    atomic: true,
+    splittable: false,
+    keepWithNext: false,
+    forceNewPage: false,
+    numbered: false,
+  };
 }
 
 /**
@@ -56,7 +81,10 @@ function buildLegalFooterHtml(identity: ResolvedBookIdentity): string {
     </div>`;
 }
 
-export function renderTitlePage(book: Pick<Book, "title" | "subtitle">, identity: ResolvedBookIdentity): StreamFragment {
+export function renderTitlePage(
+  book: Pick<Book, "title" | "subtitle">,
+  identity: ResolvedBookIdentity,
+): StreamFragment {
   const html = `
     <div class="book-title-page">
       <div class="book-title-page-main">
@@ -66,7 +94,18 @@ export function renderTitlePage(book: Pick<Book, "title" | "subtitle">, identity
       </div>
       ${buildLegalFooterHtml(identity)}
     </div>`;
-  return { id: "title-page", kind: "singlePage", pageKind: "titlePage", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: false, numbered: false };
+  return {
+    id: "title-page",
+    kind: "singlePage",
+    pageKind: "titlePage",
+    chapterId: null,
+    html,
+    atomic: true,
+    splittable: false,
+    keepWithNext: false,
+    forceNewPage: false,
+    numbered: false,
+  };
 }
 
 export function renderAboutDoctorPage(identity: ResolvedBookIdentity): StreamFragment | null {
@@ -78,11 +117,31 @@ export function renderAboutDoctorPage(identity: ResolvedBookIdentity): StreamFra
       ${identity.doctorTitle ? `<div class="book-doctor-title">${escapeHtml(identity.doctorTitle)}</div>` : ""}
       ${identity.doctorBio ? `<p>${escapeHtml(identity.doctorBio)}</p>` : ""}
     </div>`;
-  return { id: "about-doctor-page", kind: "singlePage", pageKind: "aboutDoctorPage", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: true, numbered: true };
+  return {
+    id: "about-doctor-page",
+    kind: "singlePage",
+    pageKind: "aboutDoctorPage",
+    chapterId: null,
+    html,
+    atomic: true,
+    splittable: false,
+    keepWithNext: false,
+    forceNewPage: true,
+    numbered: true,
+  };
 }
 
 export function renderTocReservationFragment(): StreamFragment {
-  return { id: "toc-reservation", kind: "tocReservation", html: "", chapterId: null, atomic: true, splittable: false, keepWithNext: false, forceNewPage: true };
+  return {
+    id: "toc-reservation",
+    kind: "tocReservation",
+    html: "",
+    chapterId: null,
+    atomic: true,
+    splittable: false,
+    keepWithNext: false,
+    forceNewPage: true,
+  };
 }
 
 /**
@@ -108,9 +167,15 @@ export function renderTocReservationFragment(): StreamFragment {
  * since a `singlePage` fragment already always gets its own page in
  * `paginate-book.browser.ts`'s layout loop.
  */
-export function renderChapterOpenerFragment(chapter: Chapter, chapterNumber: number, identity: ResolvedBookIdentity): StreamFragment {
+export function renderChapterOpenerFragment(
+  chapter: Chapter,
+  chapterNumber: number,
+  identity: ResolvedBookIdentity,
+): StreamFragment {
   const hasCustomCover = Boolean(chapter.coverImage);
-  const style = hasCustomCover ? ` style="--book-chapter-cover-url: url('${escapeHtml(chapter.coverImage!.secureUrl)}')"` : "";
+  const style = hasCustomCover
+    ? ` style="--book-chapter-cover-url: url('${escapeHtml(chapter.coverImage!.secureUrl)}')"`
+    : "";
   const html = `
     <div class="book-chapter-opener${hasCustomCover ? " book-chapter-opener--custom-cover" : ""}"${style}>
       <div class="book-chapter-band">
@@ -138,7 +203,10 @@ export function renderChapterOpenerFragment(chapter: Chapter, chapterNumber: num
 export function renderReferencesPage(references: BookReference[]): StreamFragment[] {
   if (references.length === 0) return [];
   const entries = references
-    .map((reference) => `<div class="book-reference-entry"><span class="book-reference-label">${escapeHtml(reference.label)}:</span> ${escapeHtml(reference.text)}</div>`)
+    .map(
+      (reference) =>
+        `<div class="book-reference-entry"><span class="book-reference-label">${escapeHtml(reference.label)}:</span> ${escapeHtml(reference.text)}</div>`,
+    )
     .join("");
   return [
     {
@@ -151,7 +219,16 @@ export function renderReferencesPage(references: BookReference[]): StreamFragmen
       keepWithNext: true,
       forceNewPage: true,
     },
-    { id: "references-list", kind: "content", html: `<div class="book-references-page">${entries}</div>`, chapterId: null, atomic: false, splittable: false, keepWithNext: false, forceNewPage: false },
+    {
+      id: "references-list",
+      kind: "content",
+      html: `<div class="book-references-page">${entries}</div>`,
+      chapterId: null,
+      atomic: false,
+      splittable: false,
+      keepWithNext: false,
+      forceNewPage: false,
+    },
   ];
 }
 
@@ -161,10 +238,24 @@ export function renderReferencesPage(references: BookReference[]): StreamFragmen
  * (`backCoverImage` full-bleed, nothing else rendered) short-circuits
  * before any of the generated-mode identity/contact resolution below.
  */
-export async function renderBackCoverPage(book: Pick<Book, "backCoverMode" | "backCoverImage">, identity: ResolvedBookIdentity): Promise<StreamFragment> {
+export async function renderBackCoverPage(
+  book: Pick<Book, "backCoverMode" | "backCoverImage">,
+  identity: ResolvedBookIdentity,
+): Promise<StreamFragment> {
   if (book.backCoverMode === "uploaded" && book.backCoverImage) {
     const html = `<div class="book-back-cover book-back-cover--uploaded" style="--book-back-cover-image-url: url('${escapeHtml(book.backCoverImage.secureUrl)}')"></div>`;
-    return { id: "back-cover", kind: "singlePage", pageKind: "backCover", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: true, numbered: false };
+    return {
+      id: "back-cover",
+      kind: "singlePage",
+      pageKind: "backCover",
+      chapterId: null,
+      html,
+      atomic: true,
+      splittable: false,
+      keepWithNext: false,
+      forceNewPage: true,
+      numbered: false,
+    };
   }
 
   // `dir="ltr"` on phone/whatsapp/email/website only — never on `address`,
@@ -193,5 +284,16 @@ export async function renderBackCoverPage(book: Pick<Book, "backCoverMode" | "ba
       ${qrSvg ? `<div class="book-back-cover-qr">${qrSvg}</div>` : ""}
       ${identity.bookLogo ? `<img class="book-back-cover-logo" src="${escapeHtml(identity.bookLogo.secureUrl)}" alt="" />` : ""}
     </div>`;
-  return { id: "back-cover", kind: "singlePage", pageKind: "backCover", chapterId: null, html, atomic: true, splittable: false, keepWithNext: false, forceNewPage: true, numbered: false };
+  return {
+    id: "back-cover",
+    kind: "singlePage",
+    pageKind: "backCover",
+    chapterId: null,
+    html,
+    atomic: true,
+    splittable: false,
+    keepWithNext: false,
+    forceNewPage: true,
+    numbered: false,
+  };
 }

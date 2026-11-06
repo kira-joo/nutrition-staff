@@ -11,7 +11,9 @@ export async function removeCampaignBlock(campaignId: string, blockId: string) {
     throw new NotFoundError(`No block exists with id "${blockId}"`, { blockId });
   }
 
-  const nextBlocks = campaign.blocks.filter((block) => block.id !== blockId).map((block, order) => ({ ...block, order }));
+  const nextBlocks = campaign.blocks
+    .filter((block) => block.id !== blockId)
+    .map((block, order) => ({ ...block, order }));
   const saved = await campaignRepository.update({ where: { _id: campaignId } }, { blocks: nextBlocks });
 
   // Awaited, only after the save has already succeeded — a destroy
